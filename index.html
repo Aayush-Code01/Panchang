@@ -690,7 +690,7 @@ function locate(silent){
       const v=addNear(p.coords.latitude,p.coords.longitude);ls.set('near',v);
       if(!silent||document.getElementById('nearOpt').selected){$('loc').value=v;go()}},
     e=>{if(done)return;done=true;clearTimeout(guard);locFail(silent,e&&e.code===1?'Location is turned off for this app. Turn it on in Settings → Privacy & Security → Location Services → Safari Websites.':'Couldn\'t get your location right now. Showing Gurugram.')},
-    {enableHighAccuracy:false,timeout:10000,maximumAge:1800000})}
+    {enableHighAccuracy:false,timeout:10000,maximumAge:600000})}
 function showLocMsg(m){let el=$('locmsg');el.querySelector('span').textContent=m;el.querySelector('.ask').hidden=true;el.hidden=false}
 function hideLocMsg(){$('locmsg').hidden=true}
 $('loc').onchange=()=>{if($('loc').value==='gps')locate(false);else go()};
@@ -700,7 +700,7 @@ let shownToday=todayIST();
 function tick(force){const t=todayIST();if($('date').value===shownToday&&t!==shownToday){$('date').value=t;shownToday=t;go();return}
   shownToday=t;if($('date').value!==t)return;if(!force&&(document.querySelector('.pi.open')||document.querySelector('.past.open')))return;go()}
 setInterval(()=>tick(false),60e3);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick(true)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)return;tick(true);const no=document.getElementById('nearOpt');if(no&&no.selected)locate(true)});
 if(window.Astronomy)go();else window.addEventListener('load',go);
 </script>
 
