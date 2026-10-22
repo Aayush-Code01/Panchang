@@ -42,7 +42,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .app{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 96px;display:flex;flex-direction:column;gap:22px}
 
 /* header */
-.head{padding-block:12px 4px}
+.head{padding-block:28px 4px}
 
 .toprow{display:flex;align-items:flex-end;gap:10px}
 .toprow .t{flex:1;min-width:0}
@@ -669,6 +669,7 @@ function go(){ls.set('loc',$('loc').value);try{render($('date').value)}catch(e){
 $('date').value=todayIST();{const n=ls.get('near',null);if(n){const [a,b]=n.split(',');addNear(a,b)}}
 $('loc').value=ls.get('loc','28.4595,77.0266');if(!$('loc').value||$('loc').value==='gps')$('loc').value='28.4595,77.0266';
 if(document.getElementById('nearOpt')&&document.getElementById('nearOpt').selected)locate(true);
+else if(!ls.get('locAsked',false)){ls.set('locAsked',true);setTimeout(()=>locate(false),600)}
 $('date').onchange=()=>{if($('date').value)go()};
 function addNear(la,lo){let o=document.getElementById('nearOpt');if(!o){o=document.createElement('option');o.id='nearOpt';$('loc').insertBefore(o,$('loc').options[1])}o.value=(+la).toFixed(4)+','+(+lo).toFixed(4);o.textContent='Near me';return o.value}
 function locate(silent){if(!navigator.geolocation){if(!silent){$('loc').value=ls.get('loc','28.4595,77.0266');go()}return}
