@@ -166,6 +166,10 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .foot a{color:inherit}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
+.locmsg{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border-radius:16px;padding:12px 14px;font-size:14.5px;color:var(--text)}
+.locmsg span{flex:1 1 180px}
+.locmsg .ask{height:36px;padding:0 14px;border-radius:18px;background:var(--ink);color:var(--card);font-weight:600;font-size:14px}
+.locmsg .x{width:32px;height:32px;border-radius:50%;color:var(--muted)}
 /* v5 additions */
 .vrow{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}
 .k2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
@@ -311,6 +315,7 @@ details.grp[open] summary::after{transform:rotate(45deg)}
     <div class="strip" id="strip" role="tablist" aria-label="Choose a day"></div>
   </header>
 
+  <div class="locmsg" id="locmsg" hidden><span></span><button type="button" class="ask" id="locAsk">Use my location</button><button type="button" class="x" id="locX" aria-label="Dismiss">✕</button></div>
   <section class="card hero">
     <div class="vrow"><div><div class="k2">Your day</div><div class="verdict" id="verdict">&nbsp;</div></div><span class="vicon" id="vicon"></span></div>
     <p class="why" id="why"></p>
@@ -669,13 +674,25 @@ function go(){ls.set('loc',$('loc').value);try{render($('date').value)}catch(e){
 $('date').value=todayIST();{const n=ls.get('near',null);if(n){const [a,b]=n.split(',');addNear(a,b)}}
 $('loc').value=ls.get('loc','28.4595,77.0266');if(!$('loc').value||$('loc').value==='gps')$('loc').value='28.4595,77.0266';
 if(document.getElementById('nearOpt')&&document.getElementById('nearOpt').selected)locate(true);
-else if(!ls.get('locAsked',false)){ls.set('locAsked',true);setTimeout(()=>locate(false),600)}
+else if(!ls.get('locAsked2',false)){const el=$('locmsg');el.querySelector('span').textContent='Use your location for exact timings wherever you are?';el.querySelector('.ask').hidden=false;el.hidden=false}
 $('date').onchange=()=>{if($('date').value)go()};
-function addNear(la,lo){let o=document.getElementById('nearOpt');if(!o){o=document.createElement('option');o.id='nearOpt';$('loc').insertBefore(o,$('loc').options[1])}o.value=(+la).toFixed(4)+','+(+lo).toFixed(4);o.textContent='Near me';return o.value}
-function locate(silent){if(!navigator.geolocation){if(!silent){$('loc').value=ls.get('loc','28.4595,77.0266');go()}return}
+$('locAsk').onclick=()=>{ls.set('locAsked2',true);hideLocMsg();locate(false)};$('locX').onclick=()=>{ls.set('locAsked2',true);hideLocMsg()};
+function addNear(la,lo){let o=document.getElementById('nearOpt');if(!o){o=document.createElement('option');o.id='nearOpt';$('loc').querySelector('option[value="gps"]').after(o)}o.value=(+la).toFixed(4)+','+(+lo).toFixed(4);o.textContent='Near me';return o.value}
+var locBusy=false;
+function locFail(silent,msg){locBusy=false;const prev=ls.get('loc','28.4595,77.0266');$('loc').value=(prev==='gps'||!prev)?'28.4595,77.0266':prev;if(!$('loc').value)$('loc').value='28.4595,77.0266';go();if(!silent)showLocMsg(msg)}
+function locate(silent){
+  if(!navigator.geolocation){locFail(silent,'Location isn\'t available in this browser.');return}
+  if(locBusy)return;locBusy=true;
   if(!silent)$('cityName').textContent='Locating…';
-  navigator.geolocation.getCurrentPosition(p=>{const v=addNear(p.coords.latitude,p.coords.longitude);ls.set('near',v);if(!silent||$('loc').value==='gps'||document.getElementById('nearOpt').selected){$('loc').value=v;go()}},
-  ()=>{if(!silent){const prev=ls.get('loc','28.4595,77.0266');$('loc').value=prev==='gps'?'28.4595,77.0266':prev;go()}},{timeout:12000,maximumAge:1800000})}
+  let done=false;
+  const guard=setTimeout(()=>{if(!done){done=true;locFail(silent,'Couldn\'t get your location. Check Settings → Privacy & Security → Location Services → Safari Websites → While Using the App.')}},15000);
+  navigator.geolocation.getCurrentPosition(p=>{if(done)return;done=true;clearTimeout(guard);locBusy=false;hideLocMsg();
+      const v=addNear(p.coords.latitude,p.coords.longitude);ls.set('near',v);
+      if(!silent||document.getElementById('nearOpt').selected){$('loc').value=v;go()}},
+    e=>{if(done)return;done=true;clearTimeout(guard);locFail(silent,e&&e.code===1?'Location is turned off for this app. Turn it on in Settings → Privacy & Security → Location Services → Safari Websites.':'Couldn\'t get your location right now. Showing Gurugram.')},
+    {enableHighAccuracy:false,timeout:10000,maximumAge:1800000})}
+function showLocMsg(m){let el=$('locmsg');el.querySelector('span').textContent=m;el.querySelector('.ask').hidden=true;el.hidden=false}
+function hideLocMsg(){$('locmsg').hidden=true}
 $('loc').onchange=()=>{if($('loc').value==='gps')locate(false);else go()};
 $('totop').innerHTML=I.up;$('totop').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 window.addEventListener('scroll',()=>$('totop').classList.toggle('show',scrollY>500),{passive:true});
