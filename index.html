@@ -666,7 +666,7 @@ function render(ds,scrollStrip){
   if(isToday){seq.forEach(x=>{const endT=x.g?x.g.b:x.t;if(endT<=now)past.push(x);else rest.push(x)})}else rest=seq;
   if(past.length){h+=`<div class="past" id="past"><div class="items">${past.map(x=>x.g?item(x.g):sunI(x.t,x.sun)).join('')}</div><button type="button" class="reveal" id="reveal"><span>Show ${past.filter(x=>x.g).length} earlier</span></button></div>`}
   h+=rest.map(x=>x.g?item(x.g,isToday&&now>=x.g.a&&now<x.g.b?' cur':''):sunI(x.t,x.sun)).join('');
-  if(isToday&&!rest.length)h+=`<div class="it"><div class="tm">—</div><div class="bd"><div class="lb">That's it for today</div><div class="tg">Rest well. Tomorrow's plan is one tap away above.</div></div></div>`;
+  if(isToday&&!rest.length)h+=`<div class="it" style="--ci:var(--good-ink);--bgc:var(--good-bg)"><div class="tm">${hm(new Date(Math.max(...S.map(g=>g.b))))}<small>pm</small></div><span class="ic">${I.moon}</span><div class="bd"><div class="lb">That's it for today</div><div class="tg">Rest well. Swipe left to see tomorrow.</div></div></div>`;
   $('list').innerHTML=h;
   $('dayTitle').textContent=isToday?'Coming up':'The day';$('dayIc').innerHTML=I.now;$('pracIc').innerHTML=I.lotus;
   $('dayHint').textContent=isToday?'until 10 pm':'sunrise to 10 pm';
