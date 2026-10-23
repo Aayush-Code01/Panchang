@@ -615,7 +615,8 @@ const fmt=d=>{const x=ist(d);let h=x.getUTCHours(),m=x.getUTCMinutes();const a=h
 const hm=d=>{const x=ist(d);return (x.getUTCHours()%12||12)+':'+String(x.getUTCMinutes()).padStart(2,'0')};
 const apm=d=>ist(d).getUTCHours()>=12?'pm':'am';
 const dur=ms=>{const m=Math.max(1,Math.round(ms/60e3));return m>=60?Math.floor(m/60)+' hr'+(m%60?' '+m%60+' min':''):m+' min'};
-const todayIST=()=>ist(new Date()).toISOString().slice(0,10);
+const calDateIST=()=>ist(new Date()).toISOString().slice(0,10);
+const todayIST=()=>{const d=calDateIST();try{const v=(document.getElementById('loc')||{}).value||'';const [la,lo]=(/^-?\d/.test(v)?v:'28.4595,77.0266').split(',').map(Number);const r=calc(d,la,lo);if(Date.now()<+r.rise){const p=new Date(d+'T00:00:00Z');p.setUTCDate(p.getUTCDate()-1);return p.toISOString().slice(0,10)}}catch(e){}return d};
 const ls={get(k,v){k='d:'+k;try{const x=localStorage.getItem(k);return x==null?v:JSON.parse(x)}catch(e){return v}},set(k,v){k='d:'+k;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const short=s=>s.split(' (')[0], eng=s=>(s.match(/\((.*)\)/)||[,''])[1];
 const C={best:'var(--best)',good:'var(--good)',ok:'var(--ok)',meh:'var(--meh)',avoid:'var(--avoid)'};
@@ -685,7 +686,7 @@ function verdict(r){const tq=TARA[r.tara.name][0],cq=r.chandra.q;
   if(tq==='good'&&cq!=='bad')return['good','Good day','var(--good)'];return['mixed','Balanced day','var(--best)']}
 
 function segments(r){
-  const x=ist(r.rise),end=Math.min(+r.chog[15].b,Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate(),22)-TZ*3600e3);
+  const x=ist(r.rise),end=+r.chog[15].b;
   const cuts=new Set([+r.rise,+r.set,end]);r.chog.forEach(c=>{cuts.add(+c.a);cuts.add(+c.b)});
   [r.rahu,r.yama,r.gulika].concat(r.abhijitValid?[r.abhijit]:[]).forEach(([a,b])=>{cuts.add(+a);cuts.add(+b)});
   const pts=[...cuts].filter(t=>t>=+r.rise&&t<=end).sort((a,b)=>a-b),inR=(t,[a,b])=>t>=+a&&t<+b,S=[];
@@ -708,8 +709,8 @@ function bar(r,S,isToday){
   h+='</div>';
   if(isToday&&now>t0&&now<t1)h+=`<div class="tl-now" style="left:${pc(now)}%" title="Now"></div>`;
   const x=ist(r.rise);let lab='';
-  for(let hr=6;hr<=22;hr+=3){const t=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate(),hr)-TZ*3600e3;if(t<t0||t>t1)continue;
-    lab+=`<span style="left:${pc(t)}%">${hr%12||12}${hr<12?'am':'pm'}</span>`}
+  for(let hr=6;hr<=30;hr+=4){const t=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate(),hr)-TZ*3600e3;if(t<t0||t>t1)continue;
+    lab+=`<span style="left:${pc(t)}%">${hr%12||12}${(hr%24)<12?'am':'pm'}</span>`}
   const sm=`<div class="tl-sun" style="left:${pc(+r.set)}%" title="Sunset ${fmt(r.set)}"></div>`;
   $('tl').innerHTML=h+sm+`<div class="tl-lab">${lab}</div><div class="tl-lift" id="tlLift" hidden></div><div class="tl-bub" id="tlBub" hidden></div>`;
   window._tl={t0,t1,S,r};
@@ -732,7 +733,7 @@ function render(ds,scrollStrip){
   const r=calc(ds,lat,lon),S=segments(r),isToday=ds===todayIST(),now=Date.now();
   const [vc,vt]=verdict(r),tq=TARA[r.tara.name];
   const dt=new Date(ds+'T00:00:00Z'),tom=new Date(+new Date(todayIST()+'T00:00:00Z')+86400e3).toISOString().slice(0,10);
-  $('eyebrow').textContent=dt.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'});
+  $('eyebrow').textContent=dt.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})+(isToday&&ds!==calDateIST()?' · until sunrise':'');
   $('title').textContent=isToday?'Today':ds===tom?'Tomorrow':dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
   strip(ds,lat,lon);dayNav(ds,lat,lon);
 
@@ -776,7 +777,7 @@ function render(ds,scrollStrip){
   if(isToday&&!rest.length)h+=`<div class="it" style="--ci:var(--good-ink);--bgc:var(--good-bg)"><div class="tm">${hm(new Date(Math.max(...S.map(g=>g.b))))}<small>pm</small></div><span class="ic">${I.moon}</span><div class="bd"><div class="lb">That's it for today</div><div class="tg">Rest well. Tap Tomorrow below to plan ahead.</div></div></div>`;
   $('list').innerHTML=h;
   $('dayTitle').textContent=isToday?'Coming up':'The day';$('dayIc').innerHTML=I.now;$('pracIc').innerHTML=I.lotus;
-  $('dayHint').textContent=isToday?'until 10 pm':'sunrise to 10 pm';
+  $('dayHint').textContent=isToday?'until sunrise':'sunrise to sunrise';
   const rv=$('reveal');if(rv)rv.onclick=()=>{const p=$('past');p.classList.toggle('open');rv.firstChild.textContent=p.classList.contains('open')?'Hide earlier':`Show ${past.filter(x=>x.g).length} earlier`};
 
   // practice
