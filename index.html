@@ -193,8 +193,20 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .f-hint{font-size:15px;color:var(--text);max-width:28ch;line-height:1.4}
 .f-close{margin:0 24px calc(20px + env(safe-area-inset-bottom,0px));height:52px;border-radius:26px;background:var(--ink);color:var(--card);font-size:17px;font-weight:600}
 .app{touch-action:pan-y}
-.app > :not(.head):not(.focus):not(.totop){transform:translateX(var(--sx,0px))}
-.app.sw-anim > :not(.head):not(.focus):not(.totop){transition:transform .18s ease-out}
+.app > :not(.head):not(.focus):not(.totop){transform:translateX(var(--sx,0px));opacity:var(--so,1);will-change:transform}
+.app[data-anim="out"] > :not(.head):not(.focus):not(.totop){transition:transform .17s cubic-bezier(.4,0,1,1),opacity .17s}
+.app[data-anim="in"] > :not(.head):not(.focus):not(.totop){transition:transform .3s cubic-bezier(.2,.9,.25,1),opacity .25s}
+.app[data-anim="back"] > :not(.head):not(.focus):not(.totop){transition:transform .28s cubic-bezier(.2,.9,.25,1),opacity .2s}
+.sw-peek{position:fixed;top:46%;z-index:40;padding:9px 14px;border-radius:20px;background:var(--card);color:var(--muted);font-size:14px;font-weight:600;box-shadow:0 6px 18px rgba(30,39,39,.14);opacity:0;pointer-events:none;transition:opacity .15s,background .15s,color .15s,transform .15s;white-space:nowrap}
+.sw-peek.r{right:calc(10px + env(safe-area-inset-right,0px));transform:translateX(calc((1 - var(--px,0)) * 30px))}
+.sw-peek.l{left:calc(10px + env(safe-area-inset-left,0px));transform:translateX(calc((var(--px,0) - 1) * 30px))}
+.sw-peek.on{opacity:1}
+.sw-peek.ready{background:var(--ink);color:var(--card)}
+.sw-toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:45;transform:translate(-50%,-140%);display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 18px;border-radius:22px;background:var(--ink);color:var(--card);box-shadow:0 8px 24px rgba(30,39,39,.22);transition:transform .35s cubic-bezier(.2,.9,.25,1),opacity .25s;opacity:0;pointer-events:none;white-space:nowrap}
+.sw-toast b{font-size:14.5px;font-weight:600}
+.sw-toast span{font-size:12.5px;opacity:.75}
+.sw-toast.show{transform:translate(-50%,0);opacity:1}
+@media (prefers-reduced-motion:reduce){.sw-toast,.sw-peek{transition:none}}
 /* v5 additions */
 .vrow{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}
 .k2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
@@ -755,19 +767,31 @@ $('focusClose').onclick=closeFocus;
 (function(){const el=$('strip');let lastI=null;el.addEventListener('scroll',()=>{const it=el.querySelector('.sd');if(!it)return;const i=Math.round(el.scrollLeft/(it.offsetWidth+2));
   if(Date.now()<(window._stripProg||0)){lastI=i;return}if(lastI!==null&&i!==lastI)hapticTick();lastI=i},{passive:true})})();
 
-(function(){const app=document.querySelector('.app');let x0=0,y0=0,t0=0,mode=null,dx=0;
+(function(){const app=document.querySelector('.app');let x0=0,y0=0,t0=0,mode=null,dx=0,busy=false;
+ const peek=document.createElement('div');peek.className='sw-peek';document.body.appendChild(peek);
+ const toast=document.createElement('div');toast.className='sw-toast';document.body.appendChild(toast);let toastT=null;
  const skip=t=>t.closest('#strip,.tl-wrap,.focus,.tap2,select,input,.totop');
- const setX=(v,anim)=>{app.style.setProperty('--sx',v+'px');app.classList.toggle('sw-anim',!!anim)};
- function shiftDay(n){const d=new Date($('date').value+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);$('date').value=d.toISOString().slice(0,10);go()}
- app.addEventListener('touchstart',e=>{if(e.touches.length!==1||skip(e.target)||!$('focus').hidden){mode='off';return}const p=e.touches[0];x0=p.clientX;y0=p.clientY;t0=Date.now();mode=null;dx=0},{passive:true});
+ const set=(x,o,anim)=>{app.style.setProperty('--sx',x+'px');app.style.setProperty('--so',o);app.classList.toggle('sw-anim',anim||'')&&0;app.dataset.anim=anim||''};
+ const addDays=n=>{const d=new Date($('date').value+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);return d};
+ const lbl=d=>d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'});
+ function showToast(){const d=new Date($('date').value+'T00:00:00Z'),t=todayIST(),ds=$('date').value;
+  const rel=ds===t?'Today · ':'';const v=$('verdict').textContent;
+  toast.innerHTML=`<b>${rel}${d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}</b><span>${v}</span>`;
+  toast.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toast.classList.remove('show'),1400)}
+ app.addEventListener('touchstart',e=>{if(busy||e.touches.length!==1||skip(e.target)||!$('focus').hidden){mode='off';return}const p=e.touches[0];x0=p.clientX;y0=p.clientY;t0=Date.now();mode=null;dx=0},{passive:true});
  app.addEventListener('touchmove',e=>{if(mode==='off'||mode==='v')return;const p=e.touches[0];const ddx=p.clientX-x0,ddy=p.clientY-y0;
-  if(mode===null){if(Math.abs(ddx)<10&&Math.abs(ddy)<10)return;mode=Math.abs(ddx)>Math.abs(ddy)*1.3?'h':'v';if(mode==='v')return}
-  dx=ddx;setX(dx*.6,false)},{passive:true});
- app.addEventListener('touchend',()=>{if(mode!=='h'){mode=null;return}mode=null;const w=app.clientWidth,fast=Date.now()-t0<300;
-  if(Math.abs(dx)>w*.22||(fast&&Math.abs(dx)>50)){const dir=dx<0?1:-1;setX(-dir*w*.5,true);
-    setTimeout(()=>{shiftDay(dir);setX(dir*w*.35,false);requestAnimationFrame(()=>requestAnimationFrame(()=>setX(0,true)))},160)}
-  else setX(0,true)},{passive:true});
- app.addEventListener('touchcancel',()=>{mode=null;setX(0,true)},{passive:true});
+  if(mode===null){if(Math.abs(ddx)<8&&Math.abs(ddy)<8)return;mode=Math.abs(ddx)>Math.abs(ddy)*1.2?'h':'v';if(mode==='v')return;
+    const dir=ddx<0?1:-1;peek.innerHTML=(dir>0?'':'‹ ')+lbl(addDays(dir))+(dir>0?' ›':'');peek.className='sw-peek '+(dir>0?'r':'l')}
+  const w=app.clientWidth;dx=ddx;const lim=w*.45;const x=Math.abs(dx)<lim?dx:Math.sign(dx)*(lim+(Math.abs(dx)-lim)*.3);
+  set(x,1-Math.min(.5,Math.abs(x)/w*.8),'');const ready=Math.abs(dx)>w*.2;
+  peek.classList.add('on');peek.classList.toggle('ready',ready);peek.style.setProperty('--px',Math.min(1,Math.abs(dx)/(w*.2)))},{passive:true});
+ function finish(){if(mode!=='h'){mode=null;return}mode=null;const w=app.clientWidth,fast=Date.now()-t0<280;peek.classList.remove('on','ready');
+  if(Math.abs(dx)>w*.2||(fast&&Math.abs(dx)>45)){busy=true;const dir=dx<0?1:-1;set(-dir*w*.55,0,'out');
+    setTimeout(()=>{const d=addDays(dir);$('date').value=d.toISOString().slice(0,10);go();set(dir*w*.3,0,'');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{set(0,1,'in');showToast();setTimeout(()=>{busy=false;app.dataset.anim=''},320)}))},170)}
+  else set(0,1,'back')}
+ app.addEventListener('touchend',finish,{passive:true});
+ app.addEventListener('touchcancel',()=>{mode=null;peek.classList.remove('on','ready');set(0,1,'back')},{passive:true});
 })();
 setInterval(()=>tick(false),60e3);
 (function(){const el=$('tl');let last=null,hideT=null,active=false;
