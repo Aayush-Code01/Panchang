@@ -918,7 +918,7 @@ document.addEventListener('change',e=>{const inp=e.target.closest('.aud .afile')
   aSet(c.dataset.m,{name:fl.name.replace(/\.[^.]+$/,''),blob:fl}).then(ok=>{c.querySelector('.amsg').textContent=ok?'':'Couldn\'t save the file on this phone.';document.querySelectorAll('.aud[data-m="'+c.dataset.m+'"]').forEach(loadCard)});inp.value=''});
 document.addEventListener('visibilitychange',()=>{});
 function skySVG(r,isToday){
-  const W=400,H=300,HZ=212,next=+r.chog[15].b;let rise=+r.rise,set=+r.set;
+  const W=400,H=300,next=+r.chog[15].b;let rise=+r.rise,set=+r.set;
   let t=isToday?Date.now():(rise+set)/2;
   if(t>=next-60*60e3){const L=set-rise;rise=next;set=next+L}
   const M=60e3,lerp=(a,b,f)=>a+(b-a)*f,clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
@@ -926,105 +926,70 @@ function skySVG(r,isToday){
   if(t<rise-45*M)phase='night';else if(t<rise+35*M)phase='dawn';else if(t<set-75*M)phase='day';else if(t<set-15*M)phase='golden';else if(t<set+40*M)phase='dusk';else phase='night';
   const hr=ist(new Date(t)).getUTCHours();
   let label={night:'Night',dawn:'Sunrise',day:hr<12?'Morning':hr<16?'Afternoon':'Late afternoon',golden:'Golden hour',dusk:'Sunset'}[phase];
-  const P={
-   night:{sky:['#0E1330','#1C2452','#3A3660','#6E5A78'],far:['#3C4068','#262A49'],mid:['#2A2D4A','#1B1D33'],front:['#1A1B2E','#101120'],tree:'#0E0F1E',water:['#2C3360','#111528'],temple:'#1F2038',stone:'#2E3050',flag:'#8B4A33',cloud:'#3B4068',cloudO:.32,cloudEdge:'#4C5179',mist:'#8A86B8',mistO:.12},
-   dawn:{sky:['#3F4C86','#8E7AA0','#E6A58C','#FBDDAE'],far:['#B59DA8','#8E7C96'],mid:['#8E7E8B','#6A5D70'],front:['#5E5467','#48404F'],tree:'#4A4356',water:['#F0BF9E','#8A7FA6'],temple:'#5A4D60',stone:'#73657A',flag:'#E07A3A',cloud:'#F4C8AD',cloudO:.8,cloudEdge:'#E59E86',mist:'#FFE9D6',mistO:.45},
-   day:{sky:['#7FB4D6','#A9D1E6','#D3E7EF','#F3EFE0'],far:['#B9CDD9','#9FB8C7'],mid:['#A9BF92','#86A27F'],front:['#7E9C77','#5F7E5E'],tree:'#587A5A',water:['#BCDCE9','#7FACC4'],temple:'#E1CFAE','stone':'#C2AD86',flag:'#E5782A',cloud:'#FFFFFF',cloudO:.9,cloudEdge:'#DCE9F0',mist:'#FFFFFF',mistO:.25},
-   golden:{sky:['#86A4C5','#C9B8A8','#EFC68E','#F9E4BD'],far:['#D1B89F','#B39B82'],mid:['#BFA67D','#A08A63'],front:['#97865F','#796A4B'],tree:'#746749',water:['#F3D19B','#B09E80'],temple:'#B99E72',stone:'#9C845D',flag:'#DD6A26',cloud:'#FDE8C9',cloudO:.85,cloudEdge:'#F0C48D',mist:'#FFE7BF',mistO:.4},
-   dusk:{sky:['#2E2F62','#6B4F79','#CC7E6A','#F2B785'],far:['#8F7A95','#6F5E7B'],mid:['#6E5972','#53435B'],front:['#4C3F56','#372E40'],tree:'#352C3E',water:['#E6A68A','#52466E'],temple:'#45394B',stone:'#5A4C61',flag:'#B85A32',cloud:'#EBA59B',cloudO:.72,cloudEdge:'#D9837A',mist:'#F6C8B5',mistO:.4}}[phase];
-  const dark=phase==='night'||phase==='dusk';
-  let seed=23;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  const SK={
+    night:['#070B1F','#0F1633','#1A2147','#262C55'],
+    dawn:['#24305E','#5E5D8A','#C48C8C','#F1C49A'],
+    day:['#3F86C6','#6EA6D6','#A6CAE6','#D8E8F1'],
+    golden:['#5B86B3','#93A9C4','#E3BE94','#F6D9A8'],
+    dusk:['#1E2450','#4E4377','#B56F78','#EDA67E']}[phase];
+  let seed=97;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
   let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>
-   <linearGradient id="skg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.sky[0]}"/><stop offset=".38" stop-color="${P.sky[1]}"/><stop offset=".66" stop-color="${P.sky[2]}"/><stop offset="1" stop-color="${P.sky[3]}"/></linearGradient>
-   <linearGradient id="wtr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.water[0]}"/><stop offset="1" stop-color="${P.water[1]}"/></linearGradient>
-   <linearGradient id="farg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.far[0]}"/><stop offset="1" stop-color="${P.far[1]}"/></linearGradient>
-   <linearGradient id="midg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.mid[0]}"/><stop offset="1" stop-color="${P.mid[1]}"/></linearGradient>
-   <linearGradient id="frg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.front[0]}"/><stop offset="1" stop-color="${P.front[1]}"/></linearGradient>
-   <radialGradient id="sung"><stop offset="0" stop-color="#FFF8E3" stop-opacity="1"/><stop offset=".2" stop-color="#FFE2A3" stop-opacity=".7"/><stop offset=".55" stop-color="#FFD58A" stop-opacity=".22"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient>
-   <radialGradient id="moong"><stop offset="0" stop-color="#F3EEDC" stop-opacity=".55"/><stop offset=".5" stop-color="#F3EEDC" stop-opacity=".12"/><stop offset="1" stop-color="#F3EEDC" stop-opacity="0"/></radialGradient>
-   <radialGradient id="lamp"><stop offset="0" stop-color="#FFD27A" stop-opacity=".95"/><stop offset="1" stop-color="#FFB347" stop-opacity="0"/></radialGradient>
-   <radialGradient id="hzg" cx=".5" cy="1"><stop offset="0" stop-color="${P.sky[3]}" stop-opacity=".9"/><stop offset="1" stop-color="${P.sky[3]}" stop-opacity="0"/></radialGradient>
-   <filter id="blur8" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter>
-   <filter id="blur3" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
-  </defs>
-   <rect width="${W}" height="${H}" fill="url(#skg)"/>
-   <rect x="0" y="${HZ-120}" width="${W}" height="120" fill="url(#hzg)"/>`;
-  // stars and milky way
+   <linearGradient id="skg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SK[0]}"/><stop offset=".42" stop-color="${SK[1]}"/><stop offset=".74" stop-color="${SK[2]}"/><stop offset="1" stop-color="${SK[3]}"/></linearGradient>
+   <filter id="soft" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+   <filter id="soft4" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter>
+   <filter id="soft1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation=".7"/></filter>
+   <filter id="soft2m" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter>
+   <filter id="grainm" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .55 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+   <radialGradient id="moonBody" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#F2F0EA"/><stop offset=".6" stop-color="#DCD9D1"/><stop offset="1" stop-color="#ABA79F"/></radialGradient>
+   <radialGradient id="halo"><stop offset="0" stop-color="#DDE3FF" stop-opacity=".28"/><stop offset=".35" stop-color="#C9D2F5" stop-opacity=".1"/><stop offset="1" stop-color="#C9D2F5" stop-opacity="0"/></radialGradient>
+   <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/><stop offset=".08" stop-color="#FFF6DD" stop-opacity=".85"/><stop offset=".3" stop-color="#FFE7B5" stop-opacity=".35"/><stop offset="1" stop-color="#FFE7B5" stop-opacity="0"/></radialGradient>
+   <radialGradient id="hzGlow" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#FFD9A3" stop-opacity=".75"/><stop offset=".5" stop-color="#F7B98C" stop-opacity=".25"/><stop offset="1" stop-color="#F7B98C" stop-opacity="0"/></radialGradient>
+  </defs><rect width="${W}" height="${H}" fill="url(#skg)"/>`;
+  // horizon warmth near sunrise / sunset
+  if(phase==='dawn'||phase==='dusk'||phase==='golden'){const hx=phase==='dawn'?90:310;s+=`<ellipse cx="${hx}" cy="${H+10}" rx="260" ry="150" fill="url(#hzGlow)" opacity="${phase==='golden'?.6:1}"/>`}
+  // stars
   if(phase!=='day'&&phase!=='golden'){
-    const op=phase==='night'?1:.4;
-    if(phase==='night'){s+=`<ellipse cx="190" cy="70" rx="260" ry="26" transform="rotate(-18 190 70)" fill="#CFC7EC" opacity=".08" filter="url(#blur8)"/><ellipse cx="200" cy="66" rx="170" ry="9" transform="rotate(-18 200 66)" fill="#E8E2FF" opacity=".07" filter="url(#blur3)"/>`}
-    for(let i=0;i<110;i++){const x=rnd()*W,y=rnd()*(HZ-60),big=rnd()<.1,rr=big?1.4:rnd()<.5?.9:.55;
-      s+=`<circle class="star" style="animation-delay:${(rnd()*5).toFixed(2)}s" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr}" fill="${big?'#FFF2D0':'#FFF8E7'}" opacity="${(op*(.35+rnd()*.65)).toFixed(2)}"/>`;
-      if(big&&phase==='night')s+=`<path d="M${x-4} ${y}h8M${x} ${y-4}v8" stroke="#FFF2D0" stroke-width=".6" opacity=".5"/>`}
-    if(phase==='night')s+=`<g class="shoot"><line x1="70" y1="30" x2="118" y2="48" stroke="#FFF8E7" stroke-width="1.3" stroke-linecap="round" opacity=".9"/><line x1="86" y1="36" x2="118" y2="48" stroke="#FFF8E7" stroke-width="2.2" stroke-linecap="round" opacity=".5"/></g>`;
+    const n=phase==='night'?220:60,op=phase==='night'?1:.35;
+    for(let i=0;i<n;i++){const x=rnd()*W,y=Math.pow(rnd(),1.25)*H*.82,m=rnd(),rr=m>.985?1.25:m>.93?.85:m>.6?.55:.38,o=(op*(m>.93?.95:.35+rnd()*.5)).toFixed(2);
+      s+=`<circle${m>.9?` class="star" style="animation-delay:${(rnd()*6).toFixed(2)}s"`:''} cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr}" fill="#FFFFFF" opacity="${o}"/>`}
+    if(phase==='night')s+=`<g class="shoot"><line x1="60" y1="40" x2="104" y2="56" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" opacity=".8"/></g>`;
   }
-  // sun
-  let sunX=null,sunY=null;
-  if(t>=rise-35*M&&t<=set+30*M){const f=(t-rise)/(set-rise),fc=clamp(f,0,1);sunX=lerp(28,W-28,clamp(f,-.03,1.03));sunY=HZ-Math.sin(Math.PI*fc)*150+(f<0||f>1?14:0);
-    if(phase!=='day'){for(let a=0;a<16;a++){const ang=a*22.5*Math.PI/180;s+=`<line x1="${sunX}" y1="${sunY}" x2="${(sunX+Math.cos(ang)*170).toFixed(1)}" y2="${(sunY+Math.sin(ang)*170).toFixed(1)}" stroke="#FFE3A8" stroke-width="${a%2?5:9}" opacity="${a%2?.05:.08}"/>`}}
-    s+=`<circle cx="${sunX}" cy="${sunY}" r="90" fill="url(#sung)"/><circle cx="${sunX}" cy="${sunY}" r="15" fill="${phase==='day'?'#FFF4D4':'#FFD27A'}"/><circle cx="${sunX}" cy="${sunY}" r="19" fill="none" stroke="#FFF4D4" stroke-opacity=".35" stroke-width="2"/>`}
-  // moon
-  let moonX=null,moonY=null;
+  // sun (soft bloom, kept within the upper-middle of the sky)
+  if(t>=rise-30*M&&t<=set+25*M&&phase!=='night'){const f=clamp((t-rise)/(set-rise),-.05,1.05);
+    const x=lerp(70,W-70,clamp(f,0,1)),y=phase==='day'?lerp(150,92,Math.sin(Math.PI*clamp(f,0,1))):H*.62+(phase==='dusk'||phase==='dawn'?24:0);
+    s+=`<circle cx="${x}" cy="${y}" r="${phase==='day'?150:120}" fill="url(#sunGlow)" opacity="${phase==='day'?.9:.8}"/>`;
+    if(phase!=='dusk')s+=`<circle cx="${x}" cy="${y}" r="${phase==='day'?11:13}" fill="#FFFDF4" filter="url(#soft1)" opacity="${phase==='dawn'?.85:1}"/>`}
+  // moon: textured, real phase, sits in the middle band (not at the top edge)
   if(phase==='night'||phase==='dusk'||phase==='dawn'){
     const e=((r.tithi.idx+.5)*12)%360,k=(1-Math.cos(e*Math.PI/180))/2,wax=e<180;
-    let f;if(t>=+r.set&&t<next){f=(t-r.set)/(next-r.set)}else{f=.9}f=clamp(f,0,1);
-    const R=15;moonX=lerp(44,280,f);moonY=HZ-76-Math.sin(Math.PI*f)*80;const cx=moonX,cy=moonY;
+    let f;if(t>=+r.set&&t<next){f=(t-r.set)/(next-r.set)}else{f=.85}f=clamp(f,0,1);
+    const R=26,cx=lerp(110,300,f),cy=lerp(128,104,Math.sin(Math.PI*f));
     const rx=Math.abs(1-2*k)*R,top=`${cx} ${cy-R}`,bot=`${cx} ${cy+R}`;
     const d=wax?`M${top} A${R} ${R} 0 0 1 ${bot} A${rx} ${R} 0 0 ${k<.5?0:1} ${top}Z`:`M${top} A${R} ${R} 0 0 0 ${bot} A${rx} ${R} 0 0 ${k<.5?1:0} ${top}Z`;
-    s+=`<circle cx="${cx}" cy="${cy}" r="${56+k*18}" fill="url(#moong)"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="#F3EEDC" opacity=".12"/>
-     <clipPath id="mclip"><path d="${d}"/></clipPath><g clip-path="url(#mclip)"><circle cx="${cx}" cy="${cy}" r="${R}" fill="#F8F2E1"/>
-     <circle cx="${cx-5}" cy="${cy-4}" r="3.2" fill="#DDD4BC" opacity=".75"/><circle cx="${cx+4}" cy="${cy+5}" r="2.3" fill="#DDD4BC" opacity=".65"/><circle cx="${cx+5.5}" cy="${cy-6}" r="1.5" fill="#DDD4BC" opacity=".6"/><circle cx="${cx-2}" cy="${cy+8}" r="1.3" fill="#DDD4BC" opacity=".5"/><circle cx="${cx-8}" cy="${cy+3}" r="1.1" fill="#DDD4BC" opacity=".5"/></g>`;
+    const maria=[[-9,-8,7,5,.5],[-1,-11,5,3.5,.38],[7,-6,6,5,.42],[10,4,7.5,8,.5],[-2,5,6,4.5,.36],[-13,3,3.5,5,.34],[3,14,4,2.5,.28],[-7,15,2.5,2,.3]];
+    const craters=[[-6,14,2.2],[12,12,1.6],[-15,-6,1.4],[7,-16,1.3],[16,8,1.1]];
+    s+=`<circle cx="${cx}" cy="${cy}" r="${R*5.2}" fill="url(#halo)" opacity="${.35+k*.65}"/>
+     <mask id="mlit"><rect x="0" y="0" width="${W}" height="${H}" fill="#000"/><path d="${d}" fill="#fff" filter="url(#soft1)"/></mask>
+     <clipPath id="mdisk"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>
+     <circle cx="${cx}" cy="${cy}" r="${R}" fill="#8E96B8" opacity="${phase==='night'?.07:.05}"/>
+     <g mask="url(#mlit)"><g clip-path="url(#mdisk)">
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#moonBody)"/>
+      <g filter="url(#soft2m)" fill="#77736C">${maria.map(([dx,dy,a,b,o])=>`<ellipse cx="${cx+dx}" cy="${cy+dy}" rx="${a}" ry="${b}" opacity="${o}"/>`).join('')}</g>
+      <rect x="${cx-R}" y="${cy-R}" width="${2*R}" height="${2*R}" fill="#fff" filter="url(#grainm)" opacity=".5"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#6E6A64" stroke-opacity=".18" stroke-width="3"/>
+     </g></g>`;
     label+=' · '+(k<.03?'New moon':k>.97?'Full moon':(wax?'Waxing':'Waning')+' moon '+Math.round(k*100)+'%');
   }
-  // clouds
-  const cloud=(x,y,sc,o)=>`<g class="cloud" transform="translate(${x} ${y}) scale(${sc})" opacity="${o}"><path d="M-34 8 a13 13 0 0 1 9-16 a17 17 0 0 1 30-7 a14 14 0 0 1 24 9 a11 11 0 0 1 3 14z" fill="${P.cloud}"/><path d="M-34 8 h66 a11 11 0 0 1-4 4 h-59z" fill="${P.cloudEdge}" opacity=".7"/><path d="M-20 -6 a14 14 0 0 1 22 -4" fill="none" stroke="#FFFFFF" stroke-opacity="${dark?.08:.45}" stroke-width="2.5" stroke-linecap="round"/></g>`;
-  s+=cloud(296,58,1.25,P.cloudO)+cloud(140,92,.8,P.cloudO*.85)+cloud(48,46,.6,P.cloudO*.7)+cloud(236,36,.45,P.cloudO*.5);
-  // birds
-  if(phase==='day'||phase==='golden'||phase==='dawn'){const bc=phase==='day'?'#56676F':'#4A3E44';[[230,112,1],[246,105,.85],[258,116,.7],[118,78,.6],[128,86,.5]].forEach(([x,y,sc])=>{s+=`<path class="bird" d="M${x-6*sc} ${y} q${3*sc} ${-3.4*sc} ${6*sc} 0 q${3*sc} ${-3.4*sc} ${6*sc} 0" fill="none" stroke="${bc}" stroke-width="1.2" stroke-linecap="round"/>`})}
-  // far ranges
-  s+=`<path d="M0 176 L30 160 L58 169 L90 142 L118 162 L150 150 L182 168 L214 146 L246 164 L272 154 L306 170 L338 148 L368 164 L400 154 V220 H0Z" fill="url(#farg)" opacity=".75"/>
-   <path d="M0 188 L36 176 L70 184 L104 168 L140 182 L176 172 L212 186 L250 170 L286 184 L322 174 L360 186 L400 178 V222 H0Z" fill="url(#farg)"/>`;
-  s+=`<rect class="mist" x="-30" y="176" width="460" height="22" fill="${P.mist}" opacity="${P.mistO}" filter="url(#blur8)"/>`;
-  // mid hills + back trees
-  s+=`<path d="M0 206 C40 194 80 198 120 202 S200 192 240 198 S330 190 400 200 V236 H0Z" fill="url(#midg)"/>`;
-  const tree=(x,y,h,c)=>`<path d="M${x} ${y-h} C${x+h*.34} ${y-h*.55} ${x+h*.32} ${y-h*.1} ${x} ${y} C${x-h*.32} ${y-h*.1} ${x-h*.34} ${y-h*.55} ${x} ${y-h}Z" fill="${c}"/>`;
-  const palm=(x,y,h,c)=>{let p=`<path d="M${x} ${y} C${x+1} ${y-h*.5} ${x+2} ${y-h*.8} ${x+3} ${y-h}" stroke="${c}" stroke-width="1.6" fill="none"/>`;for(let a=0;a<6;a++){const ang=-150+a*52,rad=ang*Math.PI/180,L=h*.55;p+=`<path d="M${x+3} ${y-h} q${Math.cos(rad)*L*.5} ${Math.sin(rad)*L*.5-4} ${Math.cos(rad)*L} ${Math.sin(rad)*L+3}" stroke="${c}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`}return p};
-  const midTree=dark?'#1C1E34':P.tree;
-  [[16,204,10],[25,203,14],[152,198,9],[163,197,13],[214,196,10],[226,197,8]].forEach(([x,y,h])=>s+=tree(x,y,h,midTree));
-  // temple complex (right)
-  const tx=318,ty=204,tc=P.temple,st=P.stone;
-  s+=`<g>
-    <rect x="${tx-30}" y="${ty-7}" width="62" height="9" rx="1" fill="${st}"/>
-    <rect x="${tx-26}" y="${ty-20}" width="18" height="13" fill="${tc}"/><path d="M${tx-28} ${ty-20} h22 l-3 -6 h-16z" fill="${st}"/><rect x="${tx-19}" y="${ty-14}" width="4" height="7" rx="2" fill="${dark?'#1A140E':'#4A3B2A'}" opacity=".85"/>
-    <path d="M${tx-4} ${ty-7} V${ty-30} C${tx-4} ${ty-46} ${tx+3} ${ty-58} ${tx+9} ${ty-70} C${tx+15} ${ty-58} ${tx+22} ${ty-46} ${tx+22} ${ty-30} V${ty-7}Z" fill="${tc}"/>
-    <path d="M${tx-1} ${ty-32} h20 M${tx} ${ty-42} h18 M${tx+2} ${ty-52} h14 M${tx+5} ${ty-61} h8" stroke="${st}" stroke-width="1.3"/>
-    <path d="M${tx+9} ${ty-70} v-3" stroke="${st}" stroke-width="2"/><ellipse cx="${tx+9}" cy="${ty-72}" rx="5" ry="2" fill="${st}"/><circle cx="${tx+9}" cy="${ty-77}" r="2" fill="${phase==='day'||phase==='golden'?'#D9AE4C':st}"/>
-    <path d="M${tx+9} ${ty-77} V${ty-94}" stroke="${st}" stroke-width="1"/><path class="flag" d="M${tx+9} ${ty-94} l13 4 l-13 4z" fill="${P.flag}"/>
-    <rect x="${tx+24}" y="${ty-18}" width="12" height="11" fill="${tc}"/><path d="M${tx+23} ${ty-18} h14 l-2 -5 h-10z" fill="${st}"/>
-    <path d="M${tx+5} ${ty-7} v-11 a4 4 0 0 1 8 0 v11z" fill="${dark?'#1A140E':'#4A3B2A'}" opacity=".9"/>
-    ${dark?`<circle cx="${tx+9}" cy="${ty-11}" r="12" fill="url(#lamp)"/><circle cx="${tx+9}" cy="${ty-10.5}" r="1.5" fill="#FFE3A0"/>`:''}
-  </g>`;
-  // front hill + trees
-  s+=`<path d="M0 226 C50 216 90 222 140 220 S230 212 280 218 S360 214 400 220 V244 H0Z" fill="url(#frg)"/>`;
-  [[52,220,15],[64,219,20],[74,220,12],[250,216,13],[262,215,18],[380,216,14],[392,217,11]].forEach(([x,y,h])=>s+=tree(x,y,h,P.tree));
-  s+=palm(196,218,26,P.tree)+palm(208,219,21,P.tree);
-  // banyan
-  s+=`<g fill="${P.tree}"><ellipse cx="112" cy="204" rx="22" ry="11"/><ellipse cx="100" cy="209" rx="14" ry="8"/><ellipse cx="126" cy="208" rx="13" ry="7"/><rect x="110" y="208" width="4" height="12"/><rect x="104" y="211" width="1.6" height="9"/><rect x="118" y="212" width="1.6" height="8"/></g>`;
-  // ghat steps on the left into the water
-  s+=`<g><path d="M0 222 h78 l6 5 h-84z M0 227 h70 l6 5 h-76z M0 232 h62 l6 5 h-68z M0 237 h54 l6 5 h-60z" fill="${st}"/><path d="M0 222 h78 l6 5 h-84z M0 232 h62 l6 5 h-68z" fill="${tc}" opacity=".5"/>
-    <rect x="40" y="208" width="3" height="14" fill="${tc}"/><rect x="60" y="210" width="3" height="12" fill="${tc}"/><path d="M38 208 h7 M58 210 h7" stroke="${st}" stroke-width="2"/></g>`;
-  // water
-  s+=`<rect x="0" y="242" width="${W}" height="${H-242}" fill="url(#wtr)"/><path d="M0 242 H${W}" stroke="#FFFFFF" stroke-opacity=".2"/>`;
-  const rx2=sunX!=null&&phase!=='night'?sunX:moonX;
-  if(rx2!=null){const c=sunX!=null&&phase!=='night'?'#FFE7B0':'#F4EEDC';for(let i=0;i<6;i++){const w=26-i*3.6,y=247+i*3.6;s+=`<rect class="shim" style="animation-delay:${i*.4}s" x="${(rx2-w/2).toFixed(1)}" y="${y}" width="${w}" height="1.5" rx=".75" fill="${c}" opacity="${(.7-i*.09).toFixed(2)}"/>`}}
-  for(let i=0;i<9;i++){const x=rnd()*W,y=246+rnd()*22,w=10+rnd()*24;s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="1" rx=".5" fill="#FFFFFF" opacity=".16"/>`}
-  // reflections of temple + trees (soft)
-  s+=`<g opacity="${dark?.14:.2}" transform="translate(0 ${484}) scale(1 -1)" filter="url(#blur3)"><path d="M${tx-4} ${ty-7} V${ty-30} C${tx-4} ${ty-46} ${tx+3} ${ty-58} ${tx+9} ${ty-70} C${tx+15} ${ty-58} ${tx+22} ${ty-46} ${tx+22} ${ty-30} V${ty-7}Z" fill="${tc}"/></g>`;
-  // lotus by day, diya by night
-  if(!dark){s+=`<g transform="translate(150 262)"><ellipse cx="0" cy="2" rx="12" ry="3.5" fill="#6E9A6F" opacity=".8"/><path d="M-6 0 q6 -10 12 0 q-6 4 -12 0z" fill="#F0A7B5"/><path d="M-9 1 q4 -8 9 -4 q-2 5 -9 4z M9 1 q-4 -8 -9 -4 q2 5 9 4z" fill="#F7C2CC"/></g><g transform="translate(58 256) scale(.7)"><ellipse cx="0" cy="2" rx="12" ry="3.5" fill="#6E9A6F" opacity=".8"/><path d="M-6 0 q6 -10 12 0 q-6 4 -12 0z" fill="#F0A7B5"/></g>`}
-  else{s+=`<g class="diya" transform="translate(60 256)"><ellipse cx="0" cy="0" rx="7" ry="2.6" fill="#8A4A2A"/><ellipse cx="0" cy="-.6" rx="5" ry="1.6" fill="#B06A3C"/><circle cx="0" cy="-3" r="7" fill="url(#lamp)" opacity=".8"/><path d="M0 -2 q-2 -3 0 -6 q2 3 0 6z" fill="#FFE39A"/><rect x="-6" y="3" width="12" height="1.2" rx=".6" fill="#FFD27A" opacity=".35"/></g>`}
-  // fireflies
-  if(phase==='night'){[[96,214],[150,208],[200,206],[236,212],[300,210],[176,230]].forEach(([x,y],i)=>s+=`<circle class="fly" style="animation-delay:${i*.7}s" cx="${x}" cy="${y}" r="1.3" fill="#FFE68A"/>`)}
+  // soft, photographic clouds
+  const C={day:['#FFFFFF','#C9D9E6',.9],golden:['#FFF1DC','#D8AE8C',.85],dusk:['#F3B6A6','#6E4F72',.75],dawn:['#F6CDB6','#7C6E93',.7],night:['#5A6188','#1E2448',.22]}[phase];
+  const cloud=(x,y,sc,o)=>{let g=`<g class="cloud" transform="translate(${x} ${y}) scale(${sc})" opacity="${(C[2]*o).toFixed(2)}">`;
+    g+=`<g filter="url(#soft)">`;[[-40,10,46,14],[-6,2,40,18],[30,8,38,14],[0,16,70,12]].forEach(([dx,dy,a,b])=>g+=`<ellipse cx="${dx}" cy="${dy}" rx="${a}" ry="${b}" fill="${C[0]}"/>`);
+    g+=`<ellipse cx="0" cy="22" rx="70" ry="8" fill="${C[1]}" opacity=".7"/></g>`;
+    g+=`<g filter="url(#soft4)">`;[[-22,4,18,10],[4,-4,20,13],[24,4,15,9]].forEach(([dx,dy,a,b])=>g+=`<ellipse cx="${dx}" cy="${dy}" rx="${a}" ry="${b}" fill="${C[0]}" opacity=".9"/>`);g+=`</g></g>`;return g};
+  if(phase==='day')s+=cloud(300,70,1,1)+cloud(90,150,.75,.85)+cloud(220,190,.6,.6);
+  else if(phase==='golden')s+=cloud(290,80,1,.9)+cloud(80,170,.8,.7);
+  else if(phase==='dusk'||phase==='dawn')s+=cloud(300,170,1.1,.85)+cloud(60,200,.8,.7);
+  else s+=cloud(320,210,1.2,1)+cloud(60,235,.9,.8);
   s+=`</svg><span class="sky-l">${label}</span>`;
   window.SKY_PHASE=phase;
   return s}
