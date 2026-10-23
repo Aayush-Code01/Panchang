@@ -282,6 +282,10 @@ html,body{overflow-x:clip}
 .amsg{font-size:13px;color:var(--avoid-ink);margin-top:6px}.amsg:empty{display:none}
 .acredit{font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.acredit:empty{display:none}.acredit a{color:inherit}
 .aud.loading .ap{opacity:.6}
+.sky{position:relative;margin:-18px -18px 16px;height:150px;border-radius:20px 20px 0 0;overflow:hidden;background:#CFE5EC}
+.sky svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sky-l{position:absolute;left:14px;bottom:10px;font-size:12px;font-weight:600;color:#FFFDF9;background:rgba(20,18,15,.28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);padding:3px 10px;border-radius:999px}
+@media (prefers-reduced-motion:no-preference){.sky .star{animation:tw 4s ease-in-out infinite}@keyframes tw{50%{opacity:.25}}}
 /* v5 additions */
 .vrow{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}
 .k2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
@@ -430,6 +434,7 @@ html,body{overflow-x:clip}
 
   <div class="locmsg" id="locmsg" hidden><span></span><button type="button" class="ask" id="locAsk">Use my location</button><button type="button" class="x" id="locX" aria-label="Dismiss">✕</button></div>
   <section class="card hero">
+    <div class="sky" id="sky"></div>
     <div class="vrow"><div><div class="k2">Your day</div><div class="verdict" id="verdict">&nbsp;</div></div><span class="vicon" id="vicon"></span></div>
     <p class="why" id="why"></p>
     <div class="tl-head"><span id="rise"></span><span id="set"></span></div>
@@ -736,7 +741,7 @@ function render(ds,scrollStrip){
   $('title').textContent=isToday?'Today':ds===tom?'Tomorrow':dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
   strip(ds,lat,lon);dayNav(ds,lat,lon);
 
-  bar(r,S,isToday);
+  bar(r,S,isToday);try{$('sky').innerHTML=skySVG(r,isToday)}catch(e){}
   $('vicon').innerHTML=VI[vc];$('vicon').className='vicon v-'+vc;
   $('verdict').textContent=vt;
   $('rise').innerHTML=I.sunrise+' Sunrise '+fmt(r.rise);$('set').innerHTML=I.sunset+' Sunset '+fmt(r.set);
@@ -940,6 +945,51 @@ document.addEventListener('change',e=>{const inp=e.target.closest('.aud .afile')
   if(!/^audio\//.test(fl.type)&&!/\.(mp3|m4a|aac|wav|ogg|opus)$/i.test(fl.name)){c.querySelector('.amsg').textContent='Please choose an audio file, such as an MP3.';return}
   aSet(c.dataset.m,{name:fl.name.replace(/\.[^.]+$/,''),blob:fl}).then(ok=>{c.querySelector('.amsg').textContent=ok?'':'Couldn\'t save the file on this phone.';document.querySelectorAll('.aud[data-m="'+c.dataset.m+'"]').forEach(loadCard)});inp.value=''});
 document.addEventListener('visibilitychange',()=>{});
+function skySVG(r,isToday){
+  const W=400,H=150,HZ=118,next=+r.chog[15].b;let rise=+r.rise,set=+r.set;
+  let t=isToday?Date.now():(rise+set)/2;
+  if(t>=next-60*60e3){const L=set-rise;rise=next;set=next+L}
+  const M=60e3,lerp=(a,b,f)=>a+(b-a)*f;
+  let phase,label;
+  if(t<rise-45*M){phase='night'}
+  else if(t<rise+35*M){phase='dawn'}
+  else if(t<set-75*M){phase='day'}
+  else if(t<set-15*M){phase='golden'}
+  else if(t<set+40*M){phase='dusk'}
+  else phase='night';
+  const hr=ist(new Date(t)).getUTCHours();
+  label={night:'Night',dawn:'Sunrise',day:hr<12?'Morning':hr<16?'Afternoon':'Late afternoon',golden:'Golden hour',dusk:'Sunset'}[phase];
+  const G={night:['#151B33','#2B3156','#5A4F72'],dawn:['#55608E','#E3A487','#F7D9A8'],day:['#93C1D9','#CFE5EC','#F6EEDD'],golden:['#9DB8D0','#EFCB98','#F8E3BE'],dusk:['#3F3F6E','#CF7F69','#F0B484']}[phase];
+  const HL={night:['#2A2B40','#1E2033'],dawn:['#9C8C86','#6F6672'],day:['#B9C6A4','#8FA788'],golden:['#C7B48B','#9E9474'],dusk:['#7E6470','#56495C']}[phase];
+  let s=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs>
+   <linearGradient id="skg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${G[0]}"/><stop offset=".62" stop-color="${G[1]}"/><stop offset="1" stop-color="${G[2]}"/></linearGradient>
+   <radialGradient id="sung"><stop offset="0" stop-color="#FFF4D6" stop-opacity=".95"/><stop offset=".35" stop-color="#FFD58A" stop-opacity=".55"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient>
+   <radialGradient id="moong"><stop offset="0" stop-color="#F3EEDC" stop-opacity=".45"/><stop offset="1" stop-color="#F3EEDC" stop-opacity="0"/></radialGradient></defs>
+   <rect width="${W}" height="${H}" fill="url(#skg)"/>`;
+  if(phase==='night'||phase==='dawn'||phase==='dusk'){
+    let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+    const op=phase==='night'?1:.45;
+    for(let i=0;i<46;i++){const x=rnd()*W,y=rnd()*(HZ-30),rr=rnd()<.15?1.3:.7;s+=`<circle class="star" style="animation-delay:${(rnd()*4).toFixed(2)}s" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr}" fill="#FFF8E7" opacity="${(op*(.45+rnd()*.55)).toFixed(2)}"/>`}
+  }
+  // sun
+  if(t>=rise-30*M&&t<=set+30*M){const f=Math.min(1.04,Math.max(-.04,(t-rise)/(set-rise)));const x=lerp(26,W-26,f),y=HZ-Math.sin(Math.PI*Math.min(1,Math.max(0,f)))*92+ (f<0||f>1?10:0);
+    s+=`<circle cx="${x}" cy="${y}" r="46" fill="url(#sung)"/><circle cx="${x}" cy="${y}" r="13" fill="${phase==='day'?'#FFF1C9':'#FFD27A'}"/>`}
+  // moon (night only) with real phase
+  if(phase==='night'||phase==='dusk'||phase==='dawn'){
+    const e=((r.tithi.idx+.5)*12)%360,k=(1-Math.cos(e*Math.PI/180))/2,wax=e<180;
+    let f;if(t>=+r.set&&t<next){f=(t-r.set)/(next-r.set)}else{f=.9}f=Math.min(1,Math.max(0,f));
+    const R=11,cx=lerp(60,W-60,f),cy=HZ-34-Math.sin(Math.PI*f)*50;
+    const rx=Math.abs(1-2*k)*R,top=`${cx} ${cy-R}`,bot=`${cx} ${cy+R}`;
+    let d;if(wax){d=`M${top} A${R} ${R} 0 0 1 ${bot} A${rx} ${R} 0 0 ${k<.5?0:1} ${top}Z`}else{d=`M${top} A${R} ${R} 0 0 0 ${bot} A${rx} ${R} 0 0 ${k<.5?1:0} ${top}Z`}
+    s+=`<circle cx="${cx}" cy="${cy}" r="34" fill="url(#moong)"/><circle cx="${cx}" cy="${cy}" r="${R}" fill="#F3EEDC" opacity=".14"/><path d="${d}" fill="#F6F0DE"/>`;
+    label+= ' · '+(k<.03?'New moon':k>.97?'Full moon':(wax?'Waxing':'Waning')+' moon '+Math.round(k*100)+'%');
+  }
+  if(phase==='day'||phase==='golden'){s+=`<g fill="#FFFFFF" opacity="${phase==='day'?.55:.35}"><ellipse cx="300" cy="30" rx="34" ry="7"/><ellipse cx="318" cy="24" rx="20" ry="8"/></g>`}
+  s+=`<path d="M0 ${HZ-6} C60 ${HZ-26} 120 ${HZ-4} 190 ${HZ-18} S320 ${HZ-30} ${W} ${HZ-12} V${H} H0Z" fill="${HL[0]}"/>
+   <path d="M0 ${HZ+8} C80 ${HZ-6} 150 ${HZ+12} 230 ${HZ+2} S350 ${HZ-4} ${W} ${HZ+6} V${H} H0Z" fill="${HL[1]}"/>`;
+  s+=`</svg><span class="sky-l">${label}</span>`;
+  return s}
+
 setInterval(()=>tick(false),60e3);
 (function(){const el=$('tl');let last=null,hideT=null,active=false;
  const tick1=hapticTick;
