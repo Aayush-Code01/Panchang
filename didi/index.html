@@ -304,7 +304,7 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .row .act.danger{color:var(--avoid-ink)}
 .sheet .ver{text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px}
 
-.sky .lyr{position:absolute;inset:-12% -14%;will-change:transform;transform:translate3d(0,0,0)}
+.sky .lyr{position:absolute;inset:0;will-change:transform;transform:translate3d(0,0,0)}
 .sky .lyr svg{position:absolute;inset:0;width:100%;height:100%}
 .tilt-ask{position:absolute;right:14px;top:14px;z-index:2;font-size:12.5px;font-weight:600;color:#FFFDF9;background:rgba(20,18,15,.3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:4px 11px;border-radius:999px}
 .sky-l{z-index:2}
@@ -463,10 +463,6 @@ details.grp[open] summary::after{transform:rotate(45deg)}
     <div class="grp-b">
       <div class="row"><span>Bell when chanting is done<small>Rings even on silent</small></span><input type="checkbox" class="tgl" id="tglBell" aria-label="Bell when chanting is done"></div>
       <div class="row"><span>Show special days<small>Ekadashi, Pradosh, full moon and more</small></span><input type="checkbox" class="tgl" id="tglSpecial" aria-label="Show special days"></div>
-    </div>
-    <div class="grp-t">Motion</div>
-    <div class="grp-b">
-      <div class="row"><span>Sky moves with your phone<small>Tilt to feel the depth</small></span><input type="checkbox" class="tgl" id="tglTilt" aria-label="Sky moves with your phone"></div>
     </div>
     <div class="grp-t">Data</div>
     <div class="grp-b">
@@ -877,7 +873,7 @@ function applyTheme(){const m=ls.get('theme','light'),dark=m==='dark'||(m==='aut
 applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(ls.get('theme','light')==='auto')applyTheme()})}catch(e){}
 function syncSettings(){const set=(id,v)=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
   set('segTheme',ls.get('theme','light'));set('segSize',ls.get('size','normal'));
-  $('tglBell').checked=ls.get('bell',true);$('tglTilt').checked=ls.get('tilt',true)&&!ls.get('tiltDenied',false);$('tglSpecial').checked=ls.get('special',true);
+  $('tglBell').checked=ls.get('bell',true);$('tglSpecial').checked=ls.get('special',true);
   const no=document.getElementById('nearOpt');$('tglGps').checked=!!(no&&no.selected);$('clearAll').textContent='Clear';$('clearAll').dataset.arm=''}
 function openSheet(){syncSettings();$('sheetBg').classList.add('show');$('sheet').classList.add('show');$('sheet').setAttribute('aria-hidden','false')}
 function closeSheet(){$('sheetBg').classList.remove('show');$('sheet').classList.remove('show');$('sheet').setAttribute('aria-hidden','true')}
@@ -885,7 +881,6 @@ $('gearBtn').onclick=openSheet;$('sheetBg').onclick=closeSheet;$('sheetDone').on
 $('segTheme').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('theme',b.dataset.v);applyTheme();applyAmbience(window.SKY_PHASE);syncSettings()};
 $('segSize').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('size',b.dataset.v);applyTheme();syncSettings()};
 $('tglBell').onchange=()=>{ls.set('bell',$('tglBell').checked);document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
-$('tglTilt').onchange=()=>{const v=$('tglTilt').checked;ls.set('tilt',v);if(v){ls.set('tiltDenied',false);tiltStart()}else tiltStop()};
 $('tglSpecial').onchange=()=>{ls.set('special',$('tglSpecial').checked);go()};
 $('tglGps').onchange=()=>{if($('tglGps').checked){ls.set('locAsked2',true);hideLocMsg();locate(false)}else{$('loc').value='28.4595,77.0266';go()}};
 $('resetToday').onclick=()=>{const d=$('date').value;ls.set('ritual:'+d,[]);ls.set('japa:'+d,{});go();$('resetToday').textContent='Done';setTimeout(()=>$('resetToday').textContent='Reset',1200)};
@@ -1047,11 +1042,11 @@ var TILT={x:0,y:0,tx:0,ty:0,run:false,base:null,on:false};
 function tiltLoop(){TILT.x+=(TILT.tx-TILT.x)*.1;TILT.y+=(TILT.ty-TILT.y)*.1;
   document.querySelectorAll('#sky .lyr').forEach(el=>{const d=+el.dataset.d;el.style.transform=`translate3d(${(-TILT.x*d).toFixed(2)}px,${(-TILT.y*d*.8).toFixed(2)}px,0)`});
   if(Math.abs(TILT.tx-TILT.x)>.001||Math.abs(TILT.ty-TILT.y)>.001)requestAnimationFrame(tiltLoop);else TILT.run=false}
-function tiltNeedsAsk(){return typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'&&!TILT.on&&ls.get('tilt',true)&&!ls.get('tiltDenied',false)&&!matchMedia('(prefers-reduced-motion: reduce)').matches}
+function tiltNeedsAsk(){return false&&typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'&&!TILT.on&&ls.get('tilt',true)&&!ls.get('tiltDenied',false)&&!matchMedia('(prefers-reduced-motion: reduce)').matches}
 function tiltTo(x,y){TILT.tx=Math.max(-1,Math.min(1,x));TILT.ty=Math.max(-1,Math.min(1,y));if(!TILT.run){TILT.run=true;requestAnimationFrame(tiltLoop)}}
 function onOrient(e){if(e.beta==null)return;if(TILT.base==null)TILT.base=e.beta;TILT.base+=(e.beta-TILT.base)*.003;tiltTo((e.gamma||0)/18,(e.beta-TILT.base)/18)}
 function onMotion(e){if(TILT.gotOrient)return;const g=e.accelerationIncludingGravity;if(!g||g.x==null)return;if(TILT.mbase==null)TILT.mbase=g.y;TILT.mbase+=(g.y-TILT.mbase)*.003;tiltTo(-g.x/3.5,(g.y-TILT.mbase)/3.5)}
-function tiltStart(){if(TILT.on||matchMedia('(prefers-reduced-motion: reduce)').matches||!ls.get('tilt',true))return;
+function tiltStart(){return;if(TILT.on||matchMedia('(prefers-reduced-motion: reduce)').matches||!ls.get('tilt',true))return;
   const go2=()=>{TILT.on=true;window.addEventListener('deviceorientation',ev=>{if(ev.beta!=null)TILT.gotOrient=true;onOrient(ev)});window.addEventListener('devicemotion',onMotion);const ta=document.getElementById('tiltAsk');if(ta)ta.remove()};
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     if(ls.get('tiltDenied',false))return;
@@ -1062,7 +1057,7 @@ function tiltStop(){TILT.on=false;window.removeEventListener('deviceorientation'
 (function(){const needsAsk=typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';
   if(!needsAsk)tiltStart();
   else{const once=()=>{document.removeEventListener('touchend',once);document.removeEventListener('click',once);tiltStart()};document.addEventListener('touchend',once,{passive:true});document.addEventListener('click',once)}
-  window.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!ls.get('tilt',true)||matchMedia('(prefers-reduced-motion: reduce)').matches)return;tiltTo((e.clientX/innerWidth-.5)*1.6,(e.clientY/innerHeight-.5)*1.2)},{passive:true})})();
+  window.addEventListener('pointermove',e=>{if(true||e.pointerType!=='mouse'||!ls.get('tilt',true)||matchMedia('(prefers-reduced-motion: reduce)').matches)return;tiltTo((e.clientX/innerWidth-.5)*1.6,(e.clientY/innerHeight-.5)*1.2)},{passive:true})})();
 function applyAmbience(phase){const dk=document.documentElement.dataset.theme==='dark';
   const A=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}
             :{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']};
