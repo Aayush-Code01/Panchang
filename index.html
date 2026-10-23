@@ -192,6 +192,9 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .focus.full .f-ring{background:conic-gradient(var(--good) 360deg,var(--good) 0)}
 .f-hint{font-size:15px;color:var(--text);max-width:28ch;line-height:1.4}
 .f-close{margin:0 24px calc(20px + env(safe-area-inset-bottom,0px));height:52px;border-radius:26px;background:var(--ink);color:var(--card);font-size:17px;font-weight:600}
+.app{touch-action:pan-y}
+.app > :not(.head):not(.focus):not(.totop){transform:translateX(var(--sx,0px))}
+.app.sw-anim > :not(.head):not(.focus):not(.totop){transition:transform .18s ease-out}
 /* v5 additions */
 .vrow{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}
 .k2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
@@ -751,6 +754,21 @@ $('focusPad').onclick=e=>{if(e.target.tagName==='INPUT'||!FOC)return;audioInit()
 $('focusClose').onclick=closeFocus;
 (function(){const el=$('strip');let lastI=null;el.addEventListener('scroll',()=>{const it=el.querySelector('.sd');if(!it)return;const i=Math.round(el.scrollLeft/(it.offsetWidth+2));
   if(Date.now()<(window._stripProg||0)){lastI=i;return}if(lastI!==null&&i!==lastI)hapticTick();lastI=i},{passive:true})})();
+
+(function(){const app=document.querySelector('.app');let x0=0,y0=0,t0=0,mode=null,dx=0;
+ const skip=t=>t.closest('#strip,.tl-wrap,.focus,.tap2,select,input,.totop');
+ const setX=(v,anim)=>{app.style.setProperty('--sx',v+'px');app.classList.toggle('sw-anim',!!anim)};
+ function shiftDay(n){const d=new Date($('date').value+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+n);$('date').value=d.toISOString().slice(0,10);go()}
+ app.addEventListener('touchstart',e=>{if(e.touches.length!==1||skip(e.target)||!$('focus').hidden){mode='off';return}const p=e.touches[0];x0=p.clientX;y0=p.clientY;t0=Date.now();mode=null;dx=0},{passive:true});
+ app.addEventListener('touchmove',e=>{if(mode==='off'||mode==='v')return;const p=e.touches[0];const ddx=p.clientX-x0,ddy=p.clientY-y0;
+  if(mode===null){if(Math.abs(ddx)<10&&Math.abs(ddy)<10)return;mode=Math.abs(ddx)>Math.abs(ddy)*1.3?'h':'v';if(mode==='v')return}
+  dx=ddx;setX(dx*.6,false)},{passive:true});
+ app.addEventListener('touchend',()=>{if(mode!=='h'){mode=null;return}mode=null;const w=app.clientWidth,fast=Date.now()-t0<300;
+  if(Math.abs(dx)>w*.22||(fast&&Math.abs(dx)>50)){const dir=dx<0?1:-1;setX(-dir*w*.5,true);
+    setTimeout(()=>{shiftDay(dir);setX(dir*w*.35,false);requestAnimationFrame(()=>requestAnimationFrame(()=>setX(0,true)))},160)}
+  else setX(0,true)},{passive:true});
+ app.addEventListener('touchcancel',()=>{mode=null;setX(0,true)},{passive:true});
+})();
 setInterval(()=>tick(false),60e3);
 (function(){const el=$('tl');let last=null,hideT=null,active=false;
  const tick1=hapticTick;
