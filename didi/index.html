@@ -304,6 +304,11 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .row .act.danger{color:var(--avoid-ink)}
 .sheet .ver{text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px}
 
+.sky .pl{will-change:transform}
+.sky .pl1{transform:translate(calc(var(--px,0) * -4px),calc(var(--py,0) * -3px))}
+.sky .pl2{transform:translate(calc(var(--px,0) * -11px),calc(var(--py,0) * -8px))}
+.sky .pl3{transform:translate(calc(var(--px,0) * -20px),calc(var(--py,0) * -12px))}
+.sky svg{transform:scale(1.06)}
 /* ---------- motion ---------- */
 .sky .shoot{opacity:0}
 @media (prefers-reduced-motion:no-preference){
@@ -459,6 +464,10 @@ details.grp[open] summary::after{transform:rotate(45deg)}
     <div class="grp-b">
       <div class="row"><span>Bell when chanting is done<small>Rings even on silent</small></span><input type="checkbox" class="tgl" id="tglBell" aria-label="Bell when chanting is done"></div>
       <div class="row"><span>Show special days<small>Ekadashi, Pradosh, full moon and more</small></span><input type="checkbox" class="tgl" id="tglSpecial" aria-label="Show special days"></div>
+    </div>
+    <div class="grp-t">Motion</div>
+    <div class="grp-b">
+      <div class="row"><span>Sky moves with your phone<small>Tilt to feel the depth</small></span><input type="checkbox" class="tgl" id="tglTilt" aria-label="Sky moves with your phone"></div>
     </div>
     <div class="grp-t">Data</div>
     <div class="grp-b">
@@ -869,7 +878,7 @@ function applyTheme(){const m=ls.get('theme','light'),dark=m==='dark'||(m==='aut
 applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(ls.get('theme','light')==='auto')applyTheme()})}catch(e){}
 function syncSettings(){const set=(id,v)=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
   set('segTheme',ls.get('theme','light'));set('segSize',ls.get('size','normal'));
-  $('tglBell').checked=ls.get('bell',true);$('tglSpecial').checked=ls.get('special',true);
+  $('tglBell').checked=ls.get('bell',true);$('tglTilt').checked=ls.get('tilt',true)&&!ls.get('tiltDenied',false);$('tglSpecial').checked=ls.get('special',true);
   const no=document.getElementById('nearOpt');$('tglGps').checked=!!(no&&no.selected);$('clearAll').textContent='Clear';$('clearAll').dataset.arm=''}
 function openSheet(){syncSettings();$('sheetBg').classList.add('show');$('sheet').classList.add('show');$('sheet').setAttribute('aria-hidden','false')}
 function closeSheet(){$('sheetBg').classList.remove('show');$('sheet').classList.remove('show');$('sheet').setAttribute('aria-hidden','true')}
@@ -877,6 +886,7 @@ $('gearBtn').onclick=openSheet;$('sheetBg').onclick=closeSheet;$('sheetDone').on
 $('segTheme').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('theme',b.dataset.v);applyTheme();applyAmbience(window.SKY_PHASE);syncSettings()};
 $('segSize').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('size',b.dataset.v);applyTheme();syncSettings()};
 $('tglBell').onchange=()=>{ls.set('bell',$('tglBell').checked);document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
+$('tglTilt').onchange=()=>{const v=$('tglTilt').checked;ls.set('tilt',v);if(v){ls.set('tiltDenied',false);tiltStart()}else tiltStop()};
 $('tglSpecial').onchange=()=>{ls.set('special',$('tglSpecial').checked);go()};
 $('tglGps').onchange=()=>{if($('tglGps').checked){ls.set('locAsked2',true);hideLocMsg();locate(false)}else{$('loc').value='28.4595,77.0266';go()}};
 $('resetToday').onclick=()=>{const d=$('date').value;ls.set('ritual:'+d,[]);ls.set('japa:'+d,{});go();$('resetToday').textContent='Done';setTimeout(()=>$('resetToday').textContent='Reset',1200)};
@@ -948,13 +958,16 @@ function skySVG(r,isToday){
   // horizon warmth near sunrise / sunset
   if(phase==='dawn'||phase==='dusk'||phase==='golden'){const hx=phase==='dawn'?90:310;s+=`<ellipse cx="${hx}" cy="${H+10}" rx="260" ry="150" fill="url(#hzGlow)" opacity="${phase==='golden'?.6:1}"/>`}
   // stars
+  s+='<g class="pl pl1">';
   if(phase!=='day'&&phase!=='golden'){
     const n=phase==='night'?220:60,op=phase==='night'?1:.35;
     for(let i=0;i<n;i++){const x=rnd()*W,y=Math.pow(rnd(),1.25)*H*.82,m=rnd(),rr=m>.985?1.25:m>.93?.85:m>.6?.55:.38,o=(op*(m>.93?.95:.35+rnd()*.5)).toFixed(2);
       s+=`<circle${m>.9?` class="star" style="animation-delay:${(rnd()*6).toFixed(2)}s"`:''} cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rr}" fill="#FFFFFF" opacity="${o}"/>`}
     if(phase==='night')s+=`<g class="shoot"><line x1="60" y1="40" x2="104" y2="56" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" opacity=".8"/></g>`;
   }
+  s+='</g>';
   // sun (soft bloom, kept within the upper-middle of the sky)
+  s+='<g class="pl pl2">';
   if(t>=rise-30*M&&t<=set+25*M&&phase!=='night'){const f=clamp((t-rise)/(set-rise),-.05,1.05);
     const x=lerp(70,W-70,clamp(f,0,1)),y=phase==='day'?lerp(150,92,Math.sin(Math.PI*clamp(f,0,1))):H*.62+(phase==='dusk'||phase==='dawn'?24:0);
     s+=`<circle cx="${x}" cy="${y}" r="${phase==='day'?150:120}" fill="url(#sunGlow)" opacity="${phase==='day'?.9:.8}"/>`;
@@ -963,7 +976,7 @@ function skySVG(r,isToday){
   if(phase==='night'||phase==='dusk'||phase==='dawn'){
     const e=((r.tithi.idx+.5)*12)%360,k=(1-Math.cos(e*Math.PI/180))/2,wax=e<180;
     let f;if(t>=+r.set&&t<next){f=(t-r.set)/(next-r.set)}else{f=.85}f=clamp(f,0,1);
-    const R=26,cx=lerp(110,300,f),cy=lerp(128,104,Math.sin(Math.PI*f));
+    const R=28,cx=lerp(110,300,f),cy=lerp(128,104,Math.sin(Math.PI*f)),MT=moonTex();
     const rx=Math.abs(1-2*k)*R,top=`${cx} ${cy-R}`,bot=`${cx} ${cy+R}`;
     const d=wax?`M${top} A${R} ${R} 0 0 1 ${bot} A${rx} ${R} 0 0 ${k<.5?0:1} ${top}Z`:`M${top} A${R} ${R} 0 0 0 ${bot} A${rx} ${R} 0 0 ${k<.5?1:0} ${top}Z`;
     const maria=[[-9,-8,7,5,.5],[-1,-11,5,3.5,.38],[7,-6,6,5,.42],[10,4,7.5,8,.5],[-2,5,6,4.5,.36],[-13,3,3.5,5,.34],[3,14,4,2.5,.28],[-7,15,2.5,2,.3]];
@@ -971,16 +984,15 @@ function skySVG(r,isToday){
     s+=`<circle cx="${cx}" cy="${cy}" r="${R*5.2}" fill="url(#halo)" opacity="${.35+k*.65}"/>
      <mask id="mlit"><rect x="0" y="0" width="${W}" height="${H}" fill="#000"/><path d="${d}" fill="#fff" filter="url(#soft1)"/></mask>
      <clipPath id="mdisk"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>
-     <circle cx="${cx}" cy="${cy}" r="${R}" fill="#8E96B8" opacity="${phase==='night'?.07:.05}"/>
+     <circle cx="${cx}" cy="${cy}" r="${R}" fill="#8E96B8" opacity="${phase==='night'?.07:.05}"/>${MT?`<image href="${MT}" x="${cx-R}" y="${cy-R}" width="${2*R}" height="${2*R}" opacity=".07"/>`:''}
      <g mask="url(#mlit)"><g clip-path="url(#mdisk)">
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#moonBody)"/>
-      <g filter="url(#soft2m)" fill="#77736C">${maria.map(([dx,dy,a,b,o])=>`<ellipse cx="${cx+dx}" cy="${cy+dy}" rx="${a}" ry="${b}" opacity="${o}"/>`).join('')}</g>
-      <rect x="${cx-R}" y="${cy-R}" width="${2*R}" height="${2*R}" fill="#fff" filter="url(#grainm)" opacity=".5"/>
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#6E6A64" stroke-opacity=".18" stroke-width="3"/>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#moonBody)"/>${MT?`<image href="${MT}" x="${cx-R}" y="${cy-R}" width="${2*R}" height="${2*R}"/>`:''}
      </g></g>`;
     label+=' · '+(k<.03?'New moon':k>.97?'Full moon':(wax?'Waxing':'Waning')+' moon '+Math.round(k*100)+'%');
   }
+  s+='</g>';
   // soft, photographic clouds
+  s+='<g class="pl pl3">';
   const C={day:['#FFFFFF','#C9D9E6',.9],golden:['#FFF1DC','#D8AE8C',.85],dusk:['#F3B6A6','#6E4F72',.75],dawn:['#F6CDB6','#7C6E93',.7],night:['#5A6188','#1E2448',.22]}[phase];
   const cloud=(x,y,sc,o)=>{let g=`<g class="cloud" transform="translate(${x} ${y}) scale(${sc})" opacity="${(C[2]*o).toFixed(2)}">`;
     g+=`<g filter="url(#soft)">`;[[-40,10,46,14],[-6,2,40,18],[30,8,38,14],[0,16,70,12]].forEach(([dx,dy,a,b])=>g+=`<ellipse cx="${dx}" cy="${dy}" rx="${a}" ry="${b}" fill="${C[0]}"/>`);
@@ -990,9 +1002,59 @@ function skySVG(r,isToday){
   else if(phase==='golden')s+=cloud(290,80,1,.9)+cloud(80,170,.8,.7);
   else if(phase==='dusk'||phase==='dawn')s+=cloud(300,170,1.1,.85)+cloud(60,200,.8,.7);
   else s+=cloud(320,210,1.2,1)+cloud(60,235,.9,.8);
+  s+='</g>';
   s+=`</svg><span class="sky-l">${label}</span>`;
   window.SKY_PHASE=phase;
   return s}
+function moonTex(){if(window._MT)return window._MT;try{
+  const N=320,c=document.createElement('canvas');c.width=c.height=N;const g=c.getContext('2d');const img=g.createImageData(N,N),D=img.data;
+  const hash=(x,y)=>{let h=x*374761393+y*668265263;h=(h^(h>>13))*1274126177;return((h^(h>>16))>>>0)/4294967295};
+  const sm=t=>t*t*(3-2*t);
+  const vn=(x,y)=>{const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi,a=hash(xi,yi),b=hash(xi+1,yi),c2=hash(xi,yi+1),d=hash(xi+1,yi+1),u=sm(xf),v=sm(yf);return a+(b-a)*u+(c2-a)*v+(a-b-c2+d)*u*v};
+  const fbm=(x,y,o=5)=>{let s=0,a=.5,f=1;for(let i=0;i<o;i++){s+=a*vn(x*f,y*f);f*=2.03;a*=.5}return s};
+  const MAR=[[-.36,-.44,.33],[.2,-.36,.2],[.36,-.06,.25],[.72,-.3,.13],[.6,.16,.17],[.36,.32,.12],[-.62,-.04,.44],[-.18,.42,.2],[-.46,.42,.12],[.05,-.2,.1],[-.1,-.72,.16],[.25,-.7,.12],[-.4,-.72,.12]];
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=(i+.5)/N*2-1,y=(j+.5)/N*2-1,rr=x*x+y*y,k=(j*N+i)*4;
+    if(rr>1){D[k+3]=0;continue}
+    const n1=fbm(x*4+7,y*4+3),n2=fbm(x*16+1,y*16+9,4),n3=vn(x*60,y*60);
+    const wx=x+(fbm(x*3+11,y*3+5,4)-.5)*.42,wy=y+(fbm(x*3+2,y*3+17,4)-.5)*.42;let fld=0;for(const[mx,my,mr]of MAR){const dd=Math.hypot(wx-mx,wy-my)/mr;fld+=Math.exp(-dd*dd*1.6)}
+    const th=fld+(n2-.5)*.55+(n1-.5)*.35;let m=Math.min(1,Math.max(0,(th-.3)/.45));m=m*m*(3-2*m);
+    const n4=fbm(x*34+5,y*34+8,3);let b=.97+(n1-.5)*.1+(n2-.5)*.1+(n3-.5)*.05+(n4-.5)*.12;
+    b-=m*(.31+(n2-.5)*.16+(n4-.5)*.06);
+    const mu=Math.sqrt(1-rr);b*=.8+.2*Math.pow(mu,.5);
+    b=Math.max(0,Math.min(1,b));
+    const tint=m*.04;D[k]=Math.min(255,b*(250-tint*200));D[k+1]=Math.min(255,b*(247-tint*120));D[k+2]=Math.min(255,b*(238+tint*40));D[k+3]=255}
+  g.putImageData(img,0,0);
+  let sd=91;const R=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  const crater=(x,y,r,str)=>{const lx=-.55,ly=-.45;
+    let gr=g.createRadialGradient(x+lx*r*.35,y+ly*r*.35,r*.1,x,y,r);gr.addColorStop(0,`rgba(60,58,54,${.32*str})`);gr.addColorStop(.75,`rgba(60,58,54,${.18*str})`);gr.addColorStop(1,'rgba(60,58,54,0)');
+    g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,7);g.fill();
+    g.strokeStyle=`rgba(255,253,246,${.45*str})`;g.lineWidth=Math.max(.6,r*.18);g.beginPath();g.arc(x,y,r*.92,.15*Math.PI,1.15*Math.PI);g.stroke();
+    g.strokeStyle=`rgba(40,38,35,${.3*str})`;g.lineWidth=Math.max(.5,r*.14);g.beginPath();g.arc(x,y,r*.9,1.2*Math.PI,2.1*Math.PI);g.stroke()};
+  for(let i=0;i<34;i++){const a=R()*Math.PI*2,d=Math.sqrt(R())*.92,x=(Math.cos(a)*d+1)/2*N,y=(Math.sin(a)*d+1)/2*N;if(y<N*.45&&R()<.7)continue;const r=1.2+Math.pow(R(),3)*7;crater(x,y,r,.22+R()*.2)}
+  const ray=(cx,cy,len,n,al)=>{for(let i=0;i<n;i++){const a=R()*Math.PI*2,l=len*(.5+R()*.5);const gr=g.createLinearGradient(cx,cy,cx+Math.cos(a)*l,cy+Math.sin(a)*l);gr.addColorStop(0,`rgba(255,253,246,${al})`);gr.addColorStop(1,'rgba(255,253,246,0)');g.strokeStyle=gr;g.lineWidth=.8+R()*1.6;g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(a)*l,cy+Math.sin(a)*l);g.stroke()}};
+  const P=v=>(v+1)/2*N;
+  ray(P(-.17),P(.72),N*.6,30,.08);crater(P(-.17),P(.72),5,.6);g.fillStyle='rgba(255,253,246,.55)';g.beginPath();g.arc(P(-.17),P(.72),2.4,0,7);g.fill();
+  ray(P(-.3),P(-.12),N*.22,16,.07);crater(P(-.3),P(-.12),5,.5);
+  ray(P(-.62),P(-.2),N*.16,12,.07);g.fillStyle='rgba(255,253,246,.6)';g.beginPath();g.arc(P(-.62),P(-.2),2.6,0,7);g.fill();
+  g.globalCompositeOperation='destination-in';g.beginPath();g.arc(N/2,N/2,N/2-.5,0,7);g.fill();g.globalCompositeOperation='source-over';
+  window._MT=c.toDataURL('image/png');}catch(e){window._MT=''}return window._MT}
+var TILT={x:0,y:0,tx:0,ty:0,run:false,base:null,on:false};
+function tiltLoop(){TILT.x+=(TILT.tx-TILT.x)*.08;TILT.y+=(TILT.ty-TILT.y)*.08;const sk=document.getElementById('sky');
+  if(sk){sk.style.setProperty('--px',TILT.x.toFixed(3));sk.style.setProperty('--py',TILT.y.toFixed(3))}
+  if(Math.abs(TILT.tx-TILT.x)>.002||Math.abs(TILT.ty-TILT.y)>.002)requestAnimationFrame(tiltLoop);else TILT.run=false}
+function tiltTo(x,y){TILT.tx=Math.max(-1,Math.min(1,x));TILT.ty=Math.max(-1,Math.min(1,y));if(!TILT.run){TILT.run=true;requestAnimationFrame(tiltLoop)}}
+function onOrient(e){if(e.beta==null)return;if(TILT.base==null)TILT.base=e.beta;TILT.base+=(e.beta-TILT.base)*.004;tiltTo((e.gamma||0)/22,(e.beta-TILT.base)/22)}
+function tiltStart(){if(TILT.on||matchMedia('(prefers-reduced-motion: reduce)').matches||!ls.get('tilt',true))return;
+  const go2=()=>{TILT.on=true;window.addEventListener('deviceorientation',onOrient)};
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    if(ls.get('tiltDenied',false))return;
+    DeviceOrientationEvent.requestPermission().then(st=>{if(st==='granted')go2();else ls.set('tiltDenied',true)}).catch(()=>{})}
+  else go2()}
+function tiltStop(){TILT.on=false;window.removeEventListener('deviceorientation',onOrient);tiltTo(0,0)}
+(function(){const needsAsk=typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';
+  if(!needsAsk)tiltStart();
+  else{const once=()=>{document.removeEventListener('touchend',once);document.removeEventListener('click',once);tiltStart()};document.addEventListener('touchend',once,{passive:true});document.addEventListener('click',once)}
+  window.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!ls.get('tilt',true)||matchMedia('(prefers-reduced-motion: reduce)').matches)return;tiltTo((e.clientX/innerWidth-.5)*1.6,(e.clientY/innerHeight-.5)*1.2)},{passive:true})})();
 function applyAmbience(phase){const dk=document.documentElement.dataset.theme==='dark';
   const A=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}
             :{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']};
