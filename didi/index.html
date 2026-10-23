@@ -214,7 +214,7 @@ html[data-theme="dark"]{
   --glass:rgba(27,25,21,.82); --veil:rgba(37,34,29,.5); color-scheme:dark;
 }
 :root{--glass:rgba(243,238,229,.82);--veil:rgba(255,253,249,.45)}
-html[data-size="large"] .app,html[data-size="large"] .focus,html[data-size="large"] .sheet{zoom:1.12}
+html[data-size="large"] .app > :not(.sheet):not(.sheet-bg):not(.daynav):not(.focus):not(.totop),html[data-size="large"] .focus-pad,html[data-size="large"] .daynav .dn{zoom:1.12}
 .gear{width:34px;padding:0;justify-content:center}
 .sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(20,18,15,.32);opacity:0;transition:opacity .2s;pointer-events:none}
 .sheet-bg.show{opacity:1;pointer-events:auto}
@@ -239,6 +239,16 @@ html[data-size="large"] .app,html[data-size="large"] .focus,html[data-size="larg
 .row .act{font-size:15px;font-weight:600;color:var(--best-ink)}
 .row .act.danger{color:var(--avoid-ink)}
 .sheet .ver{text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px}
+.mantra .ml,.mantra .el{display:inline-block;padding:0 6px;border-radius:8px;cursor:pointer;transition:background .2s,color .2s}
+.mantra .ml.on,.mantra .el.on{background:var(--best-bg);color:var(--best-ink)}
+.listen{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.listen button{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:18px;font-size:14px;font-weight:600}
+.listen .play{background:var(--best-ink);color:var(--card)}
+.listen .slow{background:var(--card);color:var(--muted);border:.5px solid var(--line)}
+.listen .slow[aria-pressed="true"]{color:var(--ink);border-color:var(--sand)}
+.lnote{font-size:12.5px;color:var(--muted);margin-top:8px;min-height:0}
+.lnote:empty{display:none}
+html,body{overflow-x:clip}
 /* v5 additions */
 .vrow{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}
 .k2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
@@ -595,6 +605,8 @@ const I={
  eye:sv('<path d="M3 10.5c2.6 3 5.6 4.5 9 4.5s6.4-1.5 9-4.5M6.2 13.6 4.8 16M12 15v2.8M17.8 13.6l1.4 2.4"/>',18),
  bell:sv('<path d="M6 16.5v-5a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0"/>',16),
  bellOff:sv('<path d="M6 16.5v-5a6 6 0 0 1 9.5-4.9M18 11.5v5l1.5 2h-15M10 20.5a2 2 0 0 0 4 0M4 4l16 16"/>',16),
+ play:sv('<path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/>',15),
+ stop:sv('<rect x="7" y="7" width="10" height="10" rx="1.5" fill="currentColor" stroke="none"/>',15),
  lotus:sv('<path d="M12 20c-4 0-8-2.5-8-6 2 0 4 .7 5.5 2M12 20c4 0 8-2.5 8-6-2 0-4 .7-5.5 2M12 20c-2.2-1.6-3.5-4-3.5-7S10 7 12 4c2 3 3.5 6 3.5 9s-1.3 5.4-3.5 7z"/>'),
  cal:sv('<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
  moon:sv('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>')
@@ -746,7 +758,7 @@ function render(ds,scrollStrip){
     <div class="ph"><button type="button" class="chk" aria-label="Mark done"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1.5 5l3.5 3.5L11.5 1.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button type="button" class="open" style="text-align:left"><div class="a">${it.t}</div><div class="b">${it.b}</div>${mm?`<div class="mpre"><span class="mh">${mm.short||mm.hi}</span><span class="me">${mm.shortEn||mm.en}</span></div><span class="peek">Read and chant ${it.n} times<svg width="10" height="7" viewBox="0 0 10 7"><path d="M1 1.2l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>`:''}</button>
     <button type="button" class="open chev" aria-label="Show mantra"><svg width="13" height="8" viewBox="0 0 13 8"><path d="M1.5 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
-    <div class="pb"><p class="how">${it.how}</p>${mm?`<div class="mantra"><div class="hi">${mm.hi}</div><div class="en">${mm.en}</div><div class="mean">${mm.mean}</div>
+    <div class="pb"><p class="how">${it.how}</p>${mm?`<div class="mantra"><div class="hi">${mm.hi.split('<br>').map((x,i)=>`<span class="ml" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="en">${mm.en.split('<br>').map((x,i)=>`<span class="el" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="listen"><button type="button" class="play">${I.play}Listen</button><button type="button" class="slow" aria-pressed="${ls.get('slowVoice',true)}">Slow</button></div><div class="lnote"></div><div class="mean">${mm.mean}</div>
     <label class="tap2" aria-label="Count one chant"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><span class="fill" style="width:${Math.min(100,(counts[it.id]||0)/it.n*100)}%"></span><span class="cnt num">${counts[it.id]||0}<small> / ${it.n}</small></span><span class="hint">Tap anywhere here after each chant</span></label><div class="japa-opts"><button type="button" class="fs">${I.eye}Eyes closed</button><button type="button" class="bellt">${bellLbl()}</button></div><div class="japa-foot"><span class="donemsg">${(counts[it.id]||0)>=it.n?'Complete. Well done 🙏':''}</span><button type="button" class="reset">Reset count</button></div></div>`:''}</div></div>`}).join('');
   const save=()=>{ls.set(key,[...$('prac').querySelectorAll('.pi.done')].map(x=>x.dataset.id));streak()};
   $('prac').querySelectorAll('.pi').forEach(p=>{
@@ -773,7 +785,7 @@ function render(ds,scrollStrip){
 }
 function streak(){let n=0;const t=new Date(todayIST()+'T00:00:00Z');for(let i=0;i<400;i++){const v=ls.get('ritual:'+new Date(+t-i*86400e3).toISOString().slice(0,10),[]);if(v.length)n++;else if(i>0)break}
   $('streak').textContent=n?n+'-day streak':''}
-function go(){ls.set('loc',$('loc').value);try{render($('date').value)}catch(e){console.error(e);$('verdict').textContent='—';$('why').textContent='Could not work out this date. Try one between 1900 and 2100.'}}
+function go(){stopSpeak();ls.set('loc',$('loc').value);try{render($('date').value)}catch(e){console.error(e);$('verdict').textContent='—';$('why').textContent='Could not work out this date. Try one between 1900 and 2100.'}}
 $('date').value=todayIST();{const n=ls.get('near',null);if(n){const [a,b]=n.split(',');addNear(a,b)}}
 $('loc').value=ls.get('loc','28.4595,77.0266');if(!$('loc').value||$('loc').value==='gps')$('loc').value='28.4595,77.0266';
 if(document.getElementById('nearOpt')&&document.getElementById('nearOpt').selected)locate(true);
@@ -858,6 +870,25 @@ $('tglGps').onchange=()=>{if($('tglGps').checked){ls.set('locAsked2',true);hideL
 $('resetToday').onclick=()=>{const d=$('date').value;ls.set('ritual:'+d,[]);ls.set('japa:'+d,{});go();$('resetToday').textContent='Done';setTimeout(()=>$('resetToday').textContent='Reset',1200)};
 $('clearAll').onclick=()=>{const b=$('clearAll');if(!b.dataset.arm){b.dataset.arm='1';b.textContent='Tap again to clear';return}
   try{Object.keys(localStorage).filter(k=>/ritual:|japa:/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}b.dataset.arm='';b.textContent='Cleared';go()};
+
+var SPK_CARD=null;
+function hiVoice(){try{const vs=speechSynthesis.getVoices();return vs.find(v=>/^hi[-_]IN/i.test(v.lang))||vs.find(v=>/^hi/i.test(v.lang))||null}catch(e){return null}}
+try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
+function stopSpeak(){try{speechSynthesis.cancel()}catch(e){}if(SPK_CARD){SPK_CARD.classList.remove('playing');SPK_CARD.querySelectorAll('.on').forEach(x=>x.classList.remove('on'));const b=SPK_CARD.querySelector('.play');if(b)b.innerHTML=I.play+'Listen'}SPK_CARD=null}
+function speakCard(card,from,only){if(!('speechSynthesis' in window)){card.querySelector('.lnote').textContent='Audio isn\'t supported on this browser.';return}
+  stopSpeak();SPK_CARD=card;const hv=hiVoice();const sel=hv?'.ml':'.el';const lines=[...card.querySelectorAll(sel)].map(x=>x.textContent);
+  const slow=ls.get('slowVoice',true);let i=from;card.classList.add('playing');card.querySelector('.play').innerHTML=I.stop+'Stop';
+  if(!hv)card.querySelector('.lnote').textContent='No Hindi voice found on this device, reading the English letters.';
+  const next=()=>{if(SPK_CARD!==card)return;card.querySelectorAll('.on').forEach(x=>x.classList.remove('on'));
+    if(i>=lines.length||(only&&i>from)){stopSpeak();return}
+    card.querySelectorAll('[data-i="'+i+'"]').forEach(x=>x.classList.add('on'));
+    const u=new SpeechSynthesisUtterance(lines[i].replace(/[।॥,.]/g,' ').trim());u.lang=hv?'hi-IN':'en-IN';if(hv)u.voice=hv;u.rate=slow?0.62:0.88;u.pitch=0.95;
+    u.onend=()=>{i++;setTimeout(next,slow?350:200)};u.onerror=()=>stopSpeak();speechSynthesis.speak(u)};
+  next()}
+document.addEventListener('click',e=>{const p=e.target.closest('.mantra .play');if(p){const c=p.closest('.mantra');if(c.classList.contains('playing'))stopSpeak();else speakCard(c,0,false);return}
+  const s=e.target.closest('.mantra .slow');if(s){const v=!ls.get('slowVoice',true);ls.set('slowVoice',v);document.querySelectorAll('.mantra .slow').forEach(b=>b.setAttribute('aria-pressed',v));return}
+  const l=e.target.closest('.mantra .ml,.mantra .el');if(l){speakCard(l.closest('.mantra'),+l.dataset.i,true)}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopSpeak()});
 setInterval(()=>tick(false),60e3);
 (function(){const el=$('tl');let last=null,hideT=null,active=false;
  const tick1=hapticTick;
