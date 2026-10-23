@@ -170,6 +170,7 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .locmsg span{flex:1 1 180px}
 .locmsg .ask{height:36px;padding:0 14px;border-radius:18px;background:var(--ink);color:var(--card);font-weight:600;font-size:14px}
 .locmsg .x{width:32px;height:32px;border-radius:50%;color:var(--muted)}
+.tl-wrap{display:block;position:relative}
 .tl{touch-action:none;cursor:ew-resize;-webkit-user-select:none;user-select:none}
 .tl-track{height:18px;border-radius:9px}
 .tl-lift{position:absolute;top:-7px;height:32px;border-radius:8px;box-shadow:0 6px 14px rgba(30,39,39,.22),0 0 0 2px var(--card);pointer-events:none;z-index:3;transition:left .12s ease,width .12s ease,background .12s}
@@ -341,7 +342,7 @@ details.grp[open] summary::after{transform:rotate(45deg)}
     <div class="vrow"><div><div class="k2">Your day</div><div class="verdict" id="verdict">&nbsp;</div></div><span class="vicon" id="vicon"></span></div>
     <p class="why" id="why"></p>
     <div class="tl-head"><span id="rise"></span><span id="set"></span></div>
-    <div class="tl" id="tl"></div>
+    <label class="tl-wrap"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><div class="tl" id="tl"></div></label>
     <div class="tl-key"><span><i style="background:var(--good)"></i>Good</span><span><i style="background:var(--best)"></i>Best</span><span><i style="background:var(--ok)"></i>Okay</span><span><i style="background:var(--meh)"></i>Routine</span><span><i style="background:var(--avoid)"></i>Pause new starts</span><span><i style="background:var(--ink);border-radius:50%;width:8px;height:8px"></i>Now</span></div>
     <p class="tl-hint">Drag your thumb along the bar to see each period</p>
     <div class="nn" id="nn"></div>
@@ -762,9 +763,11 @@ setInterval(()=>tick(false),60e3);
   lf.style.left=(L*100)+'%';lf.style.width=(Wf*100)+'%';lf.style.background=C[g.cls];
   bb.innerHTML=`<span class="bt num">${hm(g.a)} – ${fmt(g.b)}</span><span class="bl" style="color:${CI[g.cls]}">${I[g.cls]}${LBL[g.cls]}</span><span class="bs">${g.tag.split(',')[0]} · ${dur(g.b-g.a)}</span>`;
   const w=bb.offsetWidth,W=el.clientWidth;let x=(L+Wf/2)*W-w/2;x=Math.max(-4,Math.min(W-w+4,x));bb.style.left=x+'px'}
- function end(){active=false;$('tlLift').hidden=true;$('tlBub').hidden=true;last=null}
- el.addEventListener('pointerdown',e=>{active=true;clearTimeout(hideT);last=null;try{el.setPointerCapture(e.pointerId)}catch(_){};show(e.clientX);tick1()});
- el.addEventListener('pointermove',e=>{if(active||e.pointerType==='mouse')show(e.clientX)});
+ function hide(){$('tlLift').hidden=true;$('tlBub').hidden=true;last=null}
+ function end(e){active=false;clearTimeout(hideT);if(e&&e.type==='pointerup'&&!moved&&e.pointerType!=='mouse'){hideT=setTimeout(hide,1600)}else hide()}
+ let sx=0,moved=false;
+ el.addEventListener('pointerdown',e=>{active=true;moved=false;sx=e.clientX;clearTimeout(hideT);last=null;if(e.pointerType==='mouse'){try{el.setPointerCapture(e.pointerId)}catch(_){}}show(e.clientX)});
+ el.addEventListener('pointermove',e=>{if(active&&Math.abs(e.clientX-sx)>6)moved=true;if(active||e.pointerType==='mouse')show(e.clientX)});
  el.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&!active)end()});
  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
 })();
