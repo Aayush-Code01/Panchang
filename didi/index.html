@@ -263,6 +263,23 @@ html,body{overflow-x:clip}
 .pl-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
 .pl-row button{font-size:15px;font-weight:600;color:var(--best-ink)}
 .pl-note{font-size:12.5px;color:var(--muted);margin:10px 4px 0}
+.aud{margin-top:14px}
+.aud .a-has{display:none}.aud.has .a-has{display:block}.aud.has .a-empty{display:none}
+.a-empty{display:flex;flex-direction:column;align-items:center;gap:6px}
+.aadd{position:relative;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:20px;background:var(--best-ink);color:var(--card);font-size:14.5px;font-weight:600;cursor:pointer;overflow:hidden}
+.aadd input,.arep input{position:absolute;inset:0;opacity:0;font-size:16px;cursor:pointer}
+.ahint{font-size:12.5px;color:var(--muted)}
+.arow{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:16px;padding:10px 12px;text-align:left}
+.ap{width:44px;height:44px;border-radius:50%;background:var(--best-ink);color:var(--card);display:grid;place-items:center;flex:0 0 auto}
+.amid{flex:1;min-width:0}
+.aname{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.abar{height:6px;border-radius:3px;background:var(--card-2);margin-top:7px;overflow:hidden;cursor:pointer}
+.abar i{display:block;height:100%;width:0;background:var(--best);border-radius:3px}
+.atime{font-size:12.5px;color:var(--muted);flex:0 0 auto}
+.aopts{display:flex;gap:6px;justify-content:center;margin-top:10px}
+.aopts button,.arep{position:relative;overflow:hidden;height:34px;padding:0 11px;white-space:nowrap;border-radius:17px;font-size:13px;font-weight:600;background:var(--card);color:var(--muted);border:.5px solid var(--line);display:inline-flex;align-items:center;cursor:pointer}
+.aopts .aloop[aria-pressed="true"]{color:var(--good-ink);border-color:var(--good-ink)}
+.amsg{font-size:13px;color:var(--avoid-ink);margin-top:6px}.amsg:empty{display:none}
 /* v5 additions */
 .vrow{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left}
 .k2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
@@ -472,13 +489,6 @@ html,body{overflow-x:clip}
     </div>
     <p class="ver">Panchang · Lahiri system · calculated on your phone</p>
   </div>
-  <div class="sheet-bg" id="playerBg"></div>
-  <div class="sheet" id="playerSheet" role="dialog" aria-modal="true" aria-label="Mantra player">
-    <div class="grab"></div>
-    <div class="sheet-h"><h3 class="pl-name">Mantra</h3><button type="button" id="plDone">Done</button></div>
-    <div class="pl-frame"></div>
-    <div class="pl-row"><span class="pl-note">Chant along, and tap the counter after each round.</span><button type="button" id="plChange">Change</button></div>
-  </div>
   <nav class="daynav" id="daynav" aria-label="Previous and next day"></nav>
   <p class="foot">Worked out on your phone from the Sun and Moon's positions, using the Lahiri system Indian panchangs follow. Matches <a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a> within about a minute. Traditional guidance, not a promise of results.</p>
 </div>
@@ -628,6 +638,8 @@ const I={
  bellOff:sv('<path d="M6 16.5v-5a6 6 0 0 1 9.5-4.9M18 11.5v5l1.5 2h-15M10 20.5a2 2 0 0 0 4 0M4 4l16 16"/>',16),
  play:sv('<path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/>',15),
  stop:sv('<rect x="7" y="7" width="10" height="10" rx="1.5" fill="currentColor" stroke="none"/>',15),
+ pause:sv('<rect x="7" y="5.5" width="3.5" height="13" rx="1" fill="currentColor" stroke="none"/><rect x="13.5" y="5.5" width="3.5" height="13" rx="1" fill="currentColor" stroke="none"/>',18),
+ music:sv('<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',17),
  lotus:sv('<path d="M12 20c-4 0-8-2.5-8-6 2 0 4 .7 5.5 2M12 20c4 0 8-2.5 8-6-2 0-4 .7-5.5 2M12 20c-2.2-1.6-3.5-4-3.5-7S10 7 12 4c2 3 3.5 6 3.5 9s-1.3 5.4-3.5 7z"/>'),
  cal:sv('<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
  moon:sv('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>')
@@ -779,7 +791,7 @@ function render(ds,scrollStrip){
     <div class="ph"><button type="button" class="chk" aria-label="Mark done"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1.5 5l3.5 3.5L11.5 1.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button type="button" class="open" style="text-align:left"><div class="a">${it.t}</div><div class="b">${it.b}</div>${mm?`<div class="mpre"><span class="mh">${mm.short||mm.hi}</span><span class="me">${mm.shortEn||mm.en}</span></div><span class="peek">Read and chant ${it.n} times<svg width="10" height="7" viewBox="0 0 10 7"><path d="M1 1.2l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>`:''}</button>
     <button type="button" class="open chev" aria-label="Show mantra"><svg width="13" height="8" viewBox="0 0 13 8"><path d="M1.5 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
-    <div class="pb"><p class="how">${it.how}</p>${mm?`<div class="mantra"><div class="hi">${mm.hi.split('<br>').map((x,i)=>`<span class="ml" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="en">${mm.en.split('<br>').map((x,i)=>`<span class="el" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="listen" data-m="${it.m}"><button type="button" class="play" data-m="${it.m}">${I.play}${ls.get('aud:'+it.m,null)?'Play my chant':'Hear it chanted'}</button><button type="button" class="setv">${ls.get('aud:'+it.m,null)?'Change':'Save a version'}</button></div><div class="setbox" data-m="${it.m}" hidden><p>Find a chant you like on YouTube, tap <b>Share → Copy link</b>, then paste it here. It will play right here from then on.</p><div class="sb-row"><input type="url" inputmode="url" placeholder="Paste YouTube link" aria-label="YouTube link"><button type="button" class="paste">Paste</button></div><div class="sb-row"><button type="button" class="save">Save</button>${ls.get('aud:'+it.m,null)?'<button type="button" class="clr">Remove saved</button>':''}</div><div class="msg"></div></div><div class="mean">${mm.mean}</div>
+    <div class="pb"><p class="how">${it.how}</p>${mm?`<div class="mantra"><div class="hi">${mm.hi.split('<br>').map((x,i)=>`<span class="ml" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="en">${mm.en.split('<br>').map((x,i)=>`<span class="el" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="aud" data-m="${it.m}"><div class="a-empty"><label class="aadd">${I.music}Add chant audio (MP3)<input type="file" class="afile" accept="audio/*,.mp3,.m4a"></label><span class="ahint">Saved on this phone. Plays here, even offline.</span></div><div class="a-has"><div class="arow"><button type="button" class="ap" aria-label="Play or pause">${I.play}</button><div class="amid"><div class="aname"></div><div class="abar"><i></i></div></div><span class="atime num">0:00</span></div><div class="aopts"><button type="button" class="aloop" aria-pressed="${ls.get('autocount',true)}">Repeat and count</button><label class="arep">Replace<input type="file" class="afile" accept="audio/*,.mp3,.m4a"></label><button type="button" class="arm">Remove</button></div></div><div class="amsg"></div></div><div class="mean">${mm.mean}</div>
     <label class="tap2" aria-label="Count one chant"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><span class="fill" style="width:${Math.min(100,(counts[it.id]||0)/it.n*100)}%"></span><span class="cnt num">${counts[it.id]||0}<small> / ${it.n}</small></span><span class="hint">Tap anywhere here after each chant</span></label><div class="japa-opts"><button type="button" class="fs">${I.eye}Eyes closed</button><button type="button" class="bellt">${bellLbl()}</button></div><div class="japa-foot"><span class="donemsg">${(counts[it.id]||0)>=it.n?'Complete. Well done 🙏':''}</span><button type="button" class="reset">Reset count</button></div></div>`:''}</div></div>`}).join('');
   const save=()=>{ls.set(key,[...$('prac').querySelectorAll('.pi.done')].map(x=>x.dataset.id));streak()};
   $('prac').querySelectorAll('.pi').forEach(p=>{
@@ -788,7 +800,7 @@ function render(ds,scrollStrip){
     const tap=p.querySelector('.tap2');const upd=v=>{const n=+p.dataset.n;tap.querySelector('.cnt').innerHTML=v+'<small> / '+n+'</small>';tap.querySelector('.fill').style.width=Math.min(100,v/n*100)+'%';p.querySelector('.donemsg').textContent=v>=n?'Complete. Well done 🙏':'';tap.classList.toggle('full',v>=n)};if(tap){tap.onclick=(e)=>{if(e.target.tagName==='INPUT')return;audioInit();upd(chantTap(p,ck,save))};p.querySelector('.fs').onclick=()=>openFocus(p,ck,save,upd);p.querySelector('.bellt').onclick=ev=>{const on=!ls.get('bell',true);ls.set('bell',on);document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
       p.querySelector('.reset').onclick=()=>{const c=ls.get(ck,{});c[p.dataset.id]=0;ls.set(ck,c);upd(0)}}
   });
-  streak();
+  streak();document.querySelectorAll('.aud').forEach(loadCard);if(AU_CARD&&!document.body.contains(AU_CARD)){AU.pause();AU_CARD=null}
 
   // details
   const until=t=>t?'until '+fmt(t)+(ist(t).getUTCDate()!==ist(r.rise).getUTCDate()?', next day':''):'';
@@ -892,23 +904,31 @@ $('resetToday').onclick=()=>{const d=$('date').value;ls.set('ritual:'+d,[]);ls.s
 $('clearAll').onclick=()=>{const b=$('clearAll');if(!b.dataset.arm){b.dataset.arm='1';b.textContent='Tap again to clear';return}
   try{Object.keys(localStorage).filter(k=>/ritual:|japa:/.test(k)).forEach(k=>localStorage.removeItem(k))}catch(e){}b.dataset.arm='';b.textContent='Cleared';go()};
 
-var AUDQ={gayatri:'Gayatri Mantra Vedic chanting',mrityunjaya:'Maha Mrityunjaya Mantra chanting',shiva:'Om Namah Shivaya chanting',ganesha:'Om Gam Ganapataye Namah chanting',vishnu:'Om Namo Bhagavate Vasudevaya chanting',lakshmi:'Om Shreem Mahalakshmyai Namah chanting',surya:'Om Suryaya Namah chanting',hanuman:'Om Ham Hanumate Namah chanting',guru:'Om Brim Brihaspataye Namah chanting'};
-function ytId(u){const m=String(u||'').trim().match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/|live\/)([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(String(u).trim())?String(u).trim():null)}
 function stopSpeak(){}
-function openPlayer(k,id){const ps=$('playerSheet');ps.querySelector('.pl-name').textContent=(M[k]&&M[k].name)||'Mantra';
-  ps.querySelector('.pl-frame').innerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1" title="Mantra chant" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
-  ps.dataset.m=k;$('playerBg').classList.add('show');ps.classList.add('show')}
-function closePlayer(){const ps=$('playerSheet');ps.classList.remove('show');$('playerBg').classList.remove('show');setTimeout(()=>{ps.querySelector('.pl-frame').innerHTML=''},300)}
-$('playerBg').onclick=closePlayer;$('plDone').onclick=closePlayer;
-$('plChange').onclick=()=>{const k=$('playerSheet').dataset.m;closePlayer();const box=document.querySelector('.setbox[data-m="'+k+'"]');if(box){box.hidden=false;box.querySelector('input').focus()}};
+var ADB=null;function adb(){return ADB||(ADB=new Promise((res,rej)=>{const r=indexedDB.open('panchang-audio-d',1);r.onupgradeneeded=()=>r.result.createObjectStore('a');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+function aGet(k){return adb().then(d=>new Promise(res=>{const q=d.transaction('a').objectStore('a').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)})).catch(()=>null)}
+function aSet(k,v){return adb().then(d=>new Promise(res=>{const t=d.transaction('a','readwrite');v?t.objectStore('a').put(v,k):t.objectStore('a').delete(k);t.oncomplete=()=>res(true);t.onerror=()=>res(false)})).catch(()=>false)}
+var AU=new Audio(),AU_CARD=null,AU_URL=null;AU.preload='auto';AU.setAttribute('playsinline','');
+function fmtT(x){x=Math.max(0,Math.floor(x||0));return Math.floor(x/60)+':'+String(x%60).padStart(2,'0')}
+function auUI(){document.querySelectorAll('.aud').forEach(c=>{const on=c===AU_CARD&&!AU.paused;c.classList.toggle('playing',on);const b=c.querySelector('.ap');if(b)b.innerHTML=on?I.pause:I.play;
+  if(c===AU_CARD){const p=AU.duration?AU.currentTime/AU.duration:0;c.querySelector('.abar i').style.width=(p*100)+'%';c.querySelector('.atime').textContent=fmtT(AU.currentTime)+' / '+fmtT(AU.duration)}})}
+AU.ontimeupdate=auUI;AU.onplay=auUI;AU.onpause=auUI;AU.onloadedmetadata=auUI;
+AU.onended=()=>{const c=AU_CARD;if(!c){auUI();return}const pi=c.closest('.pi');
+  if(ls.get('autocount',true)&&pi){const tap=pi.querySelector('.tap2');const before=pi.querySelector('.cnt').textContent;if(tap)tap.click();
+    const [v,n]=(pi.querySelector('.cnt').textContent.match(/\d+/g)||[0,0]).map(Number);if(v<n){AU.currentTime=0;AU.play().catch(()=>{});return}}
+  auUI()};
+function loadCard(c){const k=c.dataset.m;aGet(k).then(rec=>{c.classList.toggle('has',!!rec);c.querySelector('.aname').textContent=rec?rec.name:'';})}
 document.addEventListener('click',e=>{
-  const p=e.target.closest('.listen .play');if(p){const k=p.dataset.m,id=ls.get('aud:'+k,null);if(id)openPlayer(k,id);else window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(AUDQ[k]||k),'_blank','noopener');return}
-  const s=e.target.closest('.listen .setv');if(s){const box=s.closest('.mantra').querySelector('.setbox');box.hidden=!box.hidden;if(!box.hidden)box.querySelector('input').focus();return}
-  const sv=e.target.closest('.setbox .save');if(sv){const box=sv.closest('.setbox'),k=box.dataset.m,id=ytId(box.querySelector('input').value);
-    if(!id){box.querySelector('.msg').textContent='That doesn\'t look like a YouTube link. In YouTube tap Share, then Copy link, and paste it here.';return}
-    ls.set('aud:'+k,id);document.querySelectorAll('.setbox[data-m="'+k+'"]').forEach(b=>b.hidden=true);go();openPlayer(k,id);return}
-  const cl=e.target.closest('.setbox .clr');if(cl){const k=cl.closest('.setbox').dataset.m;ls.set('aud:'+k,null);go();return}
-  const pa=e.target.closest('.setbox .paste');if(pa){const inp=pa.closest('.setbox').querySelector('input');try{navigator.clipboard.readText().then(t=>{inp.value=t}).catch(()=>inp.focus())}catch(_){inp.focus()}}});
+  const ap=e.target.closest('.aud .ap');if(ap){const c=ap.closest('.aud');
+    if(AU_CARD===c&&AU.src){if(AU.paused)AU.play().catch(()=>{});else AU.pause();return}
+    aGet(c.dataset.m).then(rec=>{if(!rec)return;if(AU_URL)URL.revokeObjectURL(AU_URL);AU_URL=URL.createObjectURL(rec.blob);AU.src=AU_URL;AU_CARD=c;AU.play().catch(()=>{});auUI()});return}
+  const ab=e.target.closest('.aud .abar');if(ab){const c=ab.closest('.aud');if(c===AU_CARD&&AU.duration){const r=ab.getBoundingClientRect();AU.currentTime=AU.duration*Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))}return}
+  const lp=e.target.closest('.aud .aloop');if(lp){const v=!ls.get('autocount',true);ls.set('autocount',v);document.querySelectorAll('.aud .aloop').forEach(b=>b.setAttribute('aria-pressed',v));return}
+  const rm=e.target.closest('.aud .arm');if(rm){const c=rm.closest('.aud');if(AU_CARD===c){AU.pause();AU_CARD=null}aSet(c.dataset.m,null).then(()=>document.querySelectorAll('.aud[data-m="'+c.dataset.m+'"]').forEach(loadCard));return}});
+document.addEventListener('change',e=>{const inp=e.target.closest('.aud .afile');if(!inp||!inp.files[0])return;const c=inp.closest('.aud'),fl=inp.files[0];
+  if(!/^audio\//.test(fl.type)&&!/\.(mp3|m4a|aac|wav|ogg|opus)$/i.test(fl.name)){c.querySelector('.amsg').textContent='Please choose an audio file, such as an MP3.';return}
+  aSet(c.dataset.m,{name:fl.name.replace(/\.[^.]+$/,''),blob:fl}).then(ok=>{c.querySelector('.amsg').textContent=ok?'':'Couldn\'t save the file on this phone.';document.querySelectorAll('.aud[data-m="'+c.dataset.m+'"]').forEach(loadCard)});inp.value=''});
+document.addEventListener('visibilitychange',()=>{});
 setInterval(()=>tick(false),60e3);
 (function(){const el=$('tl');let last=null,hideT=null,active=false;
  const tick1=hapticTick;
