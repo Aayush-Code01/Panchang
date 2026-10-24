@@ -91,10 +91,15 @@ html[data-size="large"] .app > :not(.sheet):not(.sheet-bg):not(.daynav):not(.foc
 
 /* ---------- header ---------- */
 .head{padding-block:26px 6px}
-.toprow{display:flex;align-items:flex-end;gap:8px}
-.toprow .t{flex:1;min-width:0}
+.toprow{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:'eb city gear cal' 'ti ti ti ti';align-items:center;column-gap:8px;row-gap:6px}
+.toprow .t{display:contents}
+.toprow .eyebrow{grid-area:eb;min-width:0;line-height:1.2}
+.toprow h1{grid-area:ti}
+.toprow .pill[aria-label="City"]{grid-area:city}
+.toprow .gear{grid-area:gear}
+.toprow .pill[aria-label="Pick any date"]{grid-area:cal}
 .eyebrow{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--muted);letter-spacing:0;text-transform:none;font-variation-settings:"opsz" 14,"SOFT" 80}
-h1{margin:2px 0 0;font-family:var(--serif);font-size:clamp(30px,10vw,40px);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;letter-spacing:-.02em;color:var(--ink);font-variation-settings:"opsz" 72,"SOFT" 40,"WONK" 1}
+h1{margin:2px 0 0;font-family:var(--serif);font-size:44px;line-height:1.02;white-space:normal;overflow:visible;font-weight:500;letter-spacing:-.02em;color:var(--ink);font-variation-settings:"opsz" 72,"SOFT" 40,"WONK" 1}
 .pill{height:36px;padding:0 13px;border-radius:18px;background:var(--glass);border:.5px solid var(--line);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);display:inline-flex;align-items:center;gap:6px;font-size:14.5px;font-weight:500;color:var(--ink);position:relative;overflow:hidden;white-space:nowrap;max-width:46vw;box-shadow:var(--shadow-sm)}
 #cityName{overflow:hidden;text-overflow:ellipsis}
 .pill select,.pill input{position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0;font-size:16px}
@@ -108,7 +113,7 @@ h1{margin:2px 0 0;font-family:var(--serif);font-size:clamp(30px,10vw,40px);line-
 .sd.today .n{color:var(--brass);font-weight:600}
 .sd.sel .n{background:var(--ink);color:var(--paper);box-shadow:0 6px 14px -6px rgba(26,33,38,.5)}
 .sd .dot{width:6px;height:6px;border-radius:50%}
-.sd .m{font-size:10px;color:var(--muted);height:12px;line-height:12px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+.sd .m{font-size:10px;color:var(--muted);min-height:24px;line-height:1.2;white-space:normal;text-align:center;max-width:100%;padding:0 1px}
 .hsw{position:absolute;left:0;top:0;width:20px;height:12px;margin:0;opacity:.001;pointer-events:none}
 
 /* ---------- surfaces ---------- */
@@ -305,7 +310,7 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .row .act.danger{color:var(--avoid-ink)}
 .sheet .ver{text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px}
 
-.sky .lyr{position:absolute;inset:-12px;will-change:transform;transform:translate3d(0,0,0)}
+.sky .lyr{position:absolute;inset:0;will-change:transform;transform:translate3d(0,0,0)}
 .sky .lyr svg{position:absolute;inset:0;width:100%;height:100%}
 .tilt-ask{position:absolute;right:14px;top:14px;z-index:2;font-size:12.5px;font-weight:600;color:#FFFDF9;background:rgba(20,18,15,.3);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:4px 11px;border-radius:999px}
 .sky-l{z-index:2}
@@ -480,7 +485,6 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
       <div class="row"><span>Bell when chanting is done<small>Rings even on silent</small></span><input type="checkbox" class="tgl" id="tglBell" aria-label="Bell when chanting is done"></div>
       <div class="row"><span>Show special days<small>Ekadashi, Pradosh, full moon and more</small></span><input type="checkbox" class="tgl" id="tglSpecial" aria-label="Show special days"></div>
       <div class="row"><span>Live weather in the sky<small>Clouds, rain, fog and haze where you are</small></span><input type="checkbox" class="tgl" id="tglWx" aria-label="Live weather in the sky"></div>
-      <div class="row"><span>Sky depth when you tilt<small>A gentle 3D shift as you move your phone</small></span><input type="checkbox" class="tgl" id="tglTilt" aria-label="Sky depth when you tilt"></div>
     </div>
     <div class="grp-t">Data</div>
     <div class="grp-b">
@@ -731,7 +735,7 @@ function render(ds,scrollStrip){
   const [vc,vt]=verdict(r),tq=TARA[r.tara.name];
   const dt=new Date(ds+'T00:00:00Z'),tom=new Date(+new Date(todayIST()+'T00:00:00Z')+86400e3).toISOString().slice(0,10);
   $('eyebrow').textContent=dt.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})+(isToday&&ds!==calDateIST()?' · until sunrise':'');
-  {const yst=new Date(+new Date(todayIST()+'T00:00:00Z')-86400e3).toISOString().slice(0,10),sameY=dt.getUTCFullYear()===new Date().getUTCFullYear();$('title').textContent=isToday?'Today':ds===tom?'Tomorrow':ds===yst?'Yesterday':dt.toLocaleDateString('en-IN',sameY?{day:'numeric',month:'short',timeZone:'UTC'}:{month:'short',year:'numeric',timeZone:'UTC'});}
+  {const yst=new Date(+new Date(todayIST()+'T00:00:00Z')-86400e3).toISOString().slice(0,10),sameY=dt.getUTCFullYear()===new Date().getUTCFullYear();const rel=isToday||ds===tom||ds===yst;$('title').textContent=isToday?'Today':ds===tom?'Tomorrow':ds===yst?'Yesterday':dt.toLocaleDateString('en-IN',{weekday:'long',timeZone:'UTC'});if(!rel)$('eyebrow').textContent=dt.toLocaleDateString('en-IN',sameY?{day:'numeric',month:'long',timeZone:'UTC'}:{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});}
   strip(ds,lat,lon);dayNav(ds,lat,lon);
 
   bar(r,S,isToday);try{window._lastSky={r,isToday};$('sky').innerHTML=skySVG(r,isToday);applyAmbience(window.SKY_PHASE);if(isToday)loadWeather(lat,lon)}catch(e){console.error(e)}
@@ -890,7 +894,7 @@ function applyTheme(){const m=ls.get('theme','light'),dark=m==='dark'||(m==='aut
 applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(ls.get('theme','light')==='auto')applyTheme()})}catch(e){}
 function syncSettings(){const set=(id,v)=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
   set('segTheme',ls.get('theme','light'));set('segSize',ls.get('size','normal'));
-  $('tglBell').checked=ls.get('bell',true);$('tglWx').checked=ls.get('wxOn',true);$('tglTilt').checked=ls.get('tilt',true)&&!ls.get('tiltDenied',false);$('tglSpecial').checked=ls.get('special',true);
+  $('tglBell').checked=ls.get('bell',true);$('tglWx').checked=ls.get('wxOn',true);$('tglSpecial').checked=ls.get('special',true);
   const no=document.getElementById('nearOpt');$('tglGps').checked=!!(no&&no.selected);$('clearAll').textContent='Clear';$('clearAll').dataset.arm=''}
 function openSheet(){syncSettings();$('sheetBg').classList.add('show');$('sheet').classList.add('show');$('sheet').setAttribute('aria-hidden','false')}
 function closeSheet(){$('sheetBg').classList.remove('show');$('sheet').classList.remove('show');$('sheet').setAttribute('aria-hidden','true')}
@@ -898,7 +902,6 @@ $('gearBtn').onclick=openSheet;$('sheetBg').onclick=closeSheet;$('sheetDone').on
 $('segTheme').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('theme',b.dataset.v);applyTheme();applyAmbience(window.SKY_PHASE);syncSettings()};
 $('segSize').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('size',b.dataset.v);applyTheme();syncSettings()};
 $('tglBell').onchange=()=>{ls.set('bell',$('tglBell').checked);document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
-$('tglTilt').onchange=()=>{const v=$('tglTilt').checked;ls.set('tilt',v);if(v){ls.set('tiltDenied',false);tiltStart()}else tiltStop();go()};
 $('tglWx').onchange=()=>{ls.set('wxOn',$('tglWx').checked);go()};
 $('tglSpecial').onchange=()=>{ls.set('special',$('tglSpecial').checked);go()};
 $('tglGps').onchange=()=>{if($('tglGps').checked){ls.set('locAsked2',true);hideLocMsg();locate(false)}else{$('loc').value='28.4595,77.0266';go()}};
@@ -1037,7 +1040,7 @@ function skySVG(r,isToday){
   {const open=s.slice(0,s.indexOf('>')+1).replace('preserveAspectRatio="xMidYMid slice"','preserveAspectRatio="xMidYMid slice" overflow="visible"'),defs=(s.match(/<defs>[\s\S]*?<\/defs>/)||[''])[0],body=s.slice(s.indexOf('</defs>')+7,s.lastIndexOf('</svg>'));
    const i1=body.indexOf('<g class="pl pl1">'),i2=body.indexOf('<g class="pl pl2">'),i3=body.indexOf('<g class="pl pl3">');
    const parts=[body.slice(0,i1),body.slice(i1,i2),body.slice(i2,i3),body.slice(i3)];
-   s=parts.map((p,i)=>`<div class="lyr" data-d="${[0,3,6,9][i]}">${open}${i===0||i===2||i===3?defs:''}${p}</svg></div>`).join('')+(WXC&&(wet)?`<div class="wx-p ${WK}" style="background-image:${wxTile(WK)}"></div><div class="wx-p ${WK} l2" style="background-image:${wxTile(WK)};background-size:90px 116px"></div>`:'')+(WK==='storm'?'<div class="wx-flash"></div>':'')+(WK==='fog'?'<div class="wx-fog"></div>':'')+(WK==='haze'?'<div class="wx-haze"></div>':'')+`<span class="sky-l">${label}${WXC?' · '+wxText(WXC)+' · '+WXC.temp+'°':''}</span>${tiltNeedsAsk()?'<button type="button" class="tilt-ask" id="tiltAsk">Turn on tilt</button>':''}`;}
+   s=parts.map((p,i)=>`<div class="lyr" data-d="${[0,0,0,0][i]}">${open}${i===0||i===2||i===3?defs:''}${p}</svg></div>`).join('')+(WXC&&(wet)?`<div class="wx-p ${WK}" style="background-image:${wxTile(WK)}"></div><div class="wx-p ${WK} l2" style="background-image:${wxTile(WK)};background-size:90px 116px"></div>`:'')+(WK==='storm'?'<div class="wx-flash"></div>':'')+(WK==='fog'?'<div class="wx-fog"></div>':'')+(WK==='haze'?'<div class="wx-haze"></div>':'')+`<span class="sky-l">${label}${WXC?' · '+wxText(WXC)+' · '+WXC.temp+'°':''}</span>${tiltNeedsAsk()?'<button type="button" class="tilt-ask" id="tiltAsk">Turn on tilt</button>':''}`;}
   window.SKY_PHASE=phase;
   return s}
 function wxKey(lat,lon){return (+lat).toFixed(2)+','+(+lon).toFixed(2)}
@@ -1089,11 +1092,11 @@ var TILT={x:0,y:0,tx:0,ty:0,run:false,base:null,on:false};
 function tiltLoop(){TILT.x+=(TILT.tx-TILT.x)*.06;TILT.y+=(TILT.ty-TILT.y)*.06;
   document.querySelectorAll('#sky .lyr').forEach(el=>{const d=+el.dataset.d;el.style.transform=`translate3d(${(-TILT.x*d).toFixed(2)}px,${(-TILT.y*d*.7).toFixed(2)}px,0)`});
   if(Math.abs(TILT.tx-TILT.x)>.001||Math.abs(TILT.ty-TILT.y)>.001)requestAnimationFrame(tiltLoop);else TILT.run=false}
-function tiltNeedsAsk(){return typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'&&!TILT.on&&ls.get('tilt',true)&&!ls.get('tiltDenied',false)&&!matchMedia('(prefers-reduced-motion: reduce)').matches}
+function tiltNeedsAsk(){return false&&typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'&&!TILT.on&&ls.get('tilt',true)&&!ls.get('tiltDenied',false)&&!matchMedia('(prefers-reduced-motion: reduce)').matches}
 function tiltTo(x,y){TILT.tx=Math.max(-1,Math.min(1,x));TILT.ty=Math.max(-1,Math.min(1,y));if(!TILT.run){TILT.run=true;requestAnimationFrame(tiltLoop)}}
 function onOrient(e){if(e.beta==null)return;const b=e.beta,g=e.gamma||0;if(TILT.base==null){TILT.base=b;TILT.gbase=g}TILT.base+=(b-TILT.base)*.012;TILT.gbase+=(g-TILT.gbase)*.012;const dz=v=>Math.abs(v)<1.2?0:v-Math.sign(v)*1.2;tiltTo(dz(g-TILT.gbase)/14,dz(b-TILT.base)/14)}
 function onMotion(e){if(TILT.gotOrient)return;const g=e.accelerationIncludingGravity;if(!g||g.x==null)return;if(TILT.mbase==null){TILT.mbase=g.y;TILT.mxb=g.x}TILT.mbase+=(g.y-TILT.mbase)*.012;TILT.mxb+=(g.x-TILT.mxb)*.012;tiltTo(-(g.x-TILT.mxb)/2.4,(g.y-TILT.mbase)/2.4)}
-function tiltStart(){if(TILT.on||matchMedia('(prefers-reduced-motion: reduce)').matches||!ls.get('tilt',true))return;
+function tiltStart(){return;if(TILT.on||matchMedia('(prefers-reduced-motion: reduce)').matches||!ls.get('tilt',true))return;
   const go2=()=>{TILT.on=true;window.addEventListener('deviceorientation',ev=>{if(ev.beta!=null)TILT.gotOrient=true;onOrient(ev)});window.addEventListener('devicemotion',onMotion);const ta=document.getElementById('tiltAsk');if(ta)ta.remove()};
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     if(ls.get('tiltDenied',false))return;
@@ -1104,7 +1107,7 @@ function tiltStop(){TILT.on=false;window.removeEventListener('deviceorientation'
 (function(){const needsAsk=typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function';
   if(!needsAsk)tiltStart();
   else{const once=()=>{document.removeEventListener('touchend',once);document.removeEventListener('click',once);tiltStart()};document.addEventListener('touchend',once,{passive:true});document.addEventListener('click',once)}
-  window.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse'||!ls.get('tilt',true)||matchMedia('(prefers-reduced-motion: reduce)').matches)return;tiltTo((e.clientX/innerWidth-.5)*1.6,(e.clientY/innerHeight-.5)*1.2)},{passive:true})})();
+  window.addEventListener('pointermove',e=>{if(true||e.pointerType!=='mouse'||!ls.get('tilt',true)||matchMedia('(prefers-reduced-motion: reduce)').matches)return;tiltTo((e.clientX/innerWidth-.5)*1.6,(e.clientY/innerHeight-.5)*1.2)},{passive:true})})();
 function applyAmbience(phase){const dk=document.documentElement.dataset.theme==='dark';
   const A=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}
             :{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']};
