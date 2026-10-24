@@ -261,6 +261,32 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 /* ---------- floating ---------- */
 .totop{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(88px + env(safe-area-inset-bottom,0px));width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;box-shadow:0 8px 22px -6px rgba(26,33,38,.45);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
 .totop.show{opacity:1;transform:none;pointer-events:auto}
+.affc{padding:0;overflow:hidden}
+.affq{position:relative;display:block;padding:24px 22px 18px;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .2s}
+.affq:active{background:var(--card-2)}
+.affq .cap{font-size:13px;color:var(--muted);letter-spacing:.01em;margin-bottom:12px}
+.affq .en{font-family:var(--serif);font-size:25px;line-height:1.28;color:var(--ink);font-weight:400;letter-spacing:-.01em;font-variation-settings:"opsz" 48,"SOFT" 60;text-wrap:balance}
+.affq .hi{font-family:var(--deva);font-size:18px;line-height:1.6;color:var(--text);margin-top:10px;opacity:.85}
+.affq .rep{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:13px;color:var(--muted)}
+.affq .dots{display:flex;gap:6px}
+.affq .dots i{width:8px;height:8px;border-radius:50%;background:var(--line-strong);transition:background .25s,transform .25s}
+.affq .dots i.on{background:var(--best,#C99A2E);transform:scale(1.15)}
+.affq.full .rep span{color:var(--good-ink)}
+.affs{padding:16px 22px 20px;border-top:.5px solid var(--line)}
+.affs .lb{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted);margin-bottom:8px}
+.affs .lb b{font-size:15px;font-weight:600;color:var(--ink)}
+.affs textarea{display:block;width:100%;box-sizing:border-box;min-height:52px;resize:none;border:.5px solid var(--line);border-radius:var(--r-md);background:var(--card-2);color:var(--ink);font:inherit;font-size:17px;line-height:1.4;padding:13px 14px;outline:none;transition:border-color .2s,background .2s;overflow:hidden}
+.affs textarea:focus{border-color:var(--line-strong);background:var(--card-solid)}
+.affs textarea::placeholder{color:var(--muted);opacity:.8}
+.affs .saved{font-size:12px;color:var(--good-ink);opacity:0;transition:opacity .3s}
+.affs .saved.on{opacity:1}
+.affr{padding:16px 22px 20px;border-top:.5px solid var(--line)}
+.affr .q{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:10px}
+.affr .opts{display:flex;gap:8px}
+.affr .opts button{flex:1 1 0;min-width:0;padding:11px 6px;border-radius:var(--r-md);border:.5px solid var(--line);background:var(--card-2);color:var(--text);font:inherit;font-size:14px;cursor:pointer;transition:transform .08s,background .2s,color .2s}
+.affr .opts button:active{transform:scale(.97)}
+.affr .opts button.sel{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.affr .ans{font-size:14px;color:var(--muted);margin-top:10px;min-height:1em}
 .daynav{position:fixed;left:0;right:0;bottom:0;z-index:35;display:flex;gap:8px;padding:8px max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));background:var(--glass);-webkit-backdrop-filter:saturate(1.5) blur(22px);backdrop-filter:saturate(1.5) blur(22px);border-top:.5px solid var(--line)}
 .daynav .dn{position:relative;flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-md);background:var(--card);border:.5px solid var(--line);cursor:pointer;-webkit-user-select:none;user-select:none;transition:transform .08s}
 .daynav .dn:active{transform:scale(.97)}
@@ -464,6 +490,11 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
     <p class="note">Vishakha (4th quarter) is ruled by Jupiter, so Thursday is your strongest day. Mars rules both your Moon sign and rising sign Scorpio, which makes Tuesday a day of strength and drive for you.</p>
   </details>
 
+  <section>
+    <div class="sec-title"><h2><span class="hic" id="affIc"></span>Your intention</h2><span id="affHint"></span></div>
+    <div class="card affc" id="aff"></div>
+  </section>
+
   <button type="button" class="totop" id="totop" aria-label="Back to top"></button>
   <label id="hapt" aria-hidden="true" style="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden"><input type="checkbox" switch tabindex="-1"></label>
   <div class="focus" id="focus" hidden><label class="focus-pad" id="focusPad"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><div class="f-name"></div><div class="f-ring"><div class="f-cnt num"></div></div><div class="f-hint"></div></label><button type="button" class="f-close" id="focusClose">Done</button></div>
@@ -647,6 +678,7 @@ const I={
  music:sv('<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',17),
  lotus:sv('<path d="M12 20c-4 0-8-2.5-8-6 2 0 4 .7 5.5 2M12 20c4 0 8-2.5 8-6-2 0-4 .7-5.5 2M12 20c-2.2-1.6-3.5-4-3.5-7S10 7 12 4c2 3 3.5 6 3.5 9s-1.3 5.4-3.5 7z"/>'),
  cal:sv('<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+ spark:sv('<path d="M12 3.5l1.7 5 5 1.7-5 1.7-1.7 5-1.7-5-5-1.7 5-1.7zM18.5 15.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>'),
  moon:sv('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>')
 };
 const VI={good:sv('<circle cx="12" cy="12" r="9.5"/><path d="M7.5 13.5c1 2.3 2.6 3.5 4.5 3.5s3.5-1.2 4.5-3.5z" fill="currentColor"/><path d="M8 9.2c.5-.8 1.5-.8 2 0M14 9.2c.5-.8 1.5-.8 2 0"/>',30),
@@ -778,7 +810,7 @@ function render(ds,scrollStrip){
   h+=rest.map(x=>x.g?item(x.g,isToday&&now>=x.g.a&&now<x.g.b?' cur':''):sunI(x.t,x.sun)).join('');
   if(isToday&&!rest.length)h+=`<div class="it" style="--ci:var(--good-ink);--bgc:var(--good-bg)"><div class="tm">${hm(new Date(Math.max(...S.map(g=>g.b))))}<small>pm</small></div><span class="ic">${I.moon}</span><div class="bd"><div class="lb">That's it for today</div><div class="tg">Rest well. Tap Tomorrow below to plan ahead.</div></div></div>`;
   $('list').innerHTML=h;
-  $('dayTitle').textContent=isToday?'Coming up':'The day';$('dayIc').innerHTML=I.now;$('pracIc').innerHTML=I.lotus;
+  $('dayTitle').textContent=isToday?'Coming up':'The day';$('dayIc').innerHTML=I.now;$('pracIc').innerHTML=I.lotus;$('affIc').innerHTML=I.spark;
   $('dayHint').textContent=isToday?'until sunrise':'sunrise to sunrise';
   const rv=$('reveal');if(rv)rv.onclick=()=>{const p=$('past');p.classList.toggle('open');rv.firstChild.textContent=p.classList.contains('open')?'Hide earlier':`Show ${past.filter(x=>x.g).length} earlier`};
 
@@ -807,6 +839,7 @@ function render(ds,scrollStrip){
   });
   streak();document.querySelectorAll('.aud').forEach(loadCard);if(AU_CARD&&!document.body.contains(AU_CARD)){AU.pause();AU_CARD=null}
 
+  try{affirm(r,ds,isToday)}catch(e){console.error(e)}
   // details
   const until=t=>t?'until '+fmt(t)+(ist(t).getUTCDate()!==ist(r.rise).getUTCDate()?', next day':''):'';
   const D=[['Lunar day','Tithi',`${r.tithi.paksha==='Shukla'?'Waxing':'Waning'} · ${r.tithi.name}`,until(r.tithi.end)],
@@ -820,6 +853,40 @@ function render(ds,scrollStrip){
    ['Gulika Kaal','Avoid new starts',hm(r.gulika[0])+' – '+fmt(r.gulika[1]),''],
    ['Brahma muhurat','Best for meditation',hm(r.brahma[0])+' – '+fmt(r.brahma[1]),'']];
   $('details').innerHTML=D.map(([k,ks,v,vs])=>`<div class="kv"><div class="k">${k}<small>${ks}</small></div><div class="v num">${v}${vs?`<small>${vs}</small>`:''}</div></div>`).join('');
+}
+const BDAY='07-29';
+const AFF=[
+ [['I have the energy for what matters today.','आज जो ज़रूरी है, उसके लिए मुझमें पूरी ऊर्जा है।'],['I let my work speak with quiet confidence.','मेरा काम ही मेरा आत्मविश्वास है।'],['Like the sun, I show up on time and give fully.','सूरज की तरह, समय पर और पूरे मन से।'],['I lead by example, not by noise.','मेरी पहचान मेरे काम से है, शोर से नहीं।']],
+ [['My mind is calm, and calm choices come easily.','मन शांत है, और सही फ़ैसले सहज हैं।'],['I let go of what isn’t mine to control.','जो मेरे बस में नहीं, उसे जाने देना ही शांति है।'],['I am steady, like still water.','शांत पानी की तरह, स्थिर मन।'],['I begin again, with a clear heart.','साफ़ मन से, एक नई शुरुआत।']],
+ [['I have the strength to finish what I start.','जो शुरू करूँ, उसे पूरा करने की ताक़त मुझमें है।'],['Obstacles are steps I haven’t climbed yet.','हर रुकावट बस अगली सीढ़ी है।'],['I act with courage and a cool head.','हिम्मत भी, और ठंडा दिमाग़ भी।'],['Today I do the hard thing first.','आज सबसे मुश्किल काम सबसे पहले।']],
+ [['My words are clear, kind and well-timed.','मेरे शब्द साफ़, विनम्र और सही समय पर हैं।'],['I listen fully before I answer.','जवाब से पहले, पूरा सुनना।'],['Good ideas and good chances are finding their way to me.','अच्छे विचार और अच्छे मौक़े मेरी ओर आ रहे हैं।'],['Every conversation today moves something forward.','आज की हर बात कुछ आगे बढ़ाएगी।']],
+ [['I welcome good guidance and act on it with patience.','अच्छी सलाह का स्वागत है, और धैर्य से उस पर अमल।'],['I learn something today and share it generously.','आज कुछ सीखना है, और खुले मन से बाँटना है।'],['I trust that things are unfolding well.','भरोसा है कि सब अच्छे से हो रहा है।'],['Wisdom over hurry.','जल्दबाज़ी नहीं, समझदारी।']],
+ [['I am grateful for what I have and open to more.','जो है उसके लिए आभार, और जो आ रहा है उसके लिए खुला मन।'],['I make something beautiful today, however small.','आज कुछ सुंदर बनाना है, चाहे छोटा ही सही।'],['I value the people around me, and today I tell them.','अपने लोगों की क़द्र है, और आज उन्हें बताना भी है।'],['Abundance follows steady, honest work.','ईमानदार और लगातार मेहनत से ही लक्ष्मी आती है।']],
+ [['Slow and steady is still moving forward.','धीरे ही सही, पर आगे बढ़ना।'],['I keep my word, especially in small things.','हर वादा निभाना, छोटा हो या बड़ा।'],['One kind act today makes the whole day lighter.','आज एक भलाई, और पूरा दिन हल्का।'],['Patience is my strength today.','आज धैर्य ही मेरी ताक़त है।']]];
+const AFF_SP={bday:['A new year begins. I step into it with gratitude.','नया साल, नई शुरुआत, आभार के साथ।'],Purnima:['I am grateful for all that is full in my life.','जीवन में जो भरपूर है, उसके लिए आभार।'],Amavasya:['I let go of what’s done and make room for what’s next.','जो बीत गया उसे विदा, जो आने वाला है उसके लिए जगह।'],Ekadashi:['Less is more. I keep today light and clear.','कम में ही ज़्यादा है। आज सब हल्का और साफ़।'],ashtama:['I move gently today and trust tomorrow.','आज धीरे चलना है, कल पर भरोसा है।']};
+const PLANET=['the Sun','the Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+function affirm(r,ds,isToday){const el=$('aff');if(!el)return;
+  const days=Math.floor(+new Date(ds+'T00:00:00Z')/86400e3),wd=r.wd,dn=new Date(ds+'T00:00:00Z').toLocaleDateString('en-IN',{weekday:'long',timeZone:'UTC'});
+  let a=AFF[wd][Math.floor((days+4)/7)%4],cap=`${dn} · ${PLANET[wd]}’s day`;
+  if(ds.slice(5)===BDAY){a=AFF_SP.bday;cap='Happy birthday 🎂'}
+  else if(r.chandra.ashtama){a=AFF_SP.ashtama;cap='A gentle day'}
+  else if(AFF_SP[r.tithi.name]){a=AFF_SP[r.tithi.name];cap={Purnima:'Full moon',Amavasya:'New moon',Ekadashi:'Ekadashi'}[r.tithi.name]+' · '+dn}
+  const ak='aff:'+ds,n0=Math.min(3,ls.get(ak,0)),sk='sankalp:'+ds,txt=ls.get(sk,''),rk='reflect:'+ds,rv=ls.get(rk,'');
+  const fut=ds>todayIST(),eve=isToday&&Date.now()>=+r.set,past=!isToday&&!fut;
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const R={well:['Went well','Lovely. Carry that into tomorrow.'],part:['Partly','Progress counts. One small step more tomorrow.'],not:['Not today','That’s okay. Tomorrow is a fresh start.']};
+  $('affHint').textContent=fut?'plan ahead':past?'':eve?'evening check-in':'';
+  let h=`<label class="affq${n0>=3?' full':''}" aria-label="Count one repetition"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><div class="cap">${cap}</div><div class="en">${a[0]}</div><div class="hi">${a[1]}</div><div class="rep"><div class="dots">${[0,1,2].map(i=>`<i${i<n0?' class="on"':''}></i>`).join('')}</div><span>${n0>=3?'Settled in. Carry it with you.':'Say it slowly, 3 times. Tap after each.'}</span></div></label>`;
+  h+=`<div class="affs"><div class="lb"><b>Your sankalp</b><span class="saved">Saved</span></div><textarea rows="1" maxlength="160" enterkeyhint="done" placeholder="${fut?'An intention for this day…':past?'Nothing written this day':'One thing I’ll do today…'}">${esc(txt)}</textarea></div>`;
+  if(eve||(past&&(rv||txt))||(isToday&&rv))h+=`<div class="affr"><div class="q">${txt?'Did today go the way you set out?':'How did today feel?'}</div><div class="opts">${Object.entries(R).map(([k,v])=>`<button type="button" data-k="${k}"${rv===k?' class="sel"':''}>${v[0]}</button>`).join('')}</div><div class="ans">${rv?R[rv][1]:''}</div></div>`;
+  el.innerHTML=h;
+  const q=el.querySelector('.affq');q.onclick=e=>{if(e.target.tagName==='INPUT')return;let n=Math.min(3,ls.get(ak,0));n=n>=3?0:n+1;ls.set(ak,n);
+    q.querySelectorAll('.dots i').forEach((d,i)=>d.classList.toggle('on',i<n));q.classList.toggle('full',n>=3);q.querySelector('.rep span').textContent=n>=3?'Settled in. Carry it with you.':n?`${3-n} more, slowly.`:'Say it slowly, 3 times. Tap after each.';if(n>=3)haptic(2)};
+  const ta=el.querySelector('textarea'),sv2=el.querySelector('.saved');let tm;const grow=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'};requestAnimationFrame(grow);
+  ta.oninput=()=>{grow();clearTimeout(tm);tm=setTimeout(()=>{ls.set(sk,ta.value.trim());sv2.classList.add('on');setTimeout(()=>sv2.classList.remove('on'),1200)},500)};
+  ta.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ta.blur()}};
+  ta.onblur=()=>{clearTimeout(tm);ls.set(sk,ta.value.trim())};
+  el.querySelectorAll('.affr button').forEach(b=>b.onclick=()=>{const k=b.dataset.k,cur=ls.get(rk,'')===k?'':k;ls.set(rk,cur);el.querySelectorAll('.affr button').forEach(x=>x.classList.toggle('sel',x.dataset.k===cur));el.querySelector('.affr .ans').textContent=cur?R[cur][1]:'';haptic()});
 }
 function streak(){let n=0;const t=new Date(todayIST()+'T00:00:00Z');for(let i=0;i<400;i++){const v=ls.get('ritual:'+new Date(+t-i*86400e3).toISOString().slice(0,10),[]);if(v.length)n++;else if(i>0)break}
   $('streak').textContent=n?n+'-day streak':''}
