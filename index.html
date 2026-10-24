@@ -79,7 +79,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 :focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:8px}
 .num{font-variant-numeric:tabular-nums}
 .app{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 124px;display:flex;flex-direction:column;gap:22px}
-html[data-size="large"] .app > :not(.sheet):not(.sheet-bg):not(.daynav):not(.focus):not(.totop),html[data-size="large"] .focus-pad,html[data-size="large"] .daynav .dn{zoom:1.12}
+html[data-size="large"] .app > :not(.sheet):not(.sheet-bg):not(.daynav):not(.focus):not(.totop):not(.col),html[data-size="large"] .col > :not(.daynav),html[data-size="large"] .focus-pad,html[data-size="large"] .daynav .dn{zoom:1.12}
 
 /* ---------- splash ---------- */
 .splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:linear-gradient(180deg,var(--amb1),var(--amb2) 45%,var(--bg));transition:opacity .45s ease,visibility .45s}
@@ -288,6 +288,52 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .affr .opts button.sel{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .affr .ans{font-size:14px;color:var(--muted);margin-top:10px;min-height:1em}
 .daynav{position:fixed;left:0;right:0;bottom:0;z-index:35;display:flex;gap:8px;padding:8px max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));background:var(--glass);-webkit-backdrop-filter:saturate(1.5) blur(22px);backdrop-filter:saturate(1.5) blur(22px);border-top:.5px solid var(--line)}
+/* sankalp in the bottom bar */
+.daynav{flex-wrap:wrap}
+.daynav .dsk{flex:1 0 100%;order:-1;display:flex;align-items:center;gap:8px;min-width:0;padding:2px 6px 2px 4px;font-size:14px;color:var(--ink);text-align:left;cursor:pointer;background:none;border:0}
+.daynav .dsk svg{flex:0 0 auto;color:var(--best-ink,#8E6617)}
+.daynav .dsk span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.daynav .dsk em{font-style:normal;color:var(--muted);flex:0 0 auto}
+body.has-sk .totop{bottom:calc(122px + env(safe-area-inset-bottom,0px))}
+body.has-sk .app{padding-bottom:156px}
+/* sync */
+.tokrow{padding:12px 14px;border-top:.5px solid var(--line)}
+.tokrow p{margin:0 0 10px;font-size:13.5px;color:var(--muted);line-height:1.45}
+.tokrow a{color:var(--brass)}
+.tokrow .in{display:flex;gap:8px}
+.tokrow input{flex:1;min-width:0;font:inherit;font-size:15px;padding:10px 12px;border-radius:10px;border:.5px solid var(--line-strong);background:var(--card-2);color:var(--ink);outline:none}
+.tokrow button{font-size:15px;font-weight:600;color:var(--paper);background:var(--ink);border-radius:10px;padding:0 14px}
+.tokrow .err{color:var(--avoid-ink);font-size:13px;margin-top:8px;min-height:1em}
+/* desktop bento */
+.col{display:contents}
+.app > .head{order:0}.app > .locmsg{order:1}.hero{order:2}#alerts{order:3}.s-list{order:4}.s-prac{order:5}.d-det{order:6}.d-chart{order:7}.s-aff{order:8}.app > .foot{order:9}.daynav{order:10}
+@media (min-width:1080px) and (min-height:620px){
+  .app{max-width:1500px;height:100dvh;box-sizing:border-box;padding:0 24px 16px;gap:16px;display:grid;
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);
+    grid-template-areas:'head head head' 'msg msg msg' 'c1 c2 c3'}
+  .app > .head{grid-area:head;padding-block:14px 0}
+  .strip{margin:6px 0 0;padding:0 0 2px}
+  .app > .locmsg{grid-area:msg}
+  .app > .locmsg[hidden]{display:none}
+  .col{display:flex;flex-direction:column;gap:16px;min-height:0;min-width:0}
+  .c1{grid-area:c1}.c2{grid-area:c2}.c3{grid-area:c3}
+  .c1 .hero{flex:1 1 auto;min-height:0;overflow:auto;scrollbar-width:none}
+  #alerts:empty{display:none}
+  .s-list,.s-prac{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  .s-list .list,.s-prac .prac{flex:1 1 auto;min-height:0;overflow:auto;scrollbar-width:thin}
+  .d-det,.d-chart{flex:0 0 auto}
+  .d-det[open],.d-chart[open]{max-height:42vh;overflow:auto}
+  .s-aff{flex:0 0 auto}
+  .s-prac{min-height:150px}
+  .affq{padding:18px 20px 14px}.affq .en{font-size:22px}.affq .cap{margin-bottom:8px}.affq .rep{margin-top:12px}.affs{padding:12px 20px 16px}.affr{padding:12px 20px 16px}
+  .sec-title{margin-bottom:8px}
+  .c1 > .daynav{flex:0 0 auto;position:static;transform:none;width:auto;left:auto;right:auto;border:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0}
+  body.has-sk .app{padding-bottom:16px}
+  .totop,.app > .foot{display:none!important}
+  .sky{height:180px}
+  .toprow{grid-template-columns:auto minmax(0,1fr) auto auto auto;grid-template-areas:'ti eb city gear cal'}
+  .toprow h1{margin-right:10px}
+}
 .daynav .dn{position:relative;flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-md);background:var(--card);border:.5px solid var(--line);cursor:pointer;-webkit-user-select:none;user-select:none;transition:transform .08s}
 .daynav .dn:active{transform:scale(.97)}
 .daynav .next{justify-content:flex-end;text-align:right}
@@ -455,6 +501,7 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
   </header>
 
   <div class="locmsg" id="locmsg" hidden><span></span><button type="button" class="ask" id="locAsk">Use my location</button><button type="button" class="x" id="locX" aria-label="Dismiss">✕</button></div>
+  <div class="col c1">
   <section class="card hero">
     <div class="sky" id="sky"></div>
     <div class="vrow"><div><div class="k2">Your day reads</div><div class="verdict" id="verdict">&nbsp;</div></div><span class="vicon" id="vicon"></span></div>
@@ -465,35 +512,35 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
     <p class="tl-hint">Drag your thumb along the bar to see each period</p>
     <div class="nn" id="nn"></div>
   </section>
-
+  <nav class="daynav" id="daynav" aria-label="Previous and next day"></nav>
+  </div>
+  <div class="col c2">
   <div id="alerts" style="display:flex;flex-direction:column;gap:10px"></div>
-
-  <section>
+  <section class="s-list">
     <div class="sec-title"><h2><span class="hic" id="dayIc"></span><span id="dayTitle">Coming up</span></h2><span id="dayHint"></span></div>
     <div class="list" id="list"></div>
   </section>
-
-  <section>
-    <div class="sec-title"><h2><span class="hic" id="pracIc"></span>Today's practice</h2><span class="streak" id="streak"></span></div>
-    <div id="special"></div>
-    <div class="prac" id="prac"></div>
-  </section>
-
-  <details class="grp">
+  <details class="grp d-det">
     <summary>Panchang details</summary>
     <div id="details"></div>
   </details>
-
-  <details class="grp">
+  <details class="grp d-chart">
     <summary>Your chart</summary>
     <div class="chartrow"><div><b>Cancer</b><span>Rising sign</span></div><div><b>Gemini</b><span>Moon sign</span></div><div><b>Ardra</b><span>Birth star</span></div></div>
     <p class="note">Ardra (2nd quarter) belongs to Shiva, and your Cancer rising sign is ruled by the Moon, so Monday is your strongest day. Mercury rules your Moon sign, which makes Wednesday good for deals and conversations.</p>
   </details>
-
-  <section>
+  </div>
+  <div class="col c3">
+  <section class="s-prac">
+    <div class="sec-title"><h2><span class="hic" id="pracIc"></span>Today's practice</h2><span class="streak" id="streak"></span></div>
+    <div id="special"></div>
+    <div class="prac" id="prac"></div>
+  </section>
+  <section class="s-aff">
     <div class="sec-title"><h2><span class="hic" id="affIc"></span>Your intention</h2><span id="affHint"></span></div>
     <div class="card affc" id="aff"></div>
   </section>
+  </div>
 
   <button type="button" class="totop" id="totop" aria-label="Back to top"></button>
   <label id="hapt" aria-hidden="true" style="position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden"><input type="checkbox" switch tabindex="-1"></label>
@@ -517,6 +564,8 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
       <div class="row"><span>Show special days<small>Ekadashi, Pradosh, full moon and more</small></span><input type="checkbox" class="tgl" id="tglSpecial" aria-label="Show special days"></div>
       <div class="row"><span>Live weather in the sky<small>Clouds, rain, fog and haze where you are</small></span><input type="checkbox" class="tgl" id="tglWx" aria-label="Live weather in the sky"></div>
     </div>
+    <div class="grp-t">Sync</div>
+    <div class="grp-b" id="syncBox"></div>
     <div class="grp-t">Data</div>
     <div class="grp-b">
       <div class="row"><span>Today's practice</span><button type="button" class="act" id="resetToday">Reset</button></div>
@@ -524,7 +573,6 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
     </div>
     <p class="ver">Panchang · Lahiri system · calculated on your phone</p>
   </div>
-  <nav class="daynav" id="daynav" aria-label="Previous and next day"></nav>
   <p class="foot">Worked out on your phone from the Sun and Moon's positions, using the Lahiri system Indian panchangs follow. Matches <a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a> within about a minute. Traditional guidance, not a promise of results.</p>
 </div>
 
@@ -651,6 +699,41 @@ const dur=ms=>{const m=Math.max(1,Math.round(ms/60e3));return m>=60?Math.floor(m
 const calDateIST=()=>ist(new Date()).toISOString().slice(0,10);
 const todayIST=()=>{const d=calDateIST();try{const v=(document.getElementById('loc')||{}).value||'';const [la,lo]=(/^-?\d/.test(v)?v:'28.4595,77.0266').split(',').map(Number);const r=calc(d,la,lo);if(Date.now()<+r.rise){const p=new Date(d+'T00:00:00Z');p.setUTCDate(p.getUTCDate()-1);return p.toISOString().slice(0,10)}}catch(e){}return d};
 const ls={get(k,v){try{const x=localStorage.getItem(k);return x==null?v:JSON.parse(x)}catch(e){return v}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+const SYNC_RE=/^(ritual|japa|aff|sankalp|reflect):/,SYNC_FILE='panchang.json',LSP='',SY={busy:false,err:'',t:0};
+const _lsSet=ls.set;ls.set=function(k,v){_lsSet(k,v);if(SYNC_RE.test(k)){const m=ls.get('syncMeta',{});m[k]=Date.now();_lsSet('syncMeta',m);syncSoon()}};
+async function gh(path,opt={}){const r=await fetch('https://api.github.com'+path,Object.assign({},opt,{cache:'no-store',headers:Object.assign({Authorization:'Bearer '+ls.get('ghTok',''),Accept:'application/vnd.github+json'},opt.body?{'Content-Type':'application/json'}:{})}));if(!r.ok){const e=new Error(r.status);e.code=r.status;throw e}return r.json()}
+async function findGist(){let id=ls.get('ghGist','');if(id)return id;
+  for(let p=1;p<=5;p++){const L=await gh('/gists?per_page=100&page='+p);const g=L.find(x=>x.files&&x.files[SYNC_FILE]);if(g){_lsSet('ghGist',g.id);return g.id}if(L.length<100)break}
+  const g=await gh('/gists',{method:'POST',body:JSON.stringify({description:'Panchang app sync (private)',public:false,files:{[SYNC_FILE]:{content:'{}'}}})});_lsSet('ghGist',g.id);return g.id}
+let _syT;function syncSoon(ms=2000){if(!ls.get('ghTok',''))return;clearTimeout(_syT);_syT=setTimeout(syncNow,ms)}
+async function syncNow(){if(!ls.get('ghTok','')||SY.busy||!navigator.onLine)return;SY.busy=true;syncUI();
+  try{const meta=ls.get('syncMeta',{});
+    for(let i=0;i<localStorage.length;i++){let k=localStorage.key(i);if(LSP){if(!k.startsWith(LSP))continue;k=k.slice(LSP.length)}if(SYNC_RE.test(k)&&!meta[k])meta[k]=1}
+    const id=await findGist();let g;try{g=await gh('/gists/'+id)}catch(e){if(e.code===404){_lsSet('ghGist','');SY.busy=false;return syncNow()}throw e}
+    const f=g.files[SYNC_FILE];let remote={};if(f){let c=f.content;if(f.truncated)c=await(await fetch(f.raw_url,{cache:'no-store'})).text();try{remote=JSON.parse(c||'{}')}catch(e){}}
+    let inC=false,outC=false;
+    for(const k in remote){const o=remote[k];if(o&&o.t>(meta[k]||0)){_lsSet(k,o.v);meta[k]=o.t;inC=true}}
+    for(const k in meta){if(!remote[k]||remote[k].t<meta[k]){remote[k]={v:ls.get(k,null),t:meta[k]};outC=true}}
+    const cut=new Date(Date.now()-400*86400e3).toISOString().slice(0,10);for(const k in remote){const d=k.split(':')[1];if(d&&d<cut){delete remote[k];delete meta[k];outC=true}}
+    _lsSet('syncMeta',meta);
+    if(outC)await gh('/gists/'+id,{method:'PATCH',body:JSON.stringify({files:{[SYNC_FILE]:{content:JSON.stringify(remote)}}})});
+    SY.err='';SY.t=Date.now();_lsSet('syncAt',SY.t);
+    if(inC){const a=document.activeElement;if(a&&a.tagName==='TEXTAREA')SY.pending=true;else{const y=scrollY;go();scrollTo(0,y)}}
+  }catch(e){SY.err=e.code===401?'GitHub didn’t accept the token. Set it up again.':'Couldn’t sync just now. Will retry.'}
+  finally{SY.busy=false;syncUI()}}
+function ago(t){if(!t)return'never';const s=(Date.now()-t)/1e3;return s<60?'just now':s<3600?Math.round(s/60)+' min ago':s<86400?Math.round(s/3600)+' h ago':new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}
+function syncUI(){const b=$('syncBox');if(!b)return;const tok=ls.get('ghTok','');
+  if(!tok){b.innerHTML=`<div class="row"><span>Sync across devices<small>Chants, ticks and sankalp, same on phone and computer</small></span><button type="button" class="act" id="syOpen">Set up</button></div><div class="tokrow" id="syForm" hidden><p>Sync keeps a private copy in your GitHub account. <a href="https://github.com/settings/tokens/new?scopes=gist&description=Panchang%20sync" target="_blank" rel="noopener">Create a token</a> with only <b>gist</b> ticked and <i>No expiration</i>, then paste it here. Use the same token on each device.</p><div class="in"><input id="syTok" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ghp_…"><button type="button" id="syGo">Connect</button></div><div class="err" id="syErr"></div></div>`;
+    $('syOpen').onclick=()=>{$('syForm').hidden=!$('syForm').hidden;if(!$('syForm').hidden)$('syTok').focus()};
+    $('syGo').onclick=async()=>{const v=$('syTok').value.trim();if(!v)return;$('syGo').textContent='…';_lsSet('ghTok',v);_lsSet('ghGist','');
+      try{await gh('/user');syncUI();syncNow()}catch(e){_lsSet('ghTok','');syncUI();$('syForm').hidden=false;$('syErr').textContent='That token didn’t work. Check it has the gist box ticked.'}};
+    return}
+  b.innerHTML=`<div class="row"><span>${SY.busy?'Syncing…':'Synced'}<small>${SY.err||'Last synced '+ago(SY.t||ls.get('syncAt',0))}</small></span><button type="button" class="act" id="syNow">Sync now</button></div><div class="row"><span>Link another device<small>Copies a link that sets up sync in a browser</small></span><button type="button" class="act" id="syLink">Copy</button></div><div class="row"><span>Stop syncing on this device</span><button type="button" class="act danger" id="syOff">Disconnect</button></div>`;
+  $('syNow').onclick=()=>syncNow();
+  $('syLink').onclick=()=>{const u=location.origin+location.pathname+'#sync='+encodeURIComponent(tok);(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>{$('syLink').textContent='Copied'},()=>{prompt('Copy this link',u)});setTimeout(()=>{const x=$('syLink');if(x)x.textContent='Copy'},1500)};
+  $('syOff').onclick=()=>{_lsSet('ghTok','');_lsSet('ghGist','');SY.err='';syncUI()}}
+(function(){const m=location.hash.match(/sync=([^&]+)/);if(m){_lsSet('ghTok',decodeURIComponent(m[1]));_lsSet('ghGist','');history.replaceState(null,'',location.pathname+location.search)}})();
 const short=s=>s.split(' (')[0], eng=s=>(s.match(/\((.*)\)/)||[,''])[1];
 const C={best:'var(--best)',good:'var(--good)',ok:'var(--ok)',meh:'var(--meh)',avoid:'var(--avoid)'};
 const CI={best:'var(--best-ink)',good:'var(--good-ink)',ok:'var(--ok-ink)',meh:'var(--meh-ink)',avoid:'var(--avoid-ink)'};
@@ -882,9 +965,9 @@ function affirm(r,ds,isToday){const el=$('aff');if(!el)return;
   const q=el.querySelector('.affq');q.onclick=e=>{if(e.target.tagName==='INPUT')return;let n=Math.min(3,ls.get(ak,0));n=n>=3?0:n+1;ls.set(ak,n);
     q.querySelectorAll('.dots i').forEach((d,i)=>d.classList.toggle('on',i<n));q.classList.toggle('full',n>=3);q.querySelector('.rep span').textContent=n>=3?'Settled in. Carry it with you.':n?`${3-n} more, slowly.`:'Say it slowly, 3 times. Tap after each.';if(n>=3)haptic(2)};
   const ta=el.querySelector('textarea'),sv2=el.querySelector('.saved');let tm;const grow=()=>{ta.style.height='auto';ta.style.height=ta.scrollHeight+'px'};requestAnimationFrame(grow);
-  ta.oninput=()=>{grow();clearTimeout(tm);tm=setTimeout(()=>{ls.set(sk,ta.value.trim());sv2.classList.add('on');setTimeout(()=>sv2.classList.remove('on'),1200)},500)};
+  ta.oninput=()=>{grow();clearTimeout(tm);tm=setTimeout(()=>{ls.set(sk,ta.value.trim());navSk(ds);sv2.classList.add('on');setTimeout(()=>sv2.classList.remove('on'),1200)},500)};
   ta.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();ta.blur()}};
-  ta.onblur=()=>{clearTimeout(tm);ls.set(sk,ta.value.trim())};
+  ta.onblur=()=>{clearTimeout(tm);ls.set(sk,ta.value.trim());navSk(ds);if(SY.pending){SY.pending=false;setTimeout(()=>{const y=scrollY;go();scrollTo(0,y)},50)}};
   el.querySelectorAll('.affr button').forEach(b=>b.onclick=()=>{const k=b.dataset.k,cur=ls.get(rk,'')===k?'':k;ls.set(rk,cur);el.querySelectorAll('.affr button').forEach(x=>x.classList.toggle('sel',x.dataset.k===cur));el.querySelector('.affr .ans').textContent=cur?R[cur][1]:'';haptic()});
 }
 function streak(){let n=0;const t=new Date(todayIST()+'T00:00:00Z');for(let i=0;i<400;i++){const v=ls.get('ritual:'+new Date(+t-i*86400e3).toISOString().slice(0,10),[]);if(v.length)n++;else if(i>0)break}
@@ -945,13 +1028,17 @@ $('focusClose').onclick=closeFocus;
 
 
 
+function navSk(ds){const el=$('daynav');if(!el)return;let p=el.querySelector('.dsk');const t=ls.get('sankalp:'+ds,'');
+  if(!t){if(p)p.remove();document.body.classList.remove('has-sk');return}
+  if(!p){p=document.createElement('button');p.type='button';p.className='dsk';el.prepend(p);p.onclick=()=>{const a=$('aff');if(a){a.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{const x=a.querySelector('textarea');if(x)x.focus({preventScroll:true})},450)}}}
+  const td=ds===todayIST();p.innerHTML=`${I.spark.replace('width="20" height="20"','width="16" height="16"')}<em>${td?'Today':'Sankalp'}</em><span></span>`;p.querySelector('span').textContent=t;p.setAttribute('aria-label','Your sankalp: '+t);document.body.classList.add('has-sk')}
 function dayNav(ds,lat,lon){const t=todayIST(),base=new Date(ds+'T00:00:00Z'),VC={good:'var(--good-ink)',mixed:'var(--best-ink)',slow:'var(--avoid-ink)'};
   const cell=(n)=>{const d=new Date(+base+n*86400e3),k=d.toISOString().slice(0,10),r=calc(k,lat,lon),[vc,vt]=verdict(r),o=observance(r);
     const tdy=new Date(t+'T00:00:00Z'),diff=Math.round((d-tdy)/86400e3);
     const rel=diff===0?'Today':diff===1?'Tomorrow':diff===-1?'Yesterday':d.toLocaleDateString('en-IN',{weekday:'long',timeZone:'UTC'});
     const date=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',timeZone:'UTC'});
     return `<label class="dn ${n<0?'prev':'next'}" data-d="${k}" role="button" tabindex="0" aria-label="${rel}, ${date}, ${vt}"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true">${n<0?'<span class="ch">‹</span>':''}<span class="tx"><span class="t1">${rel} · ${o?o.n:date}</span><span class="t2" style="color:${VC[vc]}">${VI[vc]}${vt.replace(' day','')}</span></span>${n>0?'<span class="ch">›</span>':''}</label>`};
-  const el=$('daynav');el.innerHTML=cell(-1)+cell(1);
+  const el=$('daynav');el.innerHTML=cell(-1)+cell(1);navSk(ds);
   el.querySelectorAll('.dn').forEach(b=>{b.onclick=e=>{if(e.target.tagName==='INPUT')return;$('date').value=b.dataset.d;go();window.scrollTo({top:0,behavior:'smooth'})};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}}})}
 
 function applyTheme(){const m=ls.get('theme','light'),dark=m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
@@ -1009,7 +1096,7 @@ document.addEventListener('click',e=>{
 document.addEventListener('change',e=>{const inp=e.target.closest('.aud .afile');if(!inp||!inp.files[0])return;const c=inp.closest('.aud'),fl=inp.files[0];
   if(!/^audio\//.test(fl.type)&&!/\.(mp3|m4a|aac|wav|ogg|opus)$/i.test(fl.name)){c.querySelector('.amsg').textContent='Please choose an audio file, such as an MP3.';return}
   aSet(c.dataset.m,{name:fl.name.replace(/\.[^.]+$/,''),blob:fl}).then(ok=>{c.querySelector('.amsg').textContent=ok?'':'Couldn\'t save the file on this phone.';document.querySelectorAll('.aud[data-m="'+c.dataset.m+'"]').forEach(loadCard)});inp.value=''});
-document.addEventListener('visibilitychange',()=>{});
+document.addEventListener('visibilitychange',()=>{});syncUI();syncSoon(800);setInterval(()=>{if(!document.hidden)syncNow()},45e3);window.addEventListener('online',()=>syncSoon(500));
 function skySVG(r,isToday){
   const W=400,H=300,next=+r.chog[15].b;let rise=+r.rise,set=+r.set;
   let t=isToday?Date.now():(rise+set)/2;
@@ -1202,7 +1289,7 @@ setInterval(()=>tick(false),60e3);
  el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
 })();
 
-document.addEventListener('visibilitychange',()=>{if(document.hidden)return;tick(true);const no=document.getElementById('nearOpt');if(no&&no.selected)locate(true)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)return;syncSoon(300);tick(true);const no=document.getElementById('nearOpt');if(no&&no.selected)locate(true)});
 if(window.Astronomy)go();else window.addEventListener('load',go);
 </script>
 
