@@ -313,9 +313,10 @@ details.grp[open] summary::after{transform:rotate(45deg)}
 .wx-p.snow{opacity:.9}
 .wx-flash{position:absolute;inset:0;background:#EEF2FF;opacity:0;pointer-events:none;z-index:1}
 .wx-fog{position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(180deg,rgba(232,230,224,.15),rgba(232,230,224,.55) 55%,rgba(232,230,224,.75));-webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px)}
-.wx-haze{position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(180deg,rgba(196,180,150,.12),rgba(196,180,150,.38) 60%,rgba(205,190,160,.55))}
+.wx-haze{position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(180deg,rgba(240,244,246,0) 30%,rgba(240,242,240,.28) 75%,rgba(244,240,232,.45))}
 html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,130,.12),rgba(120,120,130,.35) 60%,rgba(120,120,130,.5))}
 @media (prefers-reduced-motion:no-preference){
+.sky .sunrays{animation:rays 18s ease-in-out infinite alternate}@keyframes rays{to{transform:rotate(7deg)}}
 .wx-p.rain,.wx-p.storm{animation:fall .55s linear infinite}.wx-p.rain.l2,.wx-p.storm.l2{animation-duration:.85s;opacity:.45}
 .wx-p.drizzle{animation:fall 1.1s linear infinite}.wx-p.drizzle.l2{animation-duration:1.6s;opacity:.4}
 .wx-p.snow{animation:fall 7s linear infinite}.wx-p.snow.l2{animation-duration:11s;opacity:.55}
@@ -946,7 +947,7 @@ function skySVG(r,isToday){
   const hr=ist(new Date(t)).getUTCHours();
   let label={night:'Night',dawn:'Sunrise',day:hr<12?'Morning':hr<16?'Afternoon':'Late afternoon',golden:'Golden hour',dusk:'Sunset'}[phase];
   const WXC=isToday?wxNow():null,WK=wxKind(WXC),cc=WXC?WXC.cc:null,wet=WK==='rain'||WK==='storm'||WK==='drizzle'||WK==='snow';
-  const dimSM=WK==='overcast'||wet||WK==='fog'?.18:WK==='cloudy'?.75:WK==='haze'?.6:1,starOp=WK==='overcast'||wet||WK==='fog'?0:WK==='cloudy'?.45:WK==='haze'?.5:1;
+  const dimSM=WK==='overcast'||wet||WK==='fog'?.18:WK==='cloudy'?.75:WK==='haze'?.9:1,starOp=WK==='overcast'||wet||WK==='fog'?0:WK==='cloudy'?.45:WK==='haze'?.5:1;
   const SK={
     night:['#070B1F','#0F1633','#1A2147','#262C55'],
     dawn:['#24305E','#5E5D8A','#C48C8C','#F1C49A'],
@@ -965,10 +966,10 @@ function skySVG(r,isToday){
    <filter id="grainm" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .55 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
    <radialGradient id="moonBody" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#F2F0EA"/><stop offset=".6" stop-color="#DCD9D1"/><stop offset="1" stop-color="#ABA79F"/></radialGradient>
    <radialGradient id="halo"><stop offset="0" stop-color="#DDE3FF" stop-opacity=".28"/><stop offset=".35" stop-color="#C9D2F5" stop-opacity=".1"/><stop offset="1" stop-color="#C9D2F5" stop-opacity="0"/></radialGradient>
-   <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/><stop offset=".08" stop-color="#FFF6DD" stop-opacity=".85"/><stop offset=".3" stop-color="#FFE7B5" stop-opacity=".35"/><stop offset="1" stop-color="#FFE7B5" stop-opacity="0"/></radialGradient>
+   <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset=".1" stop-color="#FFFBF0" stop-opacity=".9"/><stop offset=".3" stop-color="#FFF1D6" stop-opacity=".42"/><stop offset=".6" stop-color="#E9F2FF" stop-opacity=".12"/><stop offset="1" stop-color="#E9F2FF" stop-opacity="0"/></radialGradient>
    <radialGradient id="hzGlow" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#FFD9A3" stop-opacity=".75"/><stop offset=".5" stop-color="#F7B98C" stop-opacity=".25"/><stop offset="1" stop-color="#F7B98C" stop-opacity="0"/></radialGradient>
   </defs><rect width="${W}" height="${H}" fill="url(#skg)"/>`;
-  if(WXC&&(WK==='overcast'||wet||WK==='fog'||WK==='cloudy'||WK==='haze')){const g=WK==='haze'?(phase==='night'?'#4A4438':'#CDBEA0'):phase==='night'?'#2E3342':phase==='dusk'||phase==='dawn'?'#6E6A78':(wet?'#6F7A88':'#8D97A3'),op=WK==='storm'?.8:WK==='rain'?.68:WK==='haze'?(phase==='night'?.38:.5):WK==='overcast'||WK==='snow'?.5:WK==='drizzle'?.55:WK==='fog'?.42:.18;s+=`<rect width="${W}" height="${H}" fill="${g}" opacity="${op}"/>`}
+  if(WXC&&(WK==='overcast'||wet||WK==='fog'||WK==='cloudy'||WK==='haze')){const g=WK==='haze'?(phase==='night'?'#5A5E70':'#E4EAEE'):phase==='night'?'#2E3342':phase==='dusk'||phase==='dawn'?'#6E6A78':(wet?'#6F7A88':'#8D97A3'),op=WK==='storm'?.8:WK==='rain'?.68:WK==='haze'?(phase==='night'?.18:.22):WK==='overcast'||WK==='snow'?.5:WK==='drizzle'?.55:WK==='fog'?.42:.18;s+=`<rect width="${W}" height="${H}" fill="${g}" opacity="${op}"/>`}
   // horizon warmth near sunrise / sunset
   if(phase==='dawn'||phase==='dusk'||phase==='golden'){const hx=phase==='dawn'?90:310;s+=`<ellipse cx="${hx}" cy="${H+10}" rx="260" ry="150" fill="url(#hzGlow)" opacity="${phase==='golden'?.6:1}"/>`}
   // stars
@@ -983,9 +984,17 @@ function skySVG(r,isToday){
   // sun (soft bloom, kept within the upper-middle of the sky)
   s+='<g class="pl pl2">'+`<g opacity="${dimSM}">`;
   if(t>=rise-30*M&&t<=set+25*M&&phase!=='night'){const f=clamp((t-rise)/(set-rise),-.05,1.05);
-    const x=lerp(70,W-70,clamp(f,0,1)),y=phase==='day'?lerp(150,92,Math.sin(Math.PI*clamp(f,0,1))):H*.62+(phase==='dusk'||phase==='dawn'?24:0);
-    s+=`<circle cx="${x}" cy="${y}" r="${phase==='day'?150:120}" fill="url(#sunGlow)" opacity="${phase==='day'?.9:.8}"/>`;
-    if(phase!=='dusk')s+=`<circle cx="${x}" cy="${y}" r="${phase==='day'?11:13}" fill="#FFFDF4" filter="url(#soft1)" opacity="${phase==='dawn'?.85:1}"/>`}
+    const x=lerp(64,W-64,clamp(f,0,1)),y=phase==='day'?lerp(124,80,Math.sin(Math.PI*clamp(f,0,1))):H*.62+(phase==='dusk'||phase==='dawn'?24:0);
+    const clear=!WXC||WK==='clear'||WK==='fewclouds'||WK==='haze'||WK==='cloudy',bright=phase==='day'||phase==='golden';
+    s+=`<circle cx="${x}" cy="${y}" r="${bright?190:130}" fill="url(#sunGlow)" opacity="${phase==='day'?.95:.85}"/>`;
+    if(bright&&clear){
+      const ray=(ang,len,w,o)=>`<path d="M${x} ${y-w} L${(x+Math.cos(ang)*len).toFixed(1)} ${(y+Math.sin(ang)*len).toFixed(1)} L${x} ${y+w}Z" transform="rotate(${0} ${x} ${y})" fill="url(#rayG)" opacity="${o}"/>`;
+      let rays='';for(let i=0;i<28;i++){const a=i/28*Math.PI*2+.11,l=(i%3===0?92:i%2?46:64)*(.85+((i*37)%10)/30),w=i%3===0?.05:.08;rays+=`<path d="M${x} ${y} L${(x+Math.cos(a-w)*l).toFixed(1)} ${(y+Math.sin(a-w)*l).toFixed(1)} L${(x+Math.cos(a+w)*l).toFixed(1)} ${(y+Math.sin(a+w)*l).toFixed(1)}Z" fill="#FFFFFF" opacity="${i%3===0?.2:.12}"/>`}
+      s+=`<g class="sunrays" style="transform-origin:${x}px ${y}px" filter="url(#soft4)">${rays}</g>`;
+      s+=`<circle cx="${x}" cy="${y}" r="104" fill="none" stroke="#FFE7C2" stroke-opacity=".16" stroke-width="7" filter="url(#soft4)"/><circle cx="${x}" cy="${y}" r="112" fill="none" stroke="#BFE0FF" stroke-opacity=".14" stroke-width="6" filter="url(#soft4)"/>`;
+      const vx=200-x,vy=165-y;[[.55,9,.10],[.85,20,.07],[1.15,6,.12],[1.45,30,.05]].forEach(([k,rr,o])=>{s+=`<circle cx="${(x+vx*k).toFixed(1)}" cy="${(y+vy*k).toFixed(1)}" r="${rr}" fill="#F4FAFF" opacity="${o}" filter="url(#soft1)"/>`});
+      s+=`<circle cx="${x}" cy="${y}" r="34" fill="#FFFFFF" opacity=".55" filter="url(#soft4)"/><circle cx="${x}" cy="${y}" r="17" fill="#FFFFFF" filter="url(#soft1)"/>`}
+    else if(phase!=='dusk')s+=`<circle cx="${x}" cy="${y}" r="${phase==='day'?13:13}" fill="#FFFDF4" filter="url(#soft1)" opacity="${phase==='dawn'?.85:1}"/>`}
   // moon: textured, real phase, sits in the middle band (not at the top edge)
   if(phase==='night'||phase==='dusk'||phase==='dawn'){
     const e=((r.tithi.idx+.5)*12)%360,k=(1-Math.cos(e*Math.PI/180))/2,wax=e<180;
