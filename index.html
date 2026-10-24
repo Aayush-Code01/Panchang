@@ -990,7 +990,7 @@ function skySVG(r,isToday){
   // sun (soft bloom, kept within the upper-middle of the sky)
   s+='<g class="pl pl2">'+`<g opacity="${dimSM}">`;
   if(t>=rise-30*M&&t<=set+25*M&&phase!=='night'){const f=clamp((t-rise)/(set-rise),-.05,1.05);
-    const x=lerp(64,W-64,clamp(f,0,1)),y=phase==='day'?lerp(124,80,Math.sin(Math.PI*clamp(f,0,1))):H*.62+(phase==='dusk'||phase==='dawn'?24:0);
+    const x=lerp(64,W-64,clamp(f,0,1)),y=phase==='day'?lerp(134,98,Math.sin(Math.PI*clamp(f,0,1))):H*.62+(phase==='dusk'||phase==='dawn'?24:0);
     const clear=!WXC||WK==='clear'||WK==='fewclouds'||WK==='haze'||WK==='cloudy',bright=phase==='day'||phase==='golden';
     s+=`<circle cx="${x}" cy="${y}" r="${bright?190:130}" fill="url(#sunGlow)" opacity="${phase==='day'?.95:.85}"/>`;
     if(bright&&clear){
@@ -1005,13 +1005,13 @@ function skySVG(r,isToday){
   if(phase==='night'||phase==='dusk'||phase==='dawn'){
     const e=((r.tithi.idx+.5)*12)%360,k=(1-Math.cos(e*Math.PI/180))/2,wax=e<180;
     let f;if(t>=+r.set&&t<next){f=(t-r.set)/(next-r.set)}else{f=.85}f=clamp(f,0,1);
-    const R=28,cx=lerp(110,300,f),cy=lerp(128,104,Math.sin(Math.PI*f)),MT='moon.png';
+    const R=29,cx=lerp(120,300,f),cy=lerp(150,132,Math.sin(Math.PI*f)),MT='moon.png';
     const rx=Math.abs(1-2*k)*R,top=`${cx} ${cy-R}`,bot=`${cx} ${cy+R}`;
     const d=wax?`M${top} A${R} ${R} 0 0 1 ${bot} A${rx} ${R} 0 0 ${k<.5?0:1} ${top}Z`:`M${top} A${R} ${R} 0 0 0 ${bot} A${rx} ${R} 0 0 ${k<.5?1:0} ${top}Z`;
     const maria=[[-9,-8,7,5,.5],[-1,-11,5,3.5,.38],[7,-6,6,5,.42],[10,4,7.5,8,.5],[-2,5,6,4.5,.36],[-13,3,3.5,5,.34],[3,14,4,2.5,.28],[-7,15,2.5,2,.3]];
     const craters=[[-6,14,2.2],[12,12,1.6],[-15,-6,1.4],[7,-16,1.3],[16,8,1.1]];
     s+=`<circle cx="${cx}" cy="${cy}" r="${R*5.2}" fill="url(#halo)" opacity="${.35+k*.65}"/>
-     <mask id="mlit"><rect x="0" y="0" width="${W}" height="${H}" fill="#000"/><path d="${d}" fill="#fff" filter="url(#soft15)"/></mask>
+     <mask id="mlit"><rect x="0" y="0" width="${W}" height="${H}" fill="#000"/><path d="${d}" fill="#fff" filter="url(#soft1)"/></mask>
      <clipPath id="mdisk"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>
      <circle cx="${cx}" cy="${cy}" r="${R}" fill="#8E96B8" opacity="${phase==='night'?.07:.05}"/>${MT?`<image href="${MT}" x="${cx-R}" y="${cy-R}" width="${2*R}" height="${2*R}" opacity=".07"/>`:''}
      <g mask="url(#mlit)"><g clip-path="url(#mdisk)">
