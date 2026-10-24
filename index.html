@@ -308,11 +308,21 @@ body.has-sk .app{padding-bottom:156px}
 .col{display:contents}
 .app > .head{order:0}.app > .locmsg{order:1}.hero{order:2}#alerts{order:3}.s-list{order:4}.s-prac{order:5}.d-det{order:6}.d-chart{order:7}.s-aff{order:8}.app > .foot{order:9}.daynav{order:10}
 @media (min-width:1080px) and (min-height:620px){
-  .app{max-width:1500px;height:100dvh;box-sizing:border-box;padding:0 24px 16px;gap:16px;display:grid;
+  .app{max-width:none;height:100dvh;box-sizing:border-box;padding:0 max(28px,2.2vw) 16px;gap:18px;display:grid;
     grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr) minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr);
     grid-template-areas:'head head head' 'msg msg msg' 'c1 c2 c3'}
-  .app > .head{grid-area:head;padding-block:14px 0}
-  .strip{margin:6px 0 0;padding:0 0 2px}
+  .app > .head{grid-area:head;padding-block:16px 0;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto auto;align-items:center;column-gap:10px}
+  .head .toprow{display:contents}
+  .head .toprow .t{display:flex;flex-direction:column;grid-column:1;grid-row:1;margin-right:28px;min-width:150px}
+  .head .toprow .eyebrow,.head .toprow h1{grid-area:auto}
+  .head .toprow h1{margin:0}
+  .head .strip{grid-column:2;grid-row:1;margin:0;padding:2px 0;gap:4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent)}
+  .head .strip .sd{flex:0 0 58px;min-width:58px}
+  .head .strip .sd .m{min-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58px}
+  .head .toprow .pill[aria-label="City"]{grid-area:auto;grid-column:3;grid-row:1;margin-left:16px}
+  .head .toprow .gear{grid-area:auto;grid-column:4;grid-row:1}
+  .head .toprow .pill[aria-label="Pick any date"]{grid-area:auto;grid-column:5;grid-row:1}
+  .s-list .list,.s-prac .prac{position:relative;scroll-behavior:smooth}
   .app > .locmsg{grid-area:msg}
   .app > .locmsg[hidden]{display:none}
   .col{display:flex;flex-direction:column;gap:16px;min-height:0;min-width:0}
@@ -331,8 +341,6 @@ body.has-sk .app{padding-bottom:156px}
   body.has-sk .app{padding-bottom:16px}
   .totop,.app > .foot{display:none!important}
   .sky{height:180px}
-  .toprow{grid-template-columns:auto minmax(0,1fr) auto auto auto;grid-template-areas:'ti eb city gear cal'}
-  .toprow h1{margin-right:10px}
 }
 .daynav .dn{position:relative;flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-md);background:var(--card);border:.5px solid var(--line);cursor:pointer;-webkit-user-select:none;user-select:none;transition:transform .08s}
 .daynav .dn:active{transform:scale(.97)}
@@ -342,6 +350,8 @@ body.has-sk .app{padding-bottom:156px}
 .daynav .t2{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .daynav .next .t2{justify-content:flex-end}
 .daynav .t2 svg{width:16px;height:16px;flex:0 0 auto}
+.daynav .tdb{flex:0 0 auto;justify-content:center;padding:8px 14px;font-size:14px;font-weight:600;color:var(--ink)}
+.daynav .tdb .tx{align-items:center}
 .daynav .ch{font-size:22px;line-height:1;color:var(--sand);flex:0 0 auto}
 @media (min-width:600px){.daynav{left:50%;right:auto;width:560px;transform:translateX(-50%);border-radius:20px 20px 0 0;border:.5px solid var(--line);border-bottom:0}}
 
@@ -891,7 +901,9 @@ function render(ds,scrollStrip){
   if(past.length){h+=`<div class="past" id="past"><div class="items">${past.map(x=>x.g?item(x.g):sunI(x.t,x.sun)).join('')}</div><button type="button" class="reveal" id="reveal"><span>Show ${past.filter(x=>x.g).length} earlier</span></button></div>`}
   h+=rest.map(x=>x.g?item(x.g,isToday&&now>=x.g.a&&now<x.g.b?' cur':''):sunI(x.t,x.sun)).join('');
   if(isToday&&!rest.length)h+=`<div class="it" style="--ci:var(--good-ink);--bgc:var(--good-bg)"><div class="tm">${hm(new Date(Math.max(...S.map(g=>g.b))))}<small>pm</small></div><span class="ic">${I.moon}</span><div class="bd"><div class="lb">That's it for today</div><div class="tg">Rest well. Tap Tomorrow below to plan ahead.</div></div></div>`;
-  $('list').innerHTML=h;
+  const LE=$('list'),PE=$('prac'),lkey=ds+'|'+(isToday?(S.find(g=>now>=g.a&&now<g.b)||{}).a:''),lst=LE.scrollTop,pst=PE?PE.scrollTop:0,same=window._lkey===lkey;window._lkey=lkey;
+  LE.innerHTML=h;
+  requestAnimationFrame(()=>{LE.style.scrollBehavior='auto';if(LE.scrollHeight>LE.clientHeight+4){const c=LE.querySelector('.it.cur');if(same)LE.scrollTop=lst;else if(c)LE.scrollTop=c.offsetTop-LE.clientHeight/2+c.offsetHeight/2;else LE.scrollTop=0}if(PE&&same)PE.scrollTop=pst;LE.style.scrollBehavior=''});
   $('dayTitle').textContent=isToday?'Coming up':'The day';$('dayIc').innerHTML=I.now;$('pracIc').innerHTML=I.lotus;$('affIc').innerHTML=I.spark;
   $('dayHint').textContent=isToday?'until sunrise':'sunrise to sunrise';
   const rv=$('reveal');if(rv)rv.onclick=()=>{const p=$('past');p.classList.toggle('open');rv.firstChild.textContent=p.classList.contains('open')?'Hide earlier':`Show ${past.filter(x=>x.g).length} earlier`};
@@ -1000,7 +1012,7 @@ $('totop').innerHTML=I.up;$('totop').onclick=()=>window.scrollTo({top:0,behavior
 window.addEventListener('scroll',()=>$('totop').classList.toggle('show',scrollY>500),{passive:true});
 let shownToday=todayIST();
 function tick(force){const t=todayIST();if($('date').value===shownToday&&t!==shownToday){$('date').value=t;shownToday=t;go();return}
-  shownToday=t;if($('date').value!==t)return;if(!force&&(document.querySelector('.pi.open')||document.querySelector('.past.open')))return;go()}
+  shownToday=t;if($('date').value!==t)return;const ae=document.activeElement;if(ae&&(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT'&&ae.type!=='checkbox'))return;if(!force&&(document.querySelector('.pi.open')||document.querySelector('.past.open')))return;go()}
 
 var _lastTick=0;function hapticTick(){const n=Date.now();if(n-_lastTick<45)return;_lastTick=n;try{if(navigator.vibrate&&navigator.vibrate(8))return;$('hapt').click()}catch(e){}}
 var AC=null;function audioInit(){try{if(!AC){const A=window.AudioContext||window.webkitAudioContext;if(A)AC=new A()}if(AC&&AC.state==='suspended')AC.resume()}catch(e){}}
@@ -1038,7 +1050,7 @@ function dayNav(ds,lat,lon){const t=todayIST(),base=new Date(ds+'T00:00:00Z'),VC
     const rel=diff===0?'Today':diff===1?'Tomorrow':diff===-1?'Yesterday':d.toLocaleDateString('en-IN',{weekday:'long',timeZone:'UTC'});
     const date=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',timeZone:'UTC'});
     return `<label class="dn ${n<0?'prev':'next'}" data-d="${k}" role="button" tabindex="0" aria-label="${rel}, ${date}, ${vt}"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true">${n<0?'<span class="ch">‹</span>':''}<span class="tx"><span class="t1">${rel} · ${o?o.n:date}</span><span class="t2" style="color:${VC[vc]}">${VI[vc]}${vt.replace(' day','')}</span></span>${n>0?'<span class="ch">›</span>':''}</label>`};
-  const el=$('daynav');el.innerHTML=cell(-1)+cell(1);navSk(ds);
+  const el=$('daynav');el.innerHTML=cell(-1)+(Math.abs(Math.round((base-new Date(t+'T00:00:00Z'))/86400e3))>1?`<label class="dn tdb" data-d="${t}" role="button" tabindex="0" aria-label="Back to today"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><span class="tx"><span class="t1">Back to</span><span class="t2">Today</span></span></label>`:'')+cell(1);navSk(ds);
   el.querySelectorAll('.dn').forEach(b=>{b.onclick=e=>{if(e.target.tagName==='INPUT')return;$('date').value=b.dataset.d;go();window.scrollTo({top:0,behavior:'smooth'})};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}}})}
 
 function applyTheme(){const m=ls.get('theme','light'),dark=m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
