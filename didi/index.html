@@ -200,7 +200,7 @@ h1{margin:2px 0 0;font-family:var(--serif);font-size:44px;line-height:1.02;white
 .streak{font-size:14px;color:var(--best-ink);font-weight:600}
 .pi{border-top:.5px solid var(--line)}
 .pi:first-child{border-top:0}
-.ph{display:grid;grid-template-columns:28px 1fr 18px;gap:12px;align-items:start;padding:14px 16px;width:100%;text-align:left}
+.ph{display:grid;grid-template-columns:28px 1fr 18px;gap:12px;align-items:start;padding:12px 16px;width:100%;text-align:left}
 .ph .chk{margin-top:2px}
 .ph .chev{margin-top:6px}
 .chk{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--sand);display:grid;place-items:center;transition:background .15s,border-color .15s}
@@ -214,10 +214,10 @@ h1{margin:2px 0 0;font-family:var(--serif);font-size:44px;line-height:1.02;white
 .pb{display:none;padding:0 16px 18px 56px}
 .pi.open .pb{display:block}
 .how{font-size:15px;color:var(--text);margin:0 0 12px;line-height:1.45}
-.mpre{margin-top:8px;display:flex;flex-direction:column;gap:1px}
-.mpre .mh{font-family:var(--deva);font-size:18px;font-weight:400;color:var(--best-ink);line-height:1.5}
-.mpre .me{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--text);font-variation-settings:"opsz" 14,"SOFT" 80}
-.peek{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12.5px;font-weight:600;color:var(--best-ink);background:var(--best-bg);border-radius:999px;padding:3px 10px}
+.mpre{margin-top:5px;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:8px;row-gap:0}
+.mpre .mh{font-family:var(--deva);font-size:16.5px;font-weight:400;color:var(--best-ink);line-height:1.5}
+.mpre .me{font-family:var(--serif);font-style:italic;font-size:13.5px;color:var(--text);font-variation-settings:"opsz" 14,"SOFT" 80}
+.peek{display:inline-flex;align-items:center;align-self:center;font-size:12px;font-weight:600;color:var(--best-ink);background:var(--best-bg);border-radius:999px;padding:1px 8px;font-variant-numeric:tabular-nums}
 .pi.open .peek{display:none}
 .mantra{background:var(--card-2);border-radius:var(--r-lg);padding:20px 16px;text-align:center;margin-left:-40px;border:.5px solid var(--line)}
 .mantra .hi{font-family:var(--deva);font-size:25px;line-height:1.75;color:var(--ink);font-weight:400}
@@ -234,6 +234,15 @@ h1{margin:2px 0 0;font-family:var(--serif);font-size:44px;line-height:1.02;white
 .tap2 .hsw{left:8px;top:8px}
 .japa-opts{display:flex;gap:6px;margin-top:12px}
 .japa-opts button{flex:1 1 0;min-width:0;justify-content:center;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;height:38px;padding:0 8px;border-radius:19px;background:var(--card);border:.5px solid var(--line);font-size:13.5px;font-weight:600;color:var(--ink)}
+.fj .fjic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--best-bg);color:var(--best-ink)}
+.fj .fjs{font-size:13.5px;color:var(--text);font-variant-numeric:tabular-nums}
+.fj .fjs b{color:var(--best-ink);font-weight:600}
+.fj .pb{padding-left:16px}
+.fjt{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13.5px;color:var(--muted)}
+.fjt span{margin-right:2px}
+.fjt button{height:30px;min-width:40px;padding:0 10px;border-radius:15px;border:.5px solid var(--line);background:var(--card-2);color:var(--text);font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.fjt button.sel{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fjt input{width:72px;height:30px;border-radius:15px;border:.5px solid var(--line-strong);background:var(--card-solid);color:var(--ink);font:inherit;font-size:14px;text-align:center;padding:0 8px;outline:none}
 .japa-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;min-height:22px}
 .donemsg{font-size:14px;font-weight:600;color:var(--good-ink)}
 .japa-foot .reset{font-size:13.5px;color:var(--muted);text-decoration:underline;padding:6px 0}
@@ -921,7 +930,7 @@ function render(ds,scrollStrip){
   const key='ritual:'+ds,done=ls.get(key,[]),ck='japa:'+ds,counts=ls.get(ck,{});
   $('prac').innerHTML=items.map(it=>{const mm=M[it.m];return`<div class="pi${done.includes(it.id)?' done':''}" data-id="${it.id}" data-n="${it.n}">
     <div class="ph"><button type="button" class="chk" aria-label="Mark done"><svg width="13" height="10" viewBox="0 0 13 10"><path d="M1.5 5l3.5 3.5L11.5 1.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <button type="button" class="open" style="text-align:left"><div class="a">${it.t}</div><div class="b">${it.b}</div>${mm?`<div class="mpre"><span class="mh">${mm.short||mm.hi}</span><span class="me">${mm.shortEn||mm.en}</span></div><span class="peek">Read and chant ${it.n} times<svg width="10" height="7" viewBox="0 0 10 7"><path d="M1 1.2l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>`:''}</button>
+    <button type="button" class="open" style="text-align:left"><div class="a">${it.t}</div><div class="b">${it.b}</div>${mm?`<div class="mpre"><span class="mh">${mm.short||mm.hi}</span><span class="me">${mm.shortEn||mm.en}</span><span class="peek">${it.n}×</span></div>`:''}</button>
     <button type="button" class="open chev" aria-label="Show mantra"><svg width="13" height="8" viewBox="0 0 13 8"><path d="M1.5 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
     <div class="pb"><p class="how">${it.how}</p>${mm?`<div class="mantra"><div class="hi">${mm.hi.split('<br>').map((x,i)=>`<span class="ml" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="en">${mm.en.split('<br>').map((x,i)=>`<span class="el" data-i="${i}">${x}</span>`).join('<br>')}</div><div class="mean">${mm.mean}</div>
     <label class="tap2" aria-label="Count one chant"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><span class="fill" style="width:${Math.min(100,(counts[it.id]||0)/it.n*100)}%"></span><span class="cnt num">${counts[it.id]||0}<small> / ${it.n}</small></span><span class="hint">Tap anywhere here after each chant</span></label><div class="japa-opts"><button type="button" class="fs">${I.eye}Eyes closed</button><button type="button" class="bellt">${bellLbl()}</button></div><div class="japa-foot"><span class="donemsg">${(counts[it.id]||0)>=it.n?'Complete. Well done 🙏':''}</span><button type="button" class="reset">Reset count</button></div></div>`:''}</div></div>`}).join('');
@@ -932,6 +941,7 @@ function render(ds,scrollStrip){
     const tap=p.querySelector('.tap2');const upd=v=>{const n=+p.dataset.n;tap.querySelector('.cnt').innerHTML=v+'<small> / '+n+'</small>';tap.querySelector('.fill').style.width=Math.min(100,v/n*100)+'%';p.querySelector('.donemsg').textContent=v>=n?'Complete. Well done 🙏':'';tap.classList.toggle('full',v>=n)};if(tap){tap.onclick=(e)=>{if(e.target.tagName==='INPUT')return;audioInit();upd(chantTap(p,ck,save))};p.querySelector('.fs').onclick=()=>openFocus(p,ck,save,upd);p.querySelector('.bellt').onclick=ev=>{const on=!ls.get('bell',true);ls.set('bell',on);document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
       p.querySelector('.reset').onclick=()=>{const c=ls.get(ck,{});c[p.dataset.id]=0;ls.set(ck,c);upd(0)}}
   });
+  freeJap(ds,ck,save);
   streak();document.querySelectorAll('.aud').forEach(loadCard);if(AU_CARD&&!document.body.contains(AU_CARD)){AU.pause();AU_CARD=null}
 
   try{affirm(r,ds,isToday)}catch(e){console.error(e)}
@@ -1023,6 +1033,30 @@ function bell(){try{audioInit();if(!AC)return;try{if(navigator.audioSession)navi
   const t=AC.currentTime+.03;strike(t);strike(t+1.2);strike(t+2.4);
   setTimeout(()=>{try{if(navigator.audioSession)navigator.audioSession.type='auto'}catch(_){}},7000)}catch(e){}}
 function bellLbl(){return ls.get('bell',true)?I.bell+'Bell on':I.bellOff+'Bell off'}
+const MALA=sv('<circle cx="12" cy="4.5" r="1.6"/><circle cx="17.3" cy="6.7" r="1.6"/><circle cx="19.5" cy="12" r="1.6"/><circle cx="17.3" cy="17.3" r="1.6"/><circle cx="6.7" cy="6.7" r="1.6"/><circle cx="4.5" cy="12" r="1.6"/><circle cx="6.7" cy="17.3" r="1.6"/><path d="M12 17.5v4M10.5 21.5h3"/>',18);
+function fjTap(p,ck,save){const n=+p.dataset.n,c=ls.get(ck,{});const v=(c.free||0)+1;c.free=v;ls.set(ck,c);
+  if(v%n===0){if(navigator.vibrate)navigator.vibrate([40,90,40,90,40]);if(ls.get('bell',true))bell();if(!p.classList.contains('done')){p.classList.add('done');save()}}else if(navigator.vibrate)navigator.vibrate(10);
+  return v}
+function fjCur(v,n){return v&&v%n===0?n:v%n}
+function fjSum(v,n){const r=Math.floor(v/n);return v?`<b>${v}</b> today${r?` · ${r} ${r>1?'rounds':'round'} of ${n}`:''}`:`Any mantra · bell every ${n}`}
+function freeJap(ds,ck,save){const old=document.querySelector('.pi.fj');if(old)old.remove();
+  const n=Math.max(1,+ls.get('japTarget',108)||108),v=ls.get(ck,{}).free||0,P=[11,21,54,108],cust=!P.includes(n),open=window._fjOpen;
+  const el=document.createElement('div');el.className='pi fj'+(v>=n?' done':'')+(open?' open':'');el.dataset.id='free';el.dataset.n=n;
+  el.innerHTML=`<div class="ph"><span class="fjic">${MALA}</span><button type="button" class="open" style="text-align:left"><div class="a">Jap counter</div><div class="mpre"><span class="fjs">${fjSum(v,n)}</span></div></button><button type="button" class="open chev" aria-label="Open counter"><svg width="13" height="8" viewBox="0 0 13 8"><path d="M1.5 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+   <div class="pb"><div class="fjt"><span>Bell after</span>${P.map(x=>`<button type="button" data-n="${x}"${x===n?' class="sel"':''}>${x}</button>`).join('')}<button type="button" data-n="c"${cust?' class="sel"':''}>${cust?n:'Other'}</button><input type="number" inputmode="numeric" min="1" max="100000" placeholder="e.g. 51" hidden></div>
+   <label class="tap2${v&&v%n===0?' full':''}" aria-label="Count one repetition"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><span class="fill" style="width:${fjCur(v,n)/n*100}%"></span><span class="cnt num">${fjCur(v,n)}<small> / ${n}</small></span><span class="hint">Tap anywhere here after each repetition</span></label>
+   <div class="japa-opts"><button type="button" class="fs">${I.eye}Eyes closed</button><button type="button" class="bellt">${bellLbl()}</button></div>
+   <div class="japa-foot"><span class="donemsg"></span><button type="button" class="reset">Reset count</button></div></div>`;
+  $('prac').appendChild(el);
+  const tap=el.querySelector('.tap2'),upd=v=>{const c=fjCur(v,n);tap.querySelector('.cnt').innerHTML=c+'<small> / '+n+'</small>';tap.querySelector('.fill').style.width=c/n*100+'%';tap.classList.toggle('full',!!v&&v%n===0);el.querySelector('.fjs').innerHTML=fjSum(v,n);const r=Math.floor(v/n);el.querySelector('.donemsg').textContent=v&&v%n===0?`Round ${r} complete 🙏`:r?`${r} ${r>1?'rounds':'round'} done`:''};upd(v);
+  el.querySelectorAll('.open').forEach(b=>b.onclick=()=>{el.classList.toggle('open');window._fjOpen=el.classList.contains('open')});
+  tap.onclick=e=>{if(e.target.tagName==='INPUT')return;audioInit();upd(fjTap(el,ck,save))};
+  el.querySelector('.fs').onclick=()=>{openFocus(el,ck,save,upd);FOC.tap=fjTap;FOC.free=true;focusRender(ls.get(ck,{}).free||0,n)};
+  el.querySelector('.bellt').onclick=()=>{ls.set('bell',!ls.get('bell',true));document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
+  el.querySelector('.reset').onclick=()=>{const c=ls.get(ck,{});c.free=0;ls.set(ck,c);upd(0)};
+  const inp=el.querySelector('.fjt input'),setN=x=>{x=Math.round(+x);if(!(x>=1))return;ls.set('japTarget',x);window._fjOpen=true;freeJap(ds,ck,save)};
+  el.querySelectorAll('.fjt button').forEach(b=>b.onclick=()=>{if(b.dataset.n==='c'){inp.hidden=false;inp.value=cust?n:'';inp.focus();return}setN(b.dataset.n)});
+  inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur()}};inp.onblur=()=>{if(inp.value)setN(inp.value);else inp.hidden=true}}
 function chantTap(p,ck,save){const n=+p.dataset.n,c=ls.get(ck,{});let v=c[p.dataset.id]||0;if(v>=n)return v;v++;c[p.dataset.id]=v;ls.set(ck,c);
   if(navigator.vibrate)navigator.vibrate(v===n?[40,90,40,90,40]:10);
   if(v===n){if(ls.get('bell',true))bell();if(!p.classList.contains('done')){p.classList.add('done');save()}}
@@ -1031,10 +1065,10 @@ var FOC=null,WL=null;
 function openFocus(p,ck,save,upd){audioInit();FOC={p,ck,save,upd};const f=$('focus'),n=+p.dataset.n,v=ls.get(ck,{})[p.dataset.id]||0;
   f.querySelector('.f-name').textContent=p.querySelector('.a').textContent;f.hidden=false;document.documentElement.style.overflow='hidden';focusRender(v,n);
   try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>WL=l).catch(()=>{})}catch(e){}}
-function focusRender(v,n){const f=$('focus');f.querySelector('.f-cnt').innerHTML=v+'<small> / '+n+'</small>';f.querySelector('.f-ring').style.setProperty('--p',Math.min(1,v/n));f.classList.toggle('full',v>=n);
+function focusRender(v,n){const f=$('focus');if(FOC&&FOC.free){const c=fjCur(v,n),r=Math.floor(v/n);f.querySelector('.f-cnt').innerHTML=c+'<small> / '+n+'</small>';f.querySelector('.f-ring').style.setProperty('--p',c/n);f.classList.toggle('full',!!v&&v%n===0);f.querySelector('.f-hint').textContent=v&&v%n===0?`Round ${r} complete 🙏 Keep going if you like.`:(r?`${r} ${r>1?'rounds':'round'} done. `:'')+'Tap anywhere after each repetition.';return}f.querySelector('.f-cnt').innerHTML=v+'<small> / '+n+'</small>';f.querySelector('.f-ring').style.setProperty('--p',Math.min(1,v/n));f.classList.toggle('full',v>=n);
   f.querySelector('.f-hint').textContent=v>=n?'Complete. Well done 🙏':'Tap anywhere after each chant. A bell rings when you finish.'}
 function closeFocus(){$('focus').hidden=true;document.documentElement.style.overflow='';FOC=null;try{WL&&WL.release()}catch(e){}WL=null}
-$('focusPad').onclick=e=>{if(e.target.tagName==='INPUT'||!FOC)return;audioInit();const v=chantTap(FOC.p,FOC.ck,FOC.save);FOC.upd(v);focusRender(v,+FOC.p.dataset.n)};
+$('focusPad').onclick=e=>{if(e.target.tagName==='INPUT'||!FOC)return;audioInit();const v=(FOC.tap||chantTap)(FOC.p,FOC.ck,FOC.save);FOC.upd(v);focusRender(v,+FOC.p.dataset.n)};
 $('focusClose').onclick=closeFocus;
 (function(){const el=$('strip');let lastI=null;el.addEventListener('scroll',()=>{const it=el.querySelector('.sd');if(!it)return;const i=Math.round(el.scrollLeft/(it.offsetWidth+2));
   if(Date.now()<(window._stripProg||0)){lastI=i;return}if(lastI!==null&&i!==lastI)hapticTick();lastI=i},{passive:true})})();
