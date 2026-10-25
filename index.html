@@ -447,6 +447,7 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 /* ---------- glass ---------- */
+html,body,.prac,.list{overflow-anchor:none}
 :root{--g-fill:linear-gradient(155deg,rgba(255,255,255,.50),rgba(255,253,248,.16) 46%,rgba(255,250,242,.26));--g-edge:rgba(255,255,255,.8);--g-spec:rgba(255,255,255,.95);--g-shadow:0 1px 2px rgba(60,48,30,.05),0 22px 44px -20px rgba(60,48,30,.28);--g-blur:blur(30px) saturate(2.3) brightness(1.04);--g-row:rgba(255,255,255,.28)}
 html[data-theme="dark"]{--g-fill:linear-gradient(155deg,rgba(255,255,255,.11),rgba(255,255,255,.035) 45%,rgba(255,255,255,.06));--g-edge:rgba(255,255,255,.13);--g-spec:rgba(255,255,255,.16);--g-shadow:0 1px 2px rgba(0,0,0,.3),0 22px 44px -18px rgba(0,0,0,.6);--g-blur:blur(26px) saturate(1.6);--g-row:rgba(255,255,255,.05)}
 html::after{content:"";position:fixed;inset:-12%;z-index:-1;pointer-events:none;
@@ -761,6 +762,11 @@ html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(-
 <script>
 const BIRTH={nak:5,rashi:2}, TZ=5.5;
 const $=id=>document.getElementById(id);
+function scroller(el){for(let n=el.parentElement;n&&n!==document.body;n=n.parentElement){const o=getComputedStyle(n).overflowY;if((o==='auto'||o==='scroll')&&n.scrollHeight>n.clientHeight+2)return n}return null}
+function openToggle(p,cb){const h=p.querySelector('.ph')||p,y0=h.getBoundingClientRect().top;p.classList.toggle('open');if(cb)cb();
+  const sc=scroller(p),d=h.getBoundingClientRect().top-y0;if(Math.abs(d)>1){if(sc)sc.scrollTop+=d;else window.scrollBy(0,d)}
+  if(p.classList.contains('open'))requestAnimationFrame(()=>{const r=p.getBoundingClientRect(),box=sc?sc.getBoundingClientRect():{top:0,bottom:innerHeight-(document.body.classList.contains('has-sk')?150:110)};
+    const over=r.bottom-box.bottom;if(over>0){const by=Math.min(over+12,r.top-box.top-12);if(by>0){if(sc)sc.scrollBy({top:by,behavior:'smooth'});else window.scrollBy({top:by,behavior:'smooth'})}}})}
 var _hLast=0;function haptic(n=1){const _n=Date.now();if(n===1&&_n-_hLast<60)return;_hLast=_n;try{if(navigator.vibrate&&navigator.vibrate(n>1?[12,60,12]:10))return;for(let i=0;i<n;i++)setTimeout(()=>$('hapt').click(),i*110)}catch(e){}}
 const ist=d=>new Date(+d+TZ*3600e3);
 const fmt=d=>{const x=ist(d);let h=x.getUTCHours(),m=x.getUTCMinutes();const a=h>=12?'pm':'am';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+a};
@@ -987,7 +993,7 @@ function render(ds,scrollStrip){
     <label class="tap2" aria-label="Count one chant"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><span class="fill" style="width:${Math.min(100,(counts[it.id]||0)/it.n*100)}%"></span><span class="cnt num">${counts[it.id]||0}<small> / ${it.n}</small></span><span class="hint">Tap anywhere here after each chant</span></label><div class="japa-opts"><button type="button" class="fs">${I.eye}Eyes closed</button><button type="button" class="bellt">${bellLbl()}</button></div><div class="japa-foot"><span class="donemsg">${(counts[it.id]||0)>=it.n?'Complete. Well done 🙏':''}</span><button type="button" class="reset">Reset count</button></div></div>`:''}</div></div>`}).join('');
   const save=()=>{ls.set(key,[...$('prac').querySelectorAll('.pi.done')].map(x=>x.dataset.id));streak()};
   $('prac').querySelectorAll('.pi').forEach(p=>{
-    p.querySelectorAll('.open').forEach(b=>b.onclick=()=>p.classList.toggle('open'));
+    p.querySelectorAll('.open').forEach(b=>b.onclick=()=>openToggle(p));
     p.querySelector('.chk').onclick=()=>{p.classList.toggle('done');save()};
     const tap=p.querySelector('.tap2');const upd=v=>{const n=+p.dataset.n;tap.querySelector('.cnt').innerHTML=v+'<small> / '+n+'</small>';tap.querySelector('.fill').style.width=Math.min(100,v/n*100)+'%';p.querySelector('.donemsg').textContent=v>=n?'Complete. Well done 🙏':'';tap.classList.toggle('full',v>=n)};if(tap){tap.onclick=(e)=>{if(e.target.tagName==='INPUT')return;audioInit();upd(chantTap(p,ck,save))};p.querySelector('.fs').onclick=()=>openFocus(p,ck,save,upd);p.querySelector('.bellt').onclick=ev=>{const on=!ls.get('bell',true);ls.set('bell',on);document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
       p.querySelector('.reset').onclick=()=>{const c=ls.get(ck,{});c[p.dataset.id]=0;ls.set(ck,c);upd(0)}}
@@ -1102,7 +1108,7 @@ function freeJap(ds,ck,save){const old=document.querySelector('.pi.fj');if(old)o
    <div class="japa-foot"><span class="donemsg"></span><button type="button" class="reset">Reset count</button></div></div>`;
   $('prac').appendChild(el);
   const tap=el.querySelector('.tap2'),upd=v=>{const c=fjCur(v,n);tap.querySelector('.cnt').innerHTML=c+'<small> / '+n+'</small>';tap.querySelector('.fill').style.width=c/n*100+'%';tap.classList.toggle('full',!!v&&v%n===0);el.querySelector('.fjs').innerHTML=fjSum(v,n);const r=Math.floor(v/n);el.querySelector('.donemsg').textContent=v&&v%n===0?`Round ${r} complete 🙏`:r?`${r} ${r>1?'rounds':'round'} done`:''};upd(v);
-  el.querySelectorAll('.open').forEach(b=>b.onclick=()=>{el.classList.toggle('open');window._fjOpen=el.classList.contains('open')});
+  el.querySelectorAll('.open').forEach(b=>b.onclick=()=>openToggle(el,()=>{window._fjOpen=el.classList.contains('open')}));
   tap.onclick=e=>{if(e.target.tagName==='INPUT')return;audioInit();upd(fjTap(el,ck,save))};
   el.querySelector('.fs').onclick=()=>{openFocus(el,ck,save,upd);FOC.tap=fjTap;FOC.free=true;focusRender(ls.get(ck,{}).free||0,n)};
   el.querySelector('.bellt').onclick=()=>{ls.set('bell',!ls.get('bell',true));document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
