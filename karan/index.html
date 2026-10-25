@@ -447,18 +447,21 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 /* ---------- glass ---------- */
-:root{--g-fill:linear-gradient(155deg,rgba(255,255,255,.62),rgba(255,253,248,.30) 42%,rgba(255,250,242,.40));--g-edge:rgba(255,255,255,.72);--g-spec:rgba(255,255,255,.95);--g-shadow:0 1px 2px rgba(60,48,30,.05),0 22px 44px -20px rgba(60,48,30,.28);--g-blur:blur(26px) saturate(1.9) brightness(1.03);--g-row:rgba(255,255,255,.38)}
+:root{--g-fill:linear-gradient(155deg,rgba(255,255,255,.50),rgba(255,253,248,.16) 46%,rgba(255,250,242,.26));--g-edge:rgba(255,255,255,.8);--g-spec:rgba(255,255,255,.95);--g-shadow:0 1px 2px rgba(60,48,30,.05),0 22px 44px -20px rgba(60,48,30,.28);--g-blur:blur(30px) saturate(2.3) brightness(1.04);--g-row:rgba(255,255,255,.28)}
 html[data-theme="dark"]{--g-fill:linear-gradient(155deg,rgba(255,255,255,.11),rgba(255,255,255,.035) 45%,rgba(255,255,255,.06));--g-edge:rgba(255,255,255,.13);--g-spec:rgba(255,255,255,.16);--g-shadow:0 1px 2px rgba(0,0,0,.3),0 22px 44px -18px rgba(0,0,0,.6);--g-blur:blur(26px) saturate(1.6);--g-row:rgba(255,255,255,.05)}
 html::after{content:"";position:fixed;inset:-12%;z-index:-1;pointer-events:none;
-  background:radial-gradient(34% 26% at 14% 24%,rgba(232,188,124,.7),transparent 70%),radial-gradient(32% 26% at 90% 34%,rgba(140,186,158,.55),transparent 70%),radial-gradient(40% 30% at 72% 82%,rgba(232,160,138,.48),transparent 70%),radial-gradient(36% 28% at 18% 78%,rgba(150,184,228,.52),transparent 70%),radial-gradient(28% 22% at 50% 52%,rgba(240,214,170,.30),transparent 70%);
+  background:radial-gradient(34% 26% at 14% 24%,rgba(236,184,110,.85),transparent 70%),radial-gradient(32% 26% at 90% 34%,rgba(126,182,150,.7),transparent 70%),radial-gradient(40% 30% at 72% 82%,rgba(236,150,126,.62),transparent 70%),radial-gradient(36% 28% at 18% 78%,rgba(138,176,230,.66),transparent 70%),radial-gradient(28% 22% at 50% 52%,rgba(244,208,150,.42),transparent 70%);
   animation:gdrift 46s ease-in-out infinite alternate}
 html[data-theme="dark"]::after{opacity:.32}
 @keyframes gdrift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(3%,-2%,0) scale(1.05)}100%{transform:translate3d(-3%,2%,0) scale(1.02)}}
 @media (prefers-reduced-motion:reduce){html::after{animation:none}}
 .card,.list,.prac,details.grp,.locmsg,.daynav .dn,.pill,.japa-opts button,.f-dark{background:var(--g-fill);-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-spec),inset 0 -1px 0 rgba(255,255,255,.12),var(--g-shadow)}
+.card::after,details.grp::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,0) 22%,rgba(255,255,255,0) 70%,rgba(255,255,255,.18) 100%);mix-blend-mode:soft-light}
+html[data-theme="dark"] .card::after,html[data-theme="dark"] details.grp::after{opacity:.35}
+.card,.list,.prac,details.grp{position:relative}
 .pill,.japa-opts button,.f-dark{box-shadow:inset 0 1px 0 var(--g-spec),0 4px 14px -6px rgba(60,48,30,.25)}
-.daynav{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,252,246,.5));-webkit-backdrop-filter:blur(26px) saturate(1.8);backdrop-filter:blur(26px) saturate(1.8);border-top:1px solid var(--g-edge)}
-html[data-theme="dark"] .daynav{background:rgba(20,19,16,.45)}
+.daynav{background:linear-gradient(180deg,rgba(255,253,248,.62),rgba(255,252,246,.78));-webkit-backdrop-filter:blur(34px) saturate(2);backdrop-filter:blur(34px) saturate(2);border-top:1px solid var(--g-edge)}
+html[data-theme="dark"] .daynav{background:rgba(20,19,16,.72)}
 .nn .r,.affs textarea{background:var(--g-row);border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-spec)}
 .affr .opts button:not(.sel),.fjt button:not(.sel){background:var(--g-row);border-color:var(--g-edge)}
 .it + .it,.pi{border-color:rgba(255,255,255,.5)}
@@ -740,7 +743,7 @@ html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(-
 <script>
 const BIRTH={nak:4,rashi:2}, TZ=5.5;
 const $=id=>document.getElementById(id);
-function haptic(n=1){try{if(navigator.vibrate&&navigator.vibrate(n>1?[12,60,12]:10))return;for(let i=0;i<n;i++)setTimeout(()=>$('hapt').click(),i*110)}catch(e){}}
+var _hLast=0;function haptic(n=1){const _n=Date.now();if(n===1&&_n-_hLast<60)return;_hLast=_n;try{if(navigator.vibrate&&navigator.vibrate(n>1?[12,60,12]:10))return;for(let i=0;i<n;i++)setTimeout(()=>$('hapt').click(),i*110)}catch(e){}}
 const ist=d=>new Date(+d+TZ*3600e3);
 const fmt=d=>{const x=ist(d);let h=x.getUTCHours(),m=x.getUTCMinutes();const a=h>=12?'pm':'am';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+a};
 const hm=d=>{const x=ist(d);return (x.getUTCHours()%12||12)+':'+String(x.getUTCMinutes()).padStart(2,'0')};
@@ -1056,6 +1059,8 @@ let shownToday=todayIST();
 function tick(force){const t=todayIST();if($('date').value===shownToday&&t!==shownToday){$('date').value=t;shownToday=t;go();return}
   shownToday=t;if($('date').value!==t)return;const ae=document.activeElement;if(ae&&(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT'&&ae.type!=='checkbox'))return;if(!force&&(document.querySelector('.pi.open')||document.querySelector('.past.open')))return;go()}
 
+document.addEventListener('click',e=>{if(!e.isTrusted)return;const t=e.target;if(!t||!t.closest)return;const lb=t.closest('label');if(lb&&lb.querySelector('input[switch]'))return;
+  if(t.closest('button,[role="button"],summary,.pill,a[href],.reveal,.affq')&&!t.closest('input,textarea,select'))haptic()},true);
 var _lastTick=0;function hapticTick(){const n=Date.now();if(n-_lastTick<45)return;_lastTick=n;try{if(navigator.vibrate&&navigator.vibrate(8))return;$('hapt').click()}catch(e){}}
 var AC=null;function audioInit(){try{if(!AC){const A=window.AudioContext||window.webkitAudioContext;if(A)AC=new A()}if(AC&&AC.state==='suspended')AC.resume()}catch(e){}}
 function bell(){try{audioInit();if(!AC)return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(_){}
