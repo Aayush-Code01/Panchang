@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Panchang">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#F3EEE5">
-<script>try{var m=JSON.parse(localStorage.getItem('k:theme')||'"light"'),z=JSON.parse(localStorage.getItem('k:size')||'"normal"');document.documentElement.dataset.theme=(m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';document.documentElement.dataset.size=z;var hh=(new Date(Date.now()+19800e3)).getUTCHours()+(new Date(Date.now()+19800e3)).getUTCMinutes()/60,ph=hh<5.6?'night':hh<7.2?'dawn':hh<16.3?'day':hh<17.3?'golden':hh<18.4?'dusk':'night',dk=document.documentElement.dataset.theme==='dark',AA=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}:{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']},aa=AA[ph];document.documentElement.style.setProperty('--amb1',aa[0]);document.documentElement.style.setProperty('--amb2',aa[1])}catch(e){}</script>
+<script>try{var m=JSON.parse(localStorage.getItem('k:theme')||'"light"'),z=JSON.parse(localStorage.getItem('k:size')||'"normal"');document.documentElement.dataset.glass=JSON.parse(localStorage.getItem('k:glass')||'"medium"');document.documentElement.dataset.theme=(m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';document.documentElement.dataset.size=z;var hh=(new Date(Date.now()+19800e3)).getUTCHours()+(new Date(Date.now()+19800e3)).getUTCMinutes()/60,ph=hh<5.6?'night':hh<7.2?'dawn':hh<16.3?'day':hh<17.3?'golden':hh<18.4?'dusk':'night',dk=document.documentElement.dataset.theme==='dark',AA=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}:{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']},aa=AA[ph];document.documentElement.style.setProperty('--amb1',aa[0]);document.documentElement.style.setProperty('--amb2',aa[1])}catch(e){}</script>
 <meta name="robots" content="noindex">
 <link rel="apple-touch-icon" href="../icon-180.png">
 <link rel="icon" type="image/png" href="../icon-192.png">
@@ -453,6 +453,14 @@ html::after{content:"";position:fixed;inset:-12%;z-index:-1;pointer-events:none;
   background:radial-gradient(34% 26% at 14% 24%,rgba(236,184,110,.85),transparent 70%),radial-gradient(32% 26% at 90% 34%,rgba(126,182,150,.7),transparent 70%),radial-gradient(40% 30% at 72% 82%,rgba(236,150,126,.62),transparent 70%),radial-gradient(36% 28% at 18% 78%,rgba(138,176,230,.66),transparent 70%),radial-gradient(28% 22% at 50% 52%,rgba(244,208,150,.42),transparent 70%);
   animation:gdrift 46s ease-in-out infinite alternate}
 html[data-theme="dark"]::after{opacity:.32}
+html[data-glass="subtle"]{--g-fill:linear-gradient(155deg,rgba(255,255,255,.74),rgba(255,253,248,.56) 46%,rgba(255,250,242,.62));--g-row:rgba(255,255,255,.5);--g-blur:blur(22px) saturate(1.5)}
+html[data-glass="medium"]{--g-fill:linear-gradient(155deg,rgba(255,255,255,.6),rgba(255,253,248,.3) 46%,rgba(255,250,242,.4));--g-row:rgba(255,255,255,.38);--g-blur:blur(28px) saturate(2) brightness(1.03)}
+html[data-glass="subtle"]::after{opacity:.5}
+html[data-glass="medium"]::after{opacity:.8}
+html[data-theme="dark"][data-glass="subtle"]{--g-fill:linear-gradient(155deg,rgba(60,56,48,.7),rgba(40,37,32,.6) 45%,rgba(44,40,35,.64))}
+html[data-theme="dark"][data-glass="medium"]{--g-fill:linear-gradient(155deg,rgba(255,255,255,.13),rgba(255,255,255,.06) 45%,rgba(255,255,255,.08))}
+html[data-theme="dark"][data-glass="subtle"]::after{opacity:.16}
+html[data-theme="dark"][data-glass="medium"]::after{opacity:.26}
 @keyframes gdrift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(3%,-2%,0) scale(1.05)}100%{transform:translate3d(-3%,2%,0) scale(1.02)}}
 @media (prefers-reduced-motion:reduce){html::after{animation:none}}
 .card,.list,.prac,details.grp,.locmsg,.daynav .dn,.pill,.japa-opts button,.f-dark{background:var(--g-fill);-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-spec),inset 0 -1px 0 rgba(255,255,255,.12),var(--g-shadow)}
@@ -609,6 +617,7 @@ html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(-
     <div class="grp-t">Appearance</div>
     <div class="grp-b">
       <div class="row"><span>Theme</span><div class="seg" id="segTheme"><button type="button" data-v="light">Light</button><button type="button" data-v="dark">Dark</button><button type="button" data-v="auto">Auto</button></div></div>
+      <div class="row"><span>Glass</span><div class="seg" id="segGlass"><button type="button" data-v="subtle">Subtle</button><button type="button" data-v="medium">Medium</button><button type="button" data-v="clear">Clear</button></div></div>
       <div class="row"><span>Text size</span><div class="seg" id="segSize"><button type="button" data-v="normal">Standard</button><button type="button" data-v="large">Larger</button></div></div>
     </div>
     <div class="grp-t">Location</div>
@@ -1133,18 +1142,19 @@ function dayNav(ds,lat,lon){const t=todayIST(),base=new Date(ds+'T00:00:00Z'),VC
   el.querySelectorAll('.dn').forEach(b=>{b.onclick=e=>{if(e.target.tagName==='INPUT')return;$('date').value=b.dataset.d;go();window.scrollTo({top:0,behavior:'smooth'})};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}}})}
 
 function applyTheme(){const m=ls.get('theme','light'),dark=m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
-  document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.dataset.size=ls.get('size','normal');
+  document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.dataset.size=ls.get('size','normal');document.documentElement.dataset.glass=ls.get('glass','medium');
   const tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=dark?'#1B1915':'#F3EEE5';
   const sb=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');if(sb)sb.content=dark?'black-translucent':'default'}
 applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(ls.get('theme','light')==='auto')applyTheme()})}catch(e){}
 function syncSettings(){const set=(id,v)=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
-  set('segTheme',ls.get('theme','light'));set('segSize',ls.get('size','normal'));
+  set('segTheme',ls.get('theme','light'));set('segSize',ls.get('size','normal'));set('segGlass',ls.get('glass','medium'));
   $('tglBell').checked=ls.get('bell',true);$('tglWx').checked=ls.get('wxOn',true);$('tglSpecial').checked=ls.get('special',true);
   const no=document.getElementById('nearOpt');$('tglGps').checked=!!(no&&no.selected);$('clearAll').textContent='Clear';$('clearAll').dataset.arm=''}
 function openSheet(){syncSettings();$('sheetBg').classList.add('show');$('sheet').classList.add('show');$('sheet').setAttribute('aria-hidden','false')}
 function closeSheet(){$('sheetBg').classList.remove('show');$('sheet').classList.remove('show');$('sheet').setAttribute('aria-hidden','true')}
 $('gearBtn').onclick=openSheet;$('sheetBg').onclick=closeSheet;$('sheetDone').onclick=closeSheet;
 $('segTheme').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('theme',b.dataset.v);applyTheme();applyAmbience(window.SKY_PHASE);syncSettings()};
+$('segGlass').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('glass',b.dataset.v);applyTheme();syncSettings()};
 $('segSize').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('size',b.dataset.v);applyTheme();syncSettings()};
 $('tglBell').onchange=()=>{ls.set('bell',$('tglBell').checked);document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
 $('tglWx').onchange=()=>{ls.set('wxOn',$('tglWx').checked);go()};
