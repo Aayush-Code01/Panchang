@@ -446,6 +446,25 @@ html[data-theme="dark"] .wx-fog{background:linear-gradient(180deg,rgba(120,120,1
 .sky .mist{animation:mist 16s ease-in-out infinite alternate}@keyframes mist{to{transform:translateX(-22px)}}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ---------- glass ---------- */
+:root{--g-fill:linear-gradient(155deg,rgba(255,255,255,.62),rgba(255,253,248,.30) 42%,rgba(255,250,242,.40));--g-edge:rgba(255,255,255,.72);--g-spec:rgba(255,255,255,.95);--g-shadow:0 1px 2px rgba(60,48,30,.05),0 22px 44px -20px rgba(60,48,30,.28);--g-blur:blur(26px) saturate(1.9) brightness(1.03);--g-row:rgba(255,255,255,.38)}
+html[data-theme="dark"]{--g-fill:linear-gradient(155deg,rgba(255,255,255,.11),rgba(255,255,255,.035) 45%,rgba(255,255,255,.06));--g-edge:rgba(255,255,255,.13);--g-spec:rgba(255,255,255,.16);--g-shadow:0 1px 2px rgba(0,0,0,.3),0 22px 44px -18px rgba(0,0,0,.6);--g-blur:blur(26px) saturate(1.6);--g-row:rgba(255,255,255,.05)}
+html::after{content:"";position:fixed;inset:-12%;z-index:-1;pointer-events:none;
+  background:radial-gradient(34% 26% at 14% 24%,rgba(232,188,124,.7),transparent 70%),radial-gradient(32% 26% at 90% 34%,rgba(140,186,158,.55),transparent 70%),radial-gradient(40% 30% at 72% 82%,rgba(232,160,138,.48),transparent 70%),radial-gradient(36% 28% at 18% 78%,rgba(150,184,228,.52),transparent 70%),radial-gradient(28% 22% at 50% 52%,rgba(240,214,170,.30),transparent 70%);
+  animation:gdrift 46s ease-in-out infinite alternate}
+html[data-theme="dark"]::after{opacity:.32}
+@keyframes gdrift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(3%,-2%,0) scale(1.05)}100%{transform:translate3d(-3%,2%,0) scale(1.02)}}
+@media (prefers-reduced-motion:reduce){html::after{animation:none}}
+.card,.list,.prac,details.grp,.locmsg,.daynav .dn,.pill,.japa-opts button,.f-dark{background:var(--g-fill);-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-spec),inset 0 -1px 0 rgba(255,255,255,.12),var(--g-shadow)}
+.pill,.japa-opts button,.f-dark{box-shadow:inset 0 1px 0 var(--g-spec),0 4px 14px -6px rgba(60,48,30,.25)}
+.daynav{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,252,246,.5));-webkit-backdrop-filter:blur(26px) saturate(1.8);backdrop-filter:blur(26px) saturate(1.8);border-top:1px solid var(--g-edge)}
+html[data-theme="dark"] .daynav{background:rgba(20,19,16,.45)}
+.nn .r,.affs textarea{background:var(--g-row);border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-spec)}
+.affr .opts button:not(.sel),.fjt button:not(.sel){background:var(--g-row);border-color:var(--g-edge)}
+.it + .it,.pi{border-color:rgba(255,255,255,.5)}
+html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(--line)}
+.focus:not(.shunya) .f-ring{box-shadow:inset 0 1px 0 var(--g-spec),var(--g-shadow)}
+@media (min-width:1080px) and (min-height:620px){.c1 > .daynav{background:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none}}
 </style>
 <div class="app">
   <header class="head" id="head">
