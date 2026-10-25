@@ -459,6 +459,11 @@ html[data-glass="subtle"]::after{opacity:.5}
 html[data-glass="medium"]::after{opacity:.8}
 html[data-theme="dark"][data-glass="subtle"]{--g-fill:linear-gradient(155deg,rgba(60,56,48,.7),rgba(40,37,32,.6) 45%,rgba(44,40,35,.64))}
 html[data-theme="dark"][data-glass="medium"]{--g-fill:linear-gradient(155deg,rgba(255,255,255,.13),rgba(255,255,255,.06) 45%,rgba(255,255,255,.08))}
+html[data-theme="dark"][data-glass]{--g-row:rgba(255,255,255,.055);--g-edge:rgba(255,255,255,.12);--g-spec:rgba(255,255,255,.14)}
+html[data-theme="dark"][data-glass="subtle"]{--g-blur:blur(22px) saturate(1.3)}
+html[data-theme="dark"][data-glass="medium"]{--g-blur:blur(26px) saturate(1.5)}
+html[data-theme="dark"][data-glass="clear"]{--g-blur:blur(28px) saturate(1.6)}
+html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(--line)}
 html[data-theme="dark"][data-glass="subtle"]::after{opacity:.16}
 html[data-theme="dark"][data-glass="medium"]::after{opacity:.26}
 @keyframes gdrift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(3%,-2%,0) scale(1.05)}100%{transform:translate3d(-3%,2%,0) scale(1.02)}}
