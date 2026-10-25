@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Panchang">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#F3EEE5">
-<script>try{var m=JSON.parse(localStorage.getItem('theme')||'"light"'),z=JSON.parse(localStorage.getItem('size')||'"normal"');document.documentElement.dataset.glass=JSON.parse(localStorage.getItem('glass')||'"medium"');document.documentElement.dataset.theme=(m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';document.documentElement.dataset.size=z;var hh=(new Date(Date.now()+19800e3)).getUTCHours()+(new Date(Date.now()+19800e3)).getUTCMinutes()/60,ph=hh<5.6?'night':hh<7.2?'dawn':hh<16.3?'day':hh<17.3?'golden':hh<18.4?'dusk':'night',dk=document.documentElement.dataset.theme==='dark',AA=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}:{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']},aa=AA[ph];document.documentElement.style.setProperty('--amb1',aa[0]);document.documentElement.style.setProperty('--amb2',aa[1])}catch(e){}</script>
+<script>try{var m=JSON.parse(localStorage.getItem('theme')||'"light"'),z=JSON.parse(localStorage.getItem('size')||'"normal"');document.documentElement.dataset.glass=JSON.parse(localStorage.getItem('glass')||'"subtle"');document.documentElement.dataset.theme=(m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';document.documentElement.dataset.size=z;var hh=(new Date(Date.now()+19800e3)).getUTCHours()+(new Date(Date.now()+19800e3)).getUTCMinutes()/60,ph=hh<5.6?'night':hh<7.2?'dawn':hh<16.3?'day':hh<17.3?'golden':hh<18.4?'dusk':'night',dk=document.documentElement.dataset.theme==='dark',AA=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}:{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']},aa=AA[ph];document.documentElement.style.setProperty('--amb1',aa[0]);document.documentElement.style.setProperty('--amb2',aa[1])}catch(e){}</script>
 <meta name="robots" content="noindex">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -1141,12 +1141,12 @@ function dayNav(ds,lat,lon){const t=todayIST(),base=new Date(ds+'T00:00:00Z'),VC
   el.querySelectorAll('.dn').forEach(b=>{b.onclick=e=>{if(e.target.tagName==='INPUT')return;$('date').value=b.dataset.d;go();window.scrollTo({top:0,behavior:'smooth'})};b.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();b.click()}}})}
 
 function applyTheme(){const m=ls.get('theme','light'),dark=m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
-  document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.dataset.size=ls.get('size','normal');document.documentElement.dataset.glass=ls.get('glass','medium');
+  document.documentElement.dataset.theme=dark?'dark':'light';document.documentElement.dataset.size=ls.get('size','normal');document.documentElement.dataset.glass=ls.get('glass','subtle');
   const tc=document.querySelector('meta[name="theme-color"]');if(tc)tc.content=dark?'#1B1915':'#F3EEE5';
   const sb=document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');if(sb)sb.content=dark?'black-translucent':'default'}
 applyTheme();try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(ls.get('theme','light')==='auto')applyTheme()})}catch(e){}
 function syncSettings(){const set=(id,v)=>$(id).querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
-  set('segTheme',ls.get('theme','light'));set('segSize',ls.get('size','normal'));set('segGlass',ls.get('glass','medium'));
+  set('segTheme',ls.get('theme','light'));set('segSize',ls.get('size','normal'));set('segGlass',ls.get('glass','subtle'));
   $('tglBell').checked=ls.get('bell',true);$('tglWx').checked=ls.get('wxOn',true);$('tglSpecial').checked=ls.get('special',true);
   const no=document.getElementById('nearOpt');$('tglGps').checked=!!(no&&no.selected);$('clearAll').textContent='Clear';$('clearAll').dataset.arm=''}
 function openSheet(){syncSettings();$('sheetBg').classList.add('show');$('sheet').classList.add('show');$('sheet').setAttribute('aria-hidden','false')}
