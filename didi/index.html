@@ -456,7 +456,11 @@ html[data-theme="dark"]::after{opacity:.32}
 @keyframes gdrift{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(3%,-2%,0) scale(1.05)}100%{transform:translate3d(-3%,2%,0) scale(1.02)}}
 @media (prefers-reduced-motion:reduce){html::after{animation:none}}
 .card,.list,.prac,details.grp,.locmsg,.daynav .dn,.pill,.japa-opts button,.f-dark{background:var(--g-fill);-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:1px solid var(--g-edge);box-shadow:inset 0 1px 0 var(--g-spec),inset 0 -1px 0 rgba(255,255,255,.12),var(--g-shadow)}
-.card::after,details.grp::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,0) 22%,rgba(255,255,255,0) 70%,rgba(255,255,255,.18) 100%);mix-blend-mode:soft-light}
+.card::after,details.grp::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 20%,rgba(255,255,255,0) 72%,rgba(255,255,255,.1) 100%)}
+.hero::after{display:none}
+.hero{isolation:isolate}
+.hero .sky{border-radius:calc(var(--r-xl) - 1px) calc(var(--r-xl) - 1px) 0 0;transform:translateZ(0)}
+.hero .sky .lyr{border-radius:inherit;overflow:hidden}
 html[data-theme="dark"] .card::after,html[data-theme="dark"] details.grp::after{opacity:.35}
 .card,.list,.prac,details.grp{position:relative}
 .pill,.japa-opts button,.f-dark{box-shadow:inset 0 1px 0 var(--g-spec),0 4px 14px -6px rgba(60,48,30,.25)}
