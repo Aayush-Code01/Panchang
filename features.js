@@ -325,8 +325,8 @@ function setTab(t){if(t===cur){if(t!=='today'&&view[t]&&view[t].length>1){view[t
   cur=t;document.body.dataset.tab=t;document.querySelectorAll('.tabbar button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));placeInd();draw(t);scrollTo(0,0);try{sessionStorage.setItem('tab',t)}catch(e){}}
 window.setTab=setTab;
 function introBar(){if(window._tlIntro)return;const tl=$('tl');if(!tl||!tl.querySelector('.tl-seg'))return;window._tlIntro=1;
-  tl.querySelectorAll('.tl-seg').forEach((x,i)=>x.style.setProperty('--i',i));tl.classList.add('tl-intro');if(!ls.get('tlUsed',false))tl.classList.add('tl-hint');
-  setTimeout(()=>tl.classList.remove('tl-intro','tl-hint'),3800);
+  tl.querySelectorAll('.tl-seg').forEach((x,i)=>x.style.setProperty('--i',i));tl.classList.add('tl-intro');if(!ls.get('tlUsed',false))tl.classList.add('tl-nudge');
+  setTimeout(()=>tl.classList.remove('tl-intro','tl-nudge'),3800);
   tl.addEventListener('pointerdown',()=>ls.set('tlUsed',true),{once:true})}
 function nameEyebrow(){const e=$('eyebrow'),h=$('title');if(!e||!ME.first)return;const T=h.textContent.trim();
   let t=e.textContent.replace(' · until sunrise','').replace(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)/,m=>m.slice(0,3)).replace(/ (January|February|March|April|May|June|July|August|September|October|November|December)/,(m,mo)=>' '+mo.slice(0,3));
