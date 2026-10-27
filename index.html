@@ -1409,7 +1409,7 @@ if(window.Astronomy)go();else window.addEventListener('load',go);
 navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()});
 window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{}))}</script>
-<script>window.ME={name:"You",self:true}</script>
+<script>window.ME={first:"Aayush",name:"You",self:true}</script>
 <script src="features.js"></script>
 </body>
 </html>

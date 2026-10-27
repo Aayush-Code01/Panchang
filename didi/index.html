@@ -487,6 +487,7 @@ html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(-
 .focus:not(.shunya) .f-ring{box-shadow:inset 0 1px 0 var(--g-spec),var(--g-shadow)}
 @media (min-width:1080px) and (min-height:620px){.c1 > .daynav{background:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none}}
 </style>
+<link rel="stylesheet" href="../features.css">
 <div class="app">
   <header class="head" id="head">
     <div class="toprow">
@@ -777,7 +778,7 @@ const calDateIST=()=>ist(new Date()).toISOString().slice(0,10);
 const todayIST=()=>{const d=calDateIST();try{const v=(document.getElementById('loc')||{}).value||'';const [la,lo]=(/^-?\d/.test(v)?v:'28.4595,77.0266').split(',').map(Number);const r=calc(d,la,lo);if(Date.now()<+r.rise){const p=new Date(d+'T00:00:00Z');p.setUTCDate(p.getUTCDate()-1);return p.toISOString().slice(0,10)}}catch(e){}return d};
 const ls={get(k,v){k='d:'+k;try{const x=localStorage.getItem(k);return x==null?v:JSON.parse(x)}catch(e){return v}},set(k,v){k='d:'+k;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-const SYNC_RE=/^(ritual|japa|aff|sankalp|reflect):/,SYNC_FILE='panchang-didi.json',LSP='d:',SY={busy:false,err:'',t:0};
+const SYNC_RE=/^((ritual|japa|aff|sankalp|reflect|habit):|people$)/,SYNC_FILE='panchang-didi.json',LSP='d:',SY={busy:false,err:'',t:0};
 const _lsSet=ls.set;ls.set=function(k,v){_lsSet(k,v);if(SYNC_RE.test(k)){const m=ls.get('syncMeta',{});m[k]=Date.now();_lsSet('syncMeta',m);syncSoon()}};
 async function gh(path,opt={}){const r=await fetch('https://api.github.com'+path,Object.assign({},opt,{cache:'no-store',headers:Object.assign({Authorization:'Bearer '+ls.get('ghTok',''),Accept:'application/vnd.github+json'},opt.body?{'Content-Type':'application/json'}:{})}));if(!r.ok){const e=new Error(r.status);e.code=r.status;throw e}return r.json()}
 async function findGist(){let id=ls.get('ghGist','');if(id)return id;
@@ -1409,5 +1410,7 @@ if(window.Astronomy)go();else window.addEventListener('load',go);
 navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()});
 window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{}))}</script>
+<script>window.ME={first:"Shraddha",name:"You",self:true}</script>
+<script src="../features.js"></script>
 </body>
 </html>

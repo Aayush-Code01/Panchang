@@ -275,18 +275,37 @@ function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc
   const dot=c=>`<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c==='good'?'var(--good)':c==='mixed'?'var(--best)':'var(--avoid)'}"></i>`;
   let ph;if(p){const [vc,vt]=vFor(r,p);ph=`<button type="button" class="gl card" data-go="personal"><span class="k">${IC.heart}${esc(p.name)}</span><b>${dot(vc)} ${vt}</b><small>${personSummary(p).line}</small></button>`}
   else ph=`<button type="button" class="gl card" data-go="personal"><span class="k">${IC.heart}Personal</span><b>Add your partner</b><small>See how each day looks for them</small></button>`;
-  box.innerHTML=`<button type="button" class="gl card" data-go="work"><span class="k">${IC.work}Work</span><b>${dot(wc)} ${wt}</b><small>Career and money timing</small></button>${ph}
+  box.innerHTML=(ME.noWork?'':`<button type="button" class="gl card" data-go="work"><span class="k">${IC.work}Work</span><b>${dot(wc)} ${wt}</b><small>Career and money timing</small></button>`)+`${ph}
    <button type="button" class="gl card" data-go="practice"><span class="k">${IC.lotus}Practice</span><b>${done} of ${tot} done</b><small>${kd?kd+' kind act'+(kd>1?'s':'')+' today':'Mantras, kind acts, intention'}</small></button>
    <button type="button" class="gl card" data-go="plan"><span class="k">${IC.plan}Plan</span><b>Planning something?</b><small>Find a good time</small></button>`;
   box.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(b.dataset.go))}
 
 /* ---------- tabs ---------- */
-const TABS=[['today','Today',IC.today],['plan','Plan',IC.plan],['personal','Personal',IC.heart],['work','Professional',IC.work],['practice','Practice',IC.lotus]];
+const TABS=[['today','Today',IC.today],['plan','Plan',IC.plan],['personal','Personal',IC.heart],['work','Professional',IC.work],['practice','Practice',IC.lotus]].filter(t=>!(ME.noWork&&t[0]==='work'));
 function draw(tab){if(tab==='plan')drawPlan();else if(tab==='work')drawWork();else if(tab==='personal')drawPersonal();else if(tab==='practice'){drawKind()}}
 let cur='today';
 function setTab(t){if(t===cur){if(t!=='today'&&view[t]&&view[t].length>1){view[t]=['home'];draw(t)}scrollTo({top:0,behavior:'smooth'});return}
-  cur=t;document.body.dataset.tab=t;document.querySelectorAll('.tabbar button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));draw(t);scrollTo(0,0);try{sessionStorage.setItem('tab',t)}catch(e){}}
+  cur=t;document.body.dataset.tab=t;document.querySelectorAll('.tabbar button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));placeInd();draw(t);scrollTo(0,0);try{sessionStorage.setItem('tab',t)}catch(e){}}
 window.setTab=setTab;
+function nameEyebrow(){const e=$('eyebrow'),h=$('title');if(!e||!ME.first)return;const T=h.textContent.trim();
+  let t=e.textContent.replace(' · until sunrise','').replace(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)/,m=>m.slice(0,3)).replace(/ (January|February|March|April|May|June|July|August|September|October|November|December)/,(m,mo)=>' '+mo.slice(0,3));
+  if(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)/.test(t)&&!['Today','Tomorrow','Yesterday'].includes(T))t=t.replace(/^\w{3} /,'');
+  if(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun) /.test(t)&&T!=='Today'&&T!=='Tomorrow'&&T!=='Yesterday')t=t.slice(4);
+  e.innerHTML=`<b class="eb-name">${esc(ME.self?'Hi '+ME.first:ME.first+'’s day')}</b>`;
+  h.innerHTML=`${esc(T)}<span class="tdate">${esc(t)}</span>`}
+function placeInd(){const nav=document.querySelector('.tabbar');if(!nav)return;const b=nav.querySelector(`[data-t="${cur}"]`),i=nav.querySelector('.tind');if(!b||!i)return;i.style.width=b.offsetWidth+'px';i.style.transform=`translateX(${b.offsetLeft}px)`}
+function dragTabs(nav){let sx=0,on=false,dragging=false,last=null,ind=nav.querySelector('.tind');const btns=()=>[...nav.querySelectorAll('button')];
+  const at=x=>btns().find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<r.right});
+  nav.addEventListener('pointerdown',e=>{on=true;dragging=false;sx=e.clientX;last=null});
+  nav.addEventListener('pointermove',e=>{if(!on)return;if(!dragging&&Math.abs(e.clientX-sx)<8)return;
+    if(!dragging){dragging=true;nav.classList.add('drag');try{nav.setPointerCapture(e.pointerId)}catch(_){}}
+    const nr=nav.getBoundingClientRect(),w=ind.offsetWidth,x=Math.max(5,Math.min(nr.width-5-w,e.clientX-nr.left-w/2));ind.style.transform=`translateX(${x}px) scale(1.06,1.08)`;
+    const b=at(Math.max(nr.left+6,Math.min(nr.right-6,e.clientX)));if(b&&b!==last){btns().forEach(x=>x.classList.toggle('hov',x===b));last=b;if(typeof hapticTick==='function')hapticTick()}});
+  const end=e=>{if(!on)return;on=false;nav.classList.remove('drag');btns().forEach(x=>x.classList.remove('hov'));
+    if(dragging){const b=last;dragging=false;if(b){nav._skip=Date.now();if(b.dataset.t===cur)placeInd();else setTab(b.dataset.t);haptic()}else placeInd()}};
+  nav.addEventListener('pointerup',end);nav.addEventListener('pointercancel',end);
+  nav.addEventListener('click',e=>{if(nav._skip&&Date.now()-nav._skip<400){e.stopPropagation();e.preventDefault()}},true);
+  addEventListener('resize',placeInd)}
 
 function init(){const app=document.querySelector('.app');
   ['plan','personal','work','practice'].forEach(k=>{const s=document.createElement('section');s.className='pane';s.id='pane-'+k;app.appendChild(s)});
@@ -300,14 +319,14 @@ function init(){const app=document.querySelector('.app');
   const gl=document.createElement('section');gl.className='s-glance';gl.innerHTML='<div class="sec-title"><h2><span class="hic">'+IC.spark+'</span>At a glance</h2></div><div class="glance" id="glance"></div>';
   const c3=document.querySelector('.c3');if(c3){c3.prepend(gl);const dd=document.querySelector('.d-det'),dc=document.querySelector('.d-chart');if(dd)c3.appendChild(dd);if(dc)c3.appendChild(dc)}else app.appendChild(gl);gl.style.order=5;
   const nav=document.createElement('nav');nav.className='tabbar';nav.setAttribute('role','tablist');
-  nav.innerHTML=TABS.map(([k,l,i])=>`<button type="button" role="tab" data-t="${k}" aria-selected="${k==='today'}">${i}<span>${l}</span></button>`).join('');
-  document.body.appendChild(nav);const fitL=()=>nav.querySelectorAll('span').forEach(sp=>{const b=sp.parentElement;if(b.dataset.t==='work'){sp.textContent='Professional';if(sp.scrollWidth>sp.clientWidth+1)sp.textContent='Work'}});requestAnimationFrame(fitL);addEventListener('resize',fitL);if(document.fonts)document.fonts.ready.then(fitL);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+  nav.innerHTML='<span class="tind"></span>'+TABS.map(([k,l,i])=>`<button type="button" role="tab" data-t="${k}" aria-selected="${k==='today'}">${i}<span>${l}</span></button>`).join('');
+  document.body.appendChild(nav);const fitL=()=>nav.querySelectorAll('span').forEach(sp=>{const b=sp.parentElement;if(b.dataset.t==='work'){sp.textContent='Professional';if(sp.scrollWidth>sp.clientWidth+1)sp.textContent='Work'}});requestAnimationFrame(fitL);addEventListener('resize',fitL);if(document.fonts)document.fonts.ready.then(fitL);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));dragTabs(nav);requestAnimationFrame(placeInd);if(document.fonts)document.fonts.ready.then(placeInd);
   document.body.dataset.tab='today';
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
-  try{renderGlance();drawKind()}catch(e){console.error(e)}
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
+  try{nameEyebrow();renderGlance();drawKind()}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
