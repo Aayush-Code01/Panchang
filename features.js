@@ -324,6 +324,10 @@ let cur='today';
 function setTab(t){if(t===cur){if(t!=='today'&&view[t]&&view[t].length>1){view[t]=['home'];draw(t)}scrollTo({top:0,behavior:'smooth'});return}
   cur=t;document.body.dataset.tab=t;document.querySelectorAll('.tabbar button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));placeInd();draw(t);scrollTo(0,0);try{sessionStorage.setItem('tab',t)}catch(e){}}
 window.setTab=setTab;
+function introBar(){if(window._tlIntro)return;const tl=$('tl');if(!tl||!tl.querySelector('.tl-seg'))return;window._tlIntro=1;
+  tl.querySelectorAll('.tl-seg').forEach((x,i)=>x.style.setProperty('--i',i));tl.classList.add('tl-intro');if(!ls.get('tlUsed',false))tl.classList.add('tl-hint');
+  setTimeout(()=>tl.classList.remove('tl-intro','tl-hint'),3800);
+  tl.addEventListener('pointerdown',()=>ls.set('tlUsed',true),{once:true})}
 function nameEyebrow(){const e=$('eyebrow'),h=$('title');if(!e||!ME.first)return;const T=h.textContent.trim();
   let t=e.textContent.replace(' · until sunrise','').replace(/^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)/,m=>m.slice(0,3)).replace(/ (January|February|March|April|May|June|July|August|September|October|November|December)/,(m,mo)=>' '+mo.slice(0,3));
   if(/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)/.test(t)&&!['Today','Tomorrow','Yesterday'].includes(T))t=t.replace(/^\w{3} /,'');
@@ -364,8 +368,8 @@ function init(){const app=document.querySelector('.app');
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
-  try{nameEyebrow();renderGlance();drawKind()}catch(e){console.error(e)}
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{introBar();nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
+  try{nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
