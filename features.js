@@ -137,7 +137,7 @@ function windows(r,a,after){const ok=new Set(['best','good'].concat(a.travel?['o
 function findTimes(a,b,days=30){const [lat,lon]=loc(),t0=todayIST(),now=Date.now(),out=[];
   for(let i=0;i<days;i++){const ds=addDays(t0,i),r=calc(ds,lat,lon),sc=scoreDay(r,a,b||BIRTH);if(sc.s<3)continue;const w=windows(r,a,i===0?now:0);if(!w.length)continue;out.push({ds,r,s:sc.s,why:sc.why,w})}
   return out}
-function quick(a){const L=findTimes(a,BIRTH,30),t=todayIST(),td=L.find(x=>x.ds===t);return td?{tq:'good',lab:'Today'}:L.length?{tq:'mixed',lab:dayLabel(L[0].ds).replace('Tomorrow','Tmrw')}:{tq:'slow',lab:'Later'}}
+function quick(a){const L=findTimes(a,BIRTH,30),t=todayIST(),td=L.find(x=>x.ds===t);return td?{tq:'good',lab:'Today'}:L.length?{tq:'mixed',lab:shortD(L[0].ds).replace(/ \w+$/,'').replace('Tomorrow','Tmrw')}:{tq:'slow',lab:'Later'}}
 
 /* ---------- views ---------- */
 const view={plan:['home'],personal:['home'],work:['home']};
@@ -161,8 +161,9 @@ function wire(el,tab){el.querySelectorAll('[data-back]').forEach(b=>b.onclick=()
   el.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=>openSheet())}
 function go2(tab,v){view[tab].push(v);draw(tab);scrollTo(0,0)}
 
+function shortD(ds){const d=Math.round((dObj(ds)-dObj(todayIST()))/864e5);if(d===1)return'Tomorrow';const x=dObj(ds);return WDS[x.getUTCDay()]+' '+x.getUTCDate()+' '+x.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}
 function nextFor(k){const t=todayIST();let best=null;for(const a of ACT[k].a){if(a.special)continue;const L=findTimes(a,BIRTH,30);if(L.length&&(!best||L[0].ds<best))best=L[0].ds;if(best===t)break}return best}
-function catTiles(keys,tab){return`<div class="cgrid">${keys.map(k=>{const [a,b]=MOOD[k],n=nextFor(k);return`<button type="button" class="cat card" data-cat="${k}" style="--c1:${a};--c2:${b}">${badge(k)}<span class="ct"><b>${ACT[k].t}</b><small>${ACT[k].s}</small></span><span class="cnext">${n?(n===todayIST()?'<i></i>Good today':'<i></i>Next good · '+dayLabel(n).replace('Tomorrow','Tmrw')):'Quiet month'}</span></button>`}).join('')}</div>`}
+function catTiles(keys,tab){return`<div class="cgrid">${keys.map(k=>{const [a,b]=MOOD[k],n=nextFor(k);return`<button type="button" class="cat card" data-cat="${k}" style="--c1:${a};--c2:${b}"><span class="ctop">${badge(k,36)}<span class="cnext">${n?(n===todayIST()?'<i></i>Today':'<i></i>'+shortD(n)):'Later'}</span></span><span class="ct"><b>${ACT[k].t}</b><small>${ACT[k].s}</small></span></button>`}).join('')}</div>`}
 function actList(k){const [c1,c2]=MOOD[k]||MOOD.career;return`<div class="card alist" style="--c1:${c1};--c2:${c2}">${ACT[k].a.map(a=>{const q=a.special?{tq:'mixed',lab:'Check'}:quick(a);return`<button type="button" class="arow" data-act="${k}:${a.id}"><span class="adot"></span><span><b>${a.t}</b><small>${a.d}</small></span><span style="display:flex;align-items:center;gap:8px"><span class="tq ${VK[q.tq]}">${q.lab}</span><span class="chv">›</span></span></button>`}).join('')}</div>`}
 function wireCats(el,tab){el.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>go2(tab,'cat:'+b.dataset.cat));el.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>go2(tab,'act:'+b.dataset.act))}
 function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,BIRTH,30),t=todayIST(),td=L.find(x=>x.ds===t);
@@ -176,7 +177,7 @@ function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,
   return paneHead(tab,ACT[k].t,a.t,true,k)+`<div class="card res-top">${top}</div><h2 class="sec-t">Calendar</h2><div class="card calc" id="calBox"></div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
 
 function drawPlan(){const el=$('pane-plan'),v=view.plan[view.plan.length-1];let h;
-  if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">Pick what you're planning. We'll find the kindest times in the next 30 days for ${ME.self?'you':ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+`<p class="note2">Work and money decisions are also in Professional.</p>`;
+  if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">The kindest times in the next 30 days${ME.self?'':' for '+ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+`<p class="note2">Work and money decisions are also in Professional.</p>`;
   else if(v.startsWith('cat:')){const k=v.slice(4);h=paneHead('plan','Plan',ACT[k].t,true,k)+actList(k)}
   else{const [k,id]=v.slice(4).split(':');if(id==='compat')return drawCompat();h=resultView('plan',k,id)}
   el.innerHTML=h;wire(el,'plan');wireCats(el,'plan');if($('calBox'))drawCal()}

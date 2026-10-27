@@ -234,3 +234,27 @@ html[data-theme="dark"] .phero .pmesh{opacity:.38}
 .phero.sub .pmesh{height:84px}
 .phero .pbody{margin-top:-46px}
 .phero.sub .pbody{margin-top:-40px}
+
+/* ===== compact headers & tiles ===== */
+.phero{background:none!important;border:0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;padding:0!important;margin-top:14px;overflow:visible}
+.phero::after{display:none}
+.phero .pmesh{position:absolute;left:-16px;right:-16px;top:-30px;height:150px;border-radius:0;opacity:.55;-webkit-mask-image:linear-gradient(180deg,#000 20%,transparent);mask-image:linear-gradient(180deg,#000 20%,transparent);pointer-events:none;z-index:0}
+html[data-theme="dark"] .phero .pmesh{opacity:.3}
+.phero .pbody,.phero.sub .pbody{margin-top:0;padding:4px 56px 0 4px}
+.phero h1{font-size:38px}
+.phero.sub h1{font-size:32px}
+.phero .pgear{top:6px;right:2px}
+.phero .back{margin-bottom:4px}
+.pane{gap:18px}
+.pane-lead{margin:-8px 6px 0;font-size:15px}
+.cgrid{gap:10px}
+.cat{min-height:0;gap:10px;padding:13px 13px 13px}
+.cat .ctop{display:flex;align-items:center;justify-content:space-between;width:100%;gap:6px;position:relative}
+.cat .cnext{margin-top:0;font-size:11.5px;padding:3px 9px;white-space:nowrap}
+.cat .ct{width:100%;min-width:0}
+.cat b{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+
+.arow{padding:13px 16px;gap:10px}
+.arow .tq{font-size:12px;padding:3px 8px}
+.arow small{font-size:13px}
