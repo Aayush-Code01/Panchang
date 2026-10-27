@@ -575,7 +575,7 @@ html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(-
   <div class="col c1">
   <section class="card hero">
     <div class="sky" id="sky"></div>
-    <div class="vrow"><div><div class="k2">Your day reads</div><div class="verdict" id="verdict">&nbsp;</div></div><span class="vicon" id="vicon"></span></div>
+    <div class="vrow"><div><div class="k2">Eraya’s day reads</div><div class="verdict" id="verdict">&nbsp;</div></div><span class="vicon" id="vicon"></span></div>
     <p class="why" id="why"></p>
     <div class="tl-head"><span id="rise"></span><span id="set"></span></div>
     <label class="tl-wrap"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><div class="tl" id="tl"></div></label>
@@ -603,12 +603,12 @@ html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(-
   </div>
   <div class="col c3">
   <section class="s-prac">
-    <div class="sec-title"><h2><span class="hic" id="pracIc"></span>Today's practice</h2><span class="streak" id="streak"></span></div>
+    <div class="sec-title"><h2><span class="hic" id="pracIc"></span>Today’s practice for Eraya</h2><span class="streak" id="streak"></span></div>
     <div id="special"></div>
     <div class="prac" id="prac"></div>
   </section>
   <section class="s-aff">
-    <div class="sec-title"><h2><span class="hic" id="affIc"></span>Your intention</h2><span id="affHint"></span></div>
+    <div class="sec-title"><h2><span class="hic" id="affIc"></span>A blessing for Eraya</h2><span id="affHint"></span></div>
     <div class="card affc" id="aff"></div>
   </section>
   </div>
@@ -857,15 +857,15 @@ const M={
  hanuman:{name:'Hanuman mantra',hi:'ॐ हं हनुमते नमः',en:'Om ham hanumate namah',mean:'I bow to Hanuman, giver of strength and courage.'}
 };
 const WEEKDAY=[
- {god:'Surya',colours:[['Orange','#D9772B'],['Red','#B5382C']],t:'Offer water to the Sun',how:'Face the Sun, pour a glass of water slowly towards it, and chant 12 times.',m:'surya',n:12,why:'Sunday is the Sun\'s day: energy and confidence.'},
- {god:'Shiva',colours:[['White','#FFFFFF'],['Cream','#F3EEE5']],t:'Chant for Shiva',how:'Chant 108 times (about 5 minutes), or offer water at a Shiva temple.',m:'shiva',n:108,why:'Monday is the Moon\'s day: calm and emotional balance.'},
- {god:'Hanuman',colours:[['Red','#B5382C'],['Maroon','#772A29']],t:'Chant for Hanuman',how:'Chant 21 times. If you have more time, read the Hanuman Chalisa.',m:'hanuman',n:21,why:'Tuesday is for strength and clearing obstacles.'},
- {god:'Ganesha',colours:[['Green','#477D61'],['Sage','#9CAF88']],t:'Ganesha before your first big task',how:'Chant 21 times before your first important call or meeting.',m:'ganesha',n:21,why:'Eraya\'s strongest day: Mercury rules her rising sign Virgo.'},
- {god:'Vishnu',colours:[['Yellow','#E2B53E'],['Mustard','#C8963A']],t:'Chant for Vishnu',how:'Chant 21 times, ideally in the morning.',m:'vishnu',n:21,why:'Thursday is for wisdom, learning and good advice.'},
- {god:'Lakshmi',colours:[['White','#FFFFFF'],['Light pink','#EBC4C4']],t:'Evening diya for Lakshmi',how:'Light a diya after sunset and chant 11 times.',m:'lakshmi',n:11,why:'Venus rules Eraya\'s Moon sign Libra, so Friday brings harmony and comfort.'},
- {god:'Hanuman and Shani',colours:[['Navy','#1D2750'],['Black','#1A1A1A']],t:'Hanuman, and one act of giving',how:'Chant 21 times, and give food or help to someone who needs it.',m:'hanuman',n:21,why:'Saturday calms Saturn and Rahu, the planet of Eraya\'s birth star.'}
+ {god:'Surya',colours:[['Orange','#D9772B'],['Red','#B5382C']],t:'Morning light together',how:'Sit with Eraya in soft early-morning light by a window and chant 12 times for her energy and health.',m:'surya',n:12,why:'Sunday is the Sun\'s day: energy and confidence.'},
+ {god:'Shiva',colours:[['White','#FFFFFF'],['Cream','#F3EEE5']],t:'Chant for Shiva',how:'Chant 108 times softly near her (about 5 minutes), or 11 times if she is restless.',m:'shiva',n:108,why:'Monday is the Moon\'s day: calm and emotional balance.'},
+ {god:'Hanuman',colours:[['Red','#B5382C'],['Maroon','#772A29']],t:'Hanuman, for her protection',how:'Chant 21 times for Eraya\'s protection. If you have more time, read the Hanuman Chalisa near her.',m:'hanuman',n:21,why:'Tuesday is for strength and clearing obstacles.'},
+ {god:'Ganesha',colours:[['Green','#477D61'],['Sage','#9CAF88']],t:'Ganesha, for her good start',how:'Chant 21 times and ask for a good start in everything new she does.',m:'ganesha',n:21,why:'Eraya\'s strongest day: Mercury rules her rising sign Virgo.'},
+ {god:'Vishnu',colours:[['Yellow','#E2B53E'],['Mustard','#C8963A']],t:'Vishnu, for her wisdom',how:'Chant 21 times in the morning for her wisdom and growth.',m:'vishnu',n:21,why:'Thursday is for wisdom, learning and good advice.'},
+ {god:'Lakshmi',colours:[['White','#FFFFFF'],['Light pink','#EBC4C4']],t:'Evening diya for Lakshmi',how:'Light a diya after sunset, well away from Eraya, and chant 11 times for her happiness.',m:'lakshmi',n:11,why:'Venus rules Eraya\'s Moon sign Libra, so Friday brings harmony and comfort.'},
+ {god:'Hanuman and Shani',colours:[['Navy','#1D2750'],['Blue','#3E5C8A']],t:'One act of giving in her name',how:'Chant 21 times, and give food or help to someone in Eraya\'s name.',m:'hanuman',n:21,why:'Saturday calms Saturn and Rahu, the planet of Eraya\'s birth star.'}
 ];
-const TARA={Janma:['mixed','It\'s your own star day: fine for routine'],Sampat:['good','A day of prosperity for you'],Vipat:['bad','A day to keep things simple'],Kshema:['good','A day of well-being for you'],Pratyari:['bad','A day to stay calm and let things flow'],Sadhana:['good','A day of achievement for you'],Naidhana:['bad','A rest-and-recharge day in your cycle'],Mitra:['good','A friendly day for you'],'Parama Mitra':['good','One of your most supportive days']};
+const TARA={Janma:['mixed','It\'s Eraya\'s own star day: keep her routine familiar'],Sampat:['good','A day of plenty for Eraya'],Vipat:['bad','A day to keep her day simple'],Kshema:['good','A day of well-being for Eraya'],Pratyari:['bad','A day to keep her calm and close'],Sadhana:['good','A good day for her growth'],Naidhana:['bad','A quiet rest-and-recharge day for her'],Mitra:['good','A happy, friendly day for Eraya'],'Parama Mitra':['good','One of her most supportive days']};
 function observance(r){if(!ls.get('special',true))return null;const t=r.tithi.name,p=r.tithi.paksha;
   if(t==='Ekadashi')return{n:'Ekadashi',d:'Many fast for Vishnu today. Easy version: skip rice and wheat, or eat light.',m:'vishnu'};
   if(t==='Trayodashi')return{n:'Pradosh',d:'Shiva\'s evening. Light a diya near sunset ('+fmt(r.set)+') and chant Om Namah Shivaya 11 times.',m:'shiva'};
@@ -935,8 +935,8 @@ function render(ds,scrollStrip){
   $('vicon').innerHTML=VI[vc];$('vicon').className='vicon v-'+vc;
   $('verdict').textContent=vt;
   $('rise').innerHTML=I.sunrise+' Sunrise '+fmt(r.rise);$('set').innerHTML=I.sunset+' Sunset '+fmt(r.set);
-  const moon={good:'the Moon is on your side',bad:'the Moon suggests a gentle pace',mixed:'the Moon keeps things steady'}[r.chandra.q];
-  $('why').textContent=r.chandra.ashtama?'A gentle, inward day. Perfect for rest, reflection and finishing what you started.':tq[1]+', and '+moon+'.';
+  const moon={good:'the Moon is on her side',bad:'the Moon suggests a gentle pace',mixed:'the Moon keeps her steady'}[r.chandra.q];
+  $('why').textContent=r.chandra.ashtama?'A gentle day for Eraya. Keep things calm and familiar, with extra cuddles and rest.':tq[1]+', and '+moon+'.';
 
   const good=S.filter(g=>g.cls==='best'||g.cls==='good'),w=WEEKDAY[r.wd];
   const rows=[];
@@ -952,11 +952,11 @@ function render(ds,scrollStrip){
     rows.push(['avoid','Save new starts for later','Rahu Kaal',hm(r.rahu[0])+' – '+fmt(r.rahu[1]),'']);
   }
   let nn=rows.map(([c,k,l,x,s],j)=>`<div class="r"><span class="ic" style="--ci:${CI[c]};--bgc:${CB[c]}">${j===0&&isToday?I.now:I[c]}</span><div><div class="k">${k}</div><div class="l">${l}</div></div><div class="x num">${x}<small>${s}</small></div></div>`).join('');
-  nn+=`<div class="r"><span class="ic" style="--ci:var(--ink);--bgc:var(--card-2)">${I.shirt}</span><div><div class="k">Wear today</div><div class="l">${w.colours.map(c=>c[0]).join(' or ').toLowerCase().replace(/^./,m=>m.toUpperCase())}</div></div><div class="x" style="display:flex;gap:6px;justify-content:flex-end">${w.colours.map(c=>`<span title="${c[0]}" style="width:22px;height:22px;border-radius:50%;background:${c[1]};box-shadow:inset 0 0 0 1px rgba(30,39,39,.15)"></span>`).join('')}</div></div>`;
+  nn+=`<div class="r"><span class="ic" style="--ci:var(--ink);--bgc:var(--card-2)">${I.shirt}</span><div><div class="k">Dress her in</div><div class="l">${w.colours.map(c=>c[0]).join(' or ').toLowerCase().replace(/^./,m=>m.toUpperCase())}</div></div><div class="x" style="display:flex;gap:6px;justify-content:flex-end">${w.colours.map(c=>`<span title="${c[0]}" style="width:22px;height:22px;border-radius:50%;background:${c[1]};box-shadow:inset 0 0 0 1px rgba(30,39,39,.15)"></span>`).join('')}</div></div>`;
   $('nn').innerHTML=nn;
 
   const al=[];
-  if(r.chandra.ashtama)al.push('<div class="alert"><b>A quiet day for big decisions.</b> Once a month the Moon passes the 8th sign from yours (Chandrashtama). Keep big decisions for tomorrow and enjoy an easy pace.</div>');
+  if(r.chandra.ashtama)al.push('<div class="alert"><b>A quiet day for big decisions.</b> Once a month the Moon passes the 8th sign from Eraya’s (Chandrashtama). Keep big decisions for tomorrow and enjoy an easy pace.</div>');
   if(r.karana.vishti)al.push(`<div class="alert"><b>Bhadra until ${fmt(r.karana.end)}.</b> Traditionally avoided for auspicious beginnings.</div>`);
   $('alerts').innerHTML=al.join('');
 
@@ -980,7 +980,7 @@ function render(ds,scrollStrip){
   const ob=observance(r);
   $('special').innerHTML=ob?`<div class="special"><b>${ob.n} today.</b> ${ob.d}</div>`:'';
   const items=[
-    {id:'m',t:'Five quiet minutes at sunrise',b:`Before ${fmt(new Date(+r.rise+45*60e3))}`,how:`Sit still for a few minutes and chant the Gayatri mantra 3 times. If you're up early, ${fmt(r.brahma[0])} to ${fmt(r.brahma[1])} (Brahma muhurat) is the ideal window.`,m:'gayatri',n:3},
+    {id:'m',t:'A blessing at sunrise',b:`Before ${fmt(new Date(+r.rise+45*60e3))}`,how:`Hold Eraya or sit beside her and chant the Gayatri mantra 3 times. Soft chanting is soothing for babies. If you're up early, ${fmt(r.brahma[0])} to ${fmt(r.brahma[1])} (Brahma muhurat) is the ideal window.`,m:'gayatri',n:3},
     {id:'f',t:w.t,b:w.god+' · '+(r.wd===3?'her strongest day':'day focus'),how:w.how+' '+w.why,m:w.m,n:w.n},
     {id:'a',t:'Eraya\'s birth-star mantra',b:'Any time · about 3 minutes',how:'Eraya\'s birth star Swati belongs to Vayu, the wind and the breath of life. This mantra is for her strength and good health. Chant 11 times for her.',m:'vayu',n:11}
   ];
@@ -1019,14 +1019,14 @@ function render(ds,scrollStrip){
 }
 const BDAY='09-15';
 const AFF=[
- [['I have the energy for what matters today.','आज जो ज़रूरी है, उसके लिए मुझमें पूरी ऊर्जा है।'],['I let my work speak with quiet confidence.','मेरा काम ही मेरा आत्मविश्वास है।'],['Like the sun, I show up on time and give fully.','सूरज की तरह, समय पर और पूरे मन से।'],['I lead by example, not by noise.','मेरी पहचान मेरे काम से है, शोर से नहीं।']],
- [['My mind is calm, and calm choices come easily.','मन शांत है, और सही फ़ैसले सहज हैं।'],['I let go of what isn’t mine to control.','जो मेरे बस में नहीं, उसे जाने देना ही शांति है।'],['I am steady, like still water.','शांत पानी की तरह, स्थिर मन।'],['I begin again, with a clear heart.','साफ़ मन से, एक नई शुरुआत।']],
- [['I have the strength to finish what I start.','जो शुरू करूँ, उसे पूरा करने की ताक़त मुझमें है।'],['Obstacles are steps I haven’t climbed yet.','हर रुकावट बस अगली सीढ़ी है।'],['I act with courage and a cool head.','हिम्मत भी, और ठंडा दिमाग़ भी।'],['Today I do the hard thing first.','आज सबसे मुश्किल काम सबसे पहले।']],
- [['My words are clear, kind and well-timed.','मेरे शब्द साफ़, विनम्र और सही समय पर हैं।'],['I listen fully before I answer.','जवाब से पहले, पूरा सुनना।'],['Good ideas and good chances are finding their way to me.','अच्छे विचार और अच्छे मौक़े मेरी ओर आ रहे हैं।'],['Every conversation today moves something forward.','आज की हर बात कुछ आगे बढ़ाएगी।']],
- [['I welcome good guidance and act on it with patience.','अच्छी सलाह का स्वागत है, और धैर्य से उस पर अमल।'],['I learn something today and share it generously.','आज कुछ सीखना है, और खुले मन से बाँटना है।'],['I trust that things are unfolding well.','भरोसा है कि सब अच्छे से हो रहा है।'],['Wisdom over hurry.','जल्दबाज़ी नहीं, समझदारी।']],
- [['I am grateful for what I have and open to more.','जो है उसके लिए आभार, और जो आ रहा है उसके लिए खुला मन।'],['I make something beautiful today, however small.','आज कुछ सुंदर बनाना है, चाहे छोटा ही सही।'],['I value the people around me, and today I tell them.','अपने लोगों की क़द्र है, और आज उन्हें बताना भी है।'],['Abundance follows steady, honest work.','ईमानदार और लगातार मेहनत से ही लक्ष्मी आती है।']],
- [['Slow and steady is still moving forward.','धीरे ही सही, पर आगे बढ़ना।'],['I keep my word, especially in small things.','हर वादा निभाना, छोटा हो या बड़ा।'],['One kind act today makes the whole day lighter.','आज एक भलाई, और पूरा दिन हल्का।'],['Patience is my strength today.','आज धैर्य ही मेरी ताक़त है।']]];
-const AFF_SP={bday:['A new year begins. I step into it with gratitude.','नया साल, नई शुरुआत, आभार के साथ।'],Purnima:['I am grateful for all that is full in my life.','जीवन में जो भरपूर है, उसके लिए आभार।'],Amavasya:['I let go of what’s done and make room for what’s next.','जो बीत गया उसे विदा, जो आने वाला है उसके लिए जगह।'],Ekadashi:['Less is more. I keep today light and clear.','कम में ही ज़्यादा है। आज सब हल्का और साफ़।'],ashtama:['I move gently today and trust tomorrow.','आज धीरे चलना है, कल पर भरोसा है।']};
+ [['May Eraya grow bright and strong, like the morning sun.','हमारी बिटिया सुबह के सूरज की तरह उज्ज्वल और मज़बूत बने।'],['May she always feel warm, safe and loved.','वह हमेशा सुरक्षित और प्यार से घिरी रहे।'],['May her days be full of light and laughter.','उसके दिन रोशनी और हँसी से भरे रहें।'],['May she grow with confidence and a kind heart.','वह आत्मविश्वास और दयालु दिल के साथ बड़ी हो।']],
+ [['May Eraya sleep peacefully and wake up smiling.','हमारी बिटिया चैन से सोए और मुस्कुराते हुए जागे।'],['May her mind always be calm and her heart content.','उसका मन सदा शांत और दिल संतुष्ट रहे।'],['May we be patient and gentle with her today.','आज हम उसके साथ धैर्य और कोमलता से रहें।'],['May she feel our love in every touch.','हर स्पर्श में उसे हमारा प्यार महसूस हो।']],
+ [['May Eraya be protected from every harm.','हमारी बिटिया हर बुराई से सुरक्षित रहे।'],['May she grow strong in body and brave at heart.','वह तन से मज़बूत और मन से निडर बने।'],['May every small hurdle pass her by gently.','हर छोटी रुकावट उससे आसानी से टल जाए।'],['May she always find the strength to try again.','उसमें हमेशा फिर से कोशिश करने की ताक़त रहे।']],
+ [['May Eraya’s first words be full of joy.','हमारी बिटिया के पहले शब्द खुशियों से भरे हों।'],['May she grow curious, clever and quick to learn.','वह जिज्ञासु, समझदार और जल्दी सीखने वाली बने।'],['May every new start in her life be a good one.','उसके जीवन की हर नई शुरुआत शुभ हो।'],['May her laughter fill our home today.','आज उसकी हँसी से हमारा घर भर जाए।']],
+ [['May Eraya be blessed with wisdom and good teachers.','हमारी बिटिया को ज्ञान और अच्छे गुरु मिलें।'],['May she grow up with good values and good company.','वह अच्छे संस्कारों और अच्छी संगत में बड़ी हो।'],['May the blessings of her elders always stay with her.','बड़ों का आशीर्वाद सदा उसके साथ रहे।'],['May she discover something wonderful every day.','वह हर दिन कुछ नया और सुंदर सीखे।']],
+ [['May Eraya’s life be full of beauty and harmony.','हमारी बिटिया का जीवन सुंदरता और सुख से भरा हो।'],['May she always be surrounded by people who love her.','वह हमेशा अपनों के प्यार से घिरी रहे।'],['May comfort and plenty follow her everywhere.','सुख और समृद्धि हर जगह उसके साथ रहें।'],['May she grow gentle, graceful and kind.','वह कोमल, सौम्य और दयालु बने।']],
+ [['May Eraya stay healthy and grow steadily, day by day.','हमारी बिटिया स्वस्थ रहे और दिन-ब-दिन अच्छे से बढ़े।'],['May no evil eye ever touch her.','उसे कभी किसी की बुरी नज़र न लगे।'],['May the good we do today return to her as blessings.','आज की हमारी भलाई उसके लिए आशीर्वाद बने।'],['May we find patience for every sleepless night.','हर जागती रात के लिए हममें धैर्य रहे।']]];
+const AFF_SP={bday:['Happy birthday, Eraya. May every year be brighter than the last.','जन्मदिन मुबारक, बिटिया। हर साल पिछले से ज़्यादा रोशन हो।'],Purnima:['We are grateful for the gift of Eraya.','हमारी बिटिया के रूप में मिले इस आशीर्वाद के लिए आभार।'],Amavasya:['May every old worry leave her, and only good come her way.','हर पुरानी चिंता दूर हो, और उसके पास सिर्फ़ अच्छा आए।'],Ekadashi:['A simple, gentle day. May Eraya’s home stay calm and light.','एक सरल, कोमल दिन। बिटिया का घर शांत और हल्का रहे।'],ashtama:['A gentle day for Eraya. Extra cuddles, extra rest.','बिटिया के लिए एक कोमल दिन। ज़्यादा दुलार, ज़्यादा आराम।']};
 const PLANET=['the Sun','the Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
 function affirm(r,ds,isToday){const el=$('aff');if(!el)return;
   const days=Math.floor(+new Date(ds+'T00:00:00Z')/86400e3),wd=r.wd,dn=new Date(ds+'T00:00:00Z').toLocaleDateString('en-IN',{weekday:'long',timeZone:'UTC'});
@@ -1040,7 +1040,7 @@ function affirm(r,ds,isToday){const el=$('aff');if(!el)return;
   const R={well:['Went well','Lovely. Carry that into tomorrow.'],part:['Partly','Progress counts. One small step more tomorrow.'],not:['Not today','That’s okay. Tomorrow is a fresh start.']};
   $('affHint').textContent=fut?'plan ahead':past?'':eve?'evening check-in':'';
   let h=`<label class="affq${n0>=3?' full':''}" aria-label="Count one repetition"><input type="checkbox" switch class="hsw" tabindex="-1" aria-hidden="true"><div class="cap">${cap}</div><div class="en">${a[0]}</div><div class="hi">${a[1]}</div><div class="rep"><div class="dots">${[0,1,2].map(i=>`<i${i<n0?' class="on"':''}></i>`).join('')}</div><span>${n0>=3?'Settled in. Carry it with you.':'Say it slowly, 3 times. Tap after each.'}</span></div></label>`;
-  h+=`<div class="affs"><div class="lb"><b>Your sankalp</b><span class="saved">Saved</span></div><textarea rows="1" maxlength="160" enterkeyhint="done" placeholder="${fut?'An intention for this day…':past?'Nothing written this day':'One thing I’ll do today…'}">${esc(txt)}</textarea></div>`;
+  h+=`<div class="affs"><div class="lb"><b>Your sankalp for her</b><span class="saved">Saved</span></div><textarea rows="1" maxlength="160" enterkeyhint="done" placeholder="${fut?'Something to do for her that day…':past?'Nothing written this day':'One thing I’ll do for her today…'}">${esc(txt)}</textarea></div>`;
   if(eve||(past&&(rv||txt))||(isToday&&rv))h+=`<div class="affr"><div class="q">${txt?'Did today go the way you set out?':'How did today feel?'}</div><div class="opts">${Object.entries(R).map(([k,v])=>`<button type="button" data-k="${k}"${rv===k?' class="sel"':''}>${v[0]}</button>`).join('')}</div><div class="ans">${rv?R[rv][1]:''}</div></div>`;
   el.innerHTML=h;
   const q=el.querySelector('.affq');q.onclick=e=>{if(e.target.tagName==='INPUT')return;let n=Math.min(3,ls.get(ak,0));n=n>=3?0:n+1;ls.set(ak,n);
