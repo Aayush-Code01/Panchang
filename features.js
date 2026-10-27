@@ -156,13 +156,33 @@ function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,
   else if(L.length)top=`<span class="kpill k-mixed">${VI.mixed.replace(/width="\d+" height="\d+"/,'width="16" height="16"')}A better day is coming</span><div class="ans">${dayLabel(L[0].ds)} looks better.</div><div class="when"><b>${hm(L[0].w[0].a)} – ${fmt(L[0].w[0].b)}</b> · ${L[0].why[0]||'a supportive day'}</div>`;
   else top=`<span class="kpill k-slow">${VI.slow.replace(/width="\d+" height="\d+"/,'width="16" height="16"')}Quiet month</span><div class="ans">No standout days in the next 30.</div><div class="when">Choose any calm, good window from the Today tab.</div>`;
   const slots=L.slice(0,8).map(x=>{const d=dObj(x.ds);return`<div class="slot"><div class="d"><small>${WDS[x.r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div><div class="t">${hm(x.w[0].a)} – ${fmt(x.w[0].b)}${x===best?'<span class="tagb">Best pick</span>':''}</div><div class="w">${x.why.slice(0,3).join(' · ')||'A supportive day'}${x.w[1]?` · also ${hm(x.w[1].a)} – ${fmt(x.w[1].b)}`:''}</div></div></div>`}).join('');
-  return paneHead(tab,ACT[k].t,a.t,true)+`<div class="card res-top">${top}</div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
+  CAL.k=k;CAL.id=id;CAL.m=0;CAL.sel=null;
+  return paneHead(tab,ACT[k].t,a.t,true)+`<div class="card res-top">${top}</div><h2 class="sec-t">Calendar</h2><div class="card calc" id="calBox"></div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
 
 function drawPlan(){const el=$('pane-plan'),v=view.plan[view.plan.length-1];let h;
   if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">Pick what you're planning. We'll find the kindest times in the next 30 days for ${ME.self?'you':ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+`<p class="note2">Work and money decisions are also in Professional.</p>`;
   else if(v.startsWith('cat:')){const k=v.slice(4);h=paneHead('plan','Plan',ACT[k].t,true)+actList(k)}
   else{const [k,id]=v.slice(4).split(':');if(id==='compat')return drawCompat();h=resultView('plan',k,id)}
-  el.innerHTML=h;wire(el,'plan');wireCats(el,'plan')}
+  el.innerHTML=h;wire(el,'plan');wireCats(el,'plan');if($('calBox'))drawCal()}
+const CAL={k:'',id:'',m:0,sel:null,cache:{}};
+function dayInfo(ds,a){const [lat,lon]=loc(),r=calc(ds,lat,lon),t=todayIST();if(ds<t)return{lv:'past',r};const sc=scoreDay(r,a,BIRTH);
+  const w=sc.s>=3?windows(r,a,ds===t?Date.now():0):[];const lv=sc.s>=5&&w.length?'best':sc.s>=3&&w.length?'good':sc.s>=0?'ok':'avoid';return{lv,r,w,why:sc.why}}
+const LV={best:['Best','var(--best)'],good:['Good','var(--good)'],ok:['Okay','var(--line-strong)'],avoid:['Avoid','var(--avoid)']};
+function drawCal(){const box=$('calBox');if(!box)return;const a=(ACT[CAL.k]||{a:[]}).a.find(x=>x.id===CAL.id);if(!a)return;
+  const t=todayIST(),t0=dObj(t),first=new Date(Date.UTC(t0.getUTCFullYear(),t0.getUTCMonth()+CAL.m,1)),y=first.getUTCFullYear(),mo=first.getUTCMonth(),nd=new Date(Date.UTC(y,mo+1,0)).getUTCDate();
+  const key=CAL.k+CAL.id+y+'-'+mo+loc().join();let days=CAL.cache[key];
+  if(!days){days=[];for(let d=1;d<=nd;d++){const ds=new Date(Date.UTC(y,mo,d)).toISOString().slice(0,10);days.push([ds,dayInfo(ds,a)])}CAL.cache[key]=days}
+  let g='';for(let i=0;i<first.getUTCDay();i++)g+='<span></span>';
+  days.forEach(([ds,inf])=>{g+=`<button type="button" class="cd lv-${inf.lv}${ds===t?' tdy':''}${ds===CAL.sel?' sel':''}" data-d="${ds}"${inf.lv==='past'?' disabled':''}>${+ds.slice(8)}</button>`});
+  const nb=days.filter(x=>x[1].lv==='best').length,ng=days.filter(x=>x[1].lv==='good').length;
+  let det='';if(CAL.sel){const f=days.find(x=>x[0]===CAL.sel);if(f){const inf=f[1],[l]=LV[inf.lv]||['',''];
+    det=`<div class="cdet"><div class="cdh"><b>${dObj(CAL.sel).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}</b><span class="tq ${inf.lv==='best'||inf.lv==='good'?'k-good':inf.lv==='avoid'?'k-slow':'k-mixed'}">${l}</span></div>
+     <p>${inf.w&&inf.w.length?`Best window <b>${hm(inf.w[0].a)} – ${fmt(inf.w[0].b)}</b>${inf.w[1]?`, also ${hm(inf.w[1].a)} – ${fmt(inf.w[1].b)}`:''}. ${inf.why.slice(0,3).join(' · ')}`:inf.lv==='avoid'?'Traditionally not a good day for this. Pick a green or gold day instead.':'An ordinary day for this. Fine for small steps, but a green or gold day is better for the big moment.'}</p></div>`}}
+  box.innerHTML=`<div class="calh"><button type="button" class="cnav" data-m="-1" ${CAL.m<=0?'disabled':''} aria-label="Previous month">‹</button><div><b>${first.toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'UTC'})}</b><small>${nb} best · ${ng} good day${ng===1?'':'s'}</small></div><button type="button" class="cnav" data-m="1" ${CAL.m>=11?'disabled':''} aria-label="Next month">›</button></div>
+   <div class="cgr cwk">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cgr">${g}</div>
+   <div class="wkey" style="justify-content:center"><span><i style="background:var(--best)"></i>Best</span><span><i style="background:var(--good)"></i>Good</span><span><i style="background:var(--line-strong)"></i>Okay</span><span><i style="background:var(--avoid)"></i>Avoid</span></div>${det}`;
+  box.querySelectorAll('.cnav').forEach(b=>b.onclick=()=>{CAL.m=Math.max(0,Math.min(11,CAL.m+ +b.dataset.m));CAL.sel=null;box.innerHTML='<div class="calload">Working out the month…</div>';setTimeout(drawCal,20)});
+  box.querySelectorAll('.cd:not([disabled])').forEach(b=>b.onclick=()=>{CAL.sel=CAL.sel===b.dataset.d?null:b.dataset.d;drawCal();const d=box.querySelector('.cdet');if(d){const r=d.getBoundingClientRect();if(r.bottom>innerHeight-110)scrollBy({top:r.bottom-innerHeight+130,behavior:'smooth'})}})}
 const CMP={a:'me',b:'',nb:{name:'',dob:'',time:'',place:'28.4595,77.0266'},res:null};
 function drawCompat(){const el=$('pane-plan'),P=people(),opts=$('loc').innerHTML.replace(/ selected(="")?/g,'').replace(/<option[^>]*id="nearOpt"[^>]*>.*?<\/option>/,'');
   if(!CMP.b)CMP.b=(P.find(p=>p.rel==='Partner')||P[0]||{id:'new'}).id;
@@ -202,7 +222,7 @@ function showCompat(){const {A,B}=CMP.res,m=match(A,B),us=A.me||B.me,other=A.me?
 function workScore(r){const p=personDay(r,BIRTH),tq=TARA[p.tara.name][0];let s=(tq==='good'?2:tq==='bad'?-2:0)+(p.chandra.q==='good'?1:p.chandra.q==='bad'?-1:0)+([3,4].includes(r.wd)?1:0)-(r.yoga.bad?1:0);if(p.chandra.ashtama)s=-3;
   return s>=2?['good','Strong day for work']:s>=0?['mixed','Steady day for work']:['slow','Keep work routine']}
 function drawWork(){const el=$('pane-work'),v=view.work[view.work.length-1];
-  if(v!=='home'){if(v.startsWith('act:')){const [k,id]=v.slice(4).split(':');el.innerHTML=resultView('work',k,id)}else{const k=v.slice(4);el.innerHTML=paneHead('work','Professional',ACT[k].t,true)+actList(k)}wire(el,'work');wireCats(el,'work');return}
+  if(v!=='home'){if(v.startsWith('act:')){const [k,id]=v.slice(4).split(':');el.innerHTML=resultView('work',k,id);setTimeout(drawCal)}else{const k=v.slice(4);el.innerHTML=paneHead('work','Professional',ACT[k].t,true)+actList(k)}wire(el,'work');wireCats(el,'work');return}
   const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[vc,vt]=workScore(r),now=Date.now();
   const W=windows(r,{},now).filter(g=>g.cls!=='ok');const focus=W.slice().sort((a,b)=>a.a-b.a)[0];
   const rahuLeft=+r.rahu[1]>now;

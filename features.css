@@ -164,3 +164,30 @@ body.mini .daynav{transform:translateY(64px);opacity:0;pointer-events:none}
 body.mini .totop.show{transform:translateY(64px)}
 @media (min-width:600px) and (max-width:1079px){body.mini .daynav{transform:translateX(-50%) translateY(64px)}}
 @media (min-width:1080px) and (min-height:620px){body.mini .daynav{transform:none;opacity:1;pointer-events:auto}}
+
+/* plan calendar */
+.calc{padding:16px 14px 14px}
+.calh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.calh b{display:block;text-align:center;font-family:var(--serif);font-size:21px;font-weight:500;color:var(--ink);font-variation-settings:"opsz" 36,"SOFT" 50}
+.calh small{display:block;text-align:center;font-size:12.5px;color:var(--muted)}
+.cnav{width:38px;height:38px;border-radius:50%;font-size:24px;line-height:1;color:var(--ink);background:var(--g-row);border:1px solid var(--g-edge)}
+.cnav[disabled]{opacity:.3}
+.cgr{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.cwk span{text-align:center;font-size:11.5px;font-weight:600;color:var(--muted);padding-bottom:2px}
+.cd{aspect-ratio:1;border-radius:12px;font-size:15px;font-weight:600;color:var(--text);display:grid;place-items:center;position:relative;font-variant-numeric:tabular-nums;transition:transform .1s}
+.cd:active{transform:scale(.92)}
+.cd.lv-best{background:var(--best);color:#3B2A08}
+.cd.lv-good{background:var(--good-bg);color:var(--good-ink);box-shadow:inset 0 0 0 1.5px var(--good)}
+.cd.lv-ok{background:var(--g-row);color:var(--text)}
+.cd.lv-avoid{color:var(--avoid-ink);opacity:.55}
+.cd.lv-avoid::after{content:"";position:absolute;bottom:6px;width:4px;height:4px;border-radius:50%;background:var(--avoid)}
+.cd.lv-past{color:var(--muted);opacity:.35}
+.cd.tdy{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:2px}
+.cd.sel{outline:2px solid var(--ink);outline-offset:1px}
+.cdet{margin-top:14px;padding:14px;border-radius:16px;background:var(--g-row);border:1px solid var(--g-edge)}
+.cdh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cdh b{font-size:15.5px;color:var(--ink)}
+.cdet p{margin:6px 0 0;font-size:14px;color:var(--text);line-height:1.45}
+.calload{padding:60px 0;text-align:center;color:var(--muted);font-size:14px}
+html[data-theme="dark"] .cd.lv-best{color:#2A1E05}
+.cdh .tq{font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
