@@ -263,3 +263,7 @@ html[data-theme="dark"] .phero .pmesh{opacity:.3}
 .phero .pmesh{top:10px;height:120px;left:-8px;right:-8px;border-radius:40px;-webkit-mask-image:radial-gradient(70% 80% at 30% 40%,#000 30%,transparent 75%);mask-image:radial-gradient(70% 80% at 30% 40%,#000 30%,transparent 75%)}
 .phero .eyebrow{color:var(--text);opacity:.8}
 .phero .back{position:relative;z-index:2}
+/* clean header: no glow blob */
+.phero .pmesh{display:none}
+/* soften the strip behind the clock so it blends into the page */
+body::before{height:calc(env(safe-area-inset-top,0px) + 22px)!important;background:linear-gradient(180deg,var(--amb1) 0,var(--amb1) calc(100% - 22px),color-mix(in srgb,var(--amb1) 0%,transparent))!important}
