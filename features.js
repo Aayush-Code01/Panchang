@@ -296,8 +296,8 @@ function nameEyebrow(){const e=$('eyebrow'),h=$('title');if(!e||!ME.first)return
 function placeInd(){const nav=document.querySelector('.tabbar');if(!nav)return;const b=nav.querySelector(`[data-t="${cur}"]`),i=nav.querySelector('.tind');if(!b||!i)return;i.style.width=b.offsetWidth+'px';i.style.transform=`translateX(${b.offsetLeft}px)`}
 function dragTabs(nav){let sx=0,on=false,dragging=false,last=null,ind=nav.querySelector('.tind');const btns=()=>[...nav.querySelectorAll('button')];
   const at=x=>btns().find(b=>{const r=b.getBoundingClientRect();return x>=r.left&&x<r.right});
-  nav.addEventListener('pointerdown',e=>{on=true;dragging=false;sx=e.clientX;last=null});
-  nav.addEventListener('pointermove',e=>{if(!on)return;if(!dragging&&Math.abs(e.clientX-sx)<8)return;
+  let sy=0;nav.addEventListener('pointerdown',e=>{on=true;dragging=false;sx=e.clientX;sy=e.clientY;last=null});
+  nav.addEventListener('pointermove',e=>{if(!on)return;if(!dragging){const dx=Math.abs(e.clientX-sx),dy=Math.abs(e.clientY-sy);if(dy>6&&dy>dx){on=false;return}if(dx<10)return}
     if(!dragging){dragging=true;nav.classList.add('drag');try{nav.setPointerCapture(e.pointerId)}catch(_){}}
     const nr=nav.getBoundingClientRect(),w=ind.offsetWidth,x=Math.max(5,Math.min(nr.width-5-w,e.clientX-nr.left-w/2));ind.style.transform=`translateX(${x}px) scale(1.06,1.08)`;
     const b=at(Math.max(nr.left+6,Math.min(nr.right-6,e.clientX)));if(b&&b!==last){btns().forEach(x=>x.classList.toggle('hov',x===b));last=b;if(typeof hapticTick==='function')hapticTick()}});
@@ -305,7 +305,9 @@ function dragTabs(nav){let sx=0,on=false,dragging=false,last=null,ind=nav.queryS
     if(dragging){const b=last;dragging=false;if(b){nav._skip=Date.now();if(b.dataset.t===cur)placeInd();else setTab(b.dataset.t);haptic()}else placeInd()}};
   nav.addEventListener('pointerup',end);nav.addEventListener('pointercancel',end);
   nav.addEventListener('click',e=>{if(nav._skip&&Date.now()-nav._skip<400){e.stopPropagation();e.preventDefault()}},true);
-  addEventListener('resize',placeInd)}
+  addEventListener('resize',placeInd);
+  let ly=scrollY,acc=0;addEventListener('scroll',()=>{const y=scrollY,d=y-ly;ly=y;if(innerWidth>=1080)return;acc=(Math.sign(d)===Math.sign(acc)?acc:0)+d;
+    if(y<60||acc<-24)document.body.classList.remove('mini');else if(acc>24&&y+innerHeight<document.documentElement.scrollHeight-40)document.body.classList.add('mini')},{passive:true})}
 
 function init(){const app=document.querySelector('.app');
   ['plan','personal','work','practice'].forEach(k=>{const s=document.createElement('section');s.className='pane';s.id='pane-'+k;app.appendChild(s)});
