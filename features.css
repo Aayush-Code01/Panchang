@@ -276,3 +276,7 @@ body::before{height:calc(env(safe-area-inset-top,0px) + 22px)!important;backgrou
 @keyframes tlShine{0%{transform:translateX(-110%)}100%{transform:translateX(110%)}}
 html[data-theme="dark"] .tl-intro .tl-track::after{background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%)}
 @media (prefers-reduced-motion:reduce){.tl-intro .tl-seg,.tl-intro .tl-track::after{animation:none!important}}
+/* timeline end: no notch on the last segment, keep end label inside */
+.tl-seg:last-child{border-right:0}
+.tl-lab span:last-child{transform:translateX(-78%)}
+.tl-lab span:first-child{transform:translateX(-30%)}
