@@ -141,13 +141,28 @@ function quick(a){const L=findTimes(a,BIRTH,30),t=todayIST(),td=L.find(x=>x.ds==
 
 /* ---------- views ---------- */
 const view={plan:['home'],personal:['home'],work:['home']};
-function paneHead(tab,eyebrow,title,canBack){return`<header class="pane-h"><div>${canBack?`<button type="button" class="back" data-back="${tab}">${IC.back}Back</button>`:''}<div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div><button type="button" class="pill gear" data-gear aria-label="Settings">${gearHTML()}</button></header>`}
+const MOOD={love:['#EE8F86','#C4566C'],home:['#E9AE72','#C06B3C'],travel:['#86BCE6','#4A7FBF'],health:['#A6CF9C','#4F9467'],learn:['#A7A5EA','#6460B6'],spirit:['#F6CB6A','#E0832F'],family:['#D2A8E6','#9465B8'],money:['#8FD0B0','#2F8A6A'],career:['#97ABD3','#4E6A9C']};
+const GL={love:'<path d="M12 20.5s-7.6-4.6-9.4-9.1C1.2 7.8 3.5 4.6 6.9 4.6c2 0 3.6 1 5.1 2.9 1.5-1.9 3.1-2.9 5.1-2.9 3.4 0 5.7 3.2 4.3 6.8-1.8 4.5-9.4 9.1-9.4 9.1z" fill="#fff"/><path d="M8.2 8.2c-1.4.2-2.3 1.4-2 2.8" stroke="var(--c2)" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".5"/>',
+ home:'<path d="M3 11.3 12 3.6l9 7.7V20a1 1 0 0 1-1 1h-5.3v-5.6H9.3V21H4a1 1 0 0 1-1-1z" fill="#fff"/><rect x="10" y="9.2" width="4" height="3.4" rx=".7" fill="#FFD27A"/>',
+ travel:'<circle cx="17.5" cy="7" r="3.2" fill="#FFE29A"/><path d="M2.5 16.5h19" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".55"/><path d="M3.5 13.2 9 12l4.6-6.2 1.6.4-2 5.4 5.3-.9 1.3 1.1-5.6 2.6-1.3 4.6-1.2.4-.6-4.1-4.7.8z" fill="#fff"/>',
+ health:'<path d="M19.5 4.5C10.5 4.2 4.5 8.6 4.5 15c0 1.6.4 3 1 4.3C7 14.6 10.4 11 14.6 9.2c-3.4 2.3-6 5.8-7 10C8.8 20.4 10.3 21 12 21c5.8 0 8.6-5.5 7.5-16.5z" fill="#fff"/>',
+ learn:'<path d="M12 6.4C10 5 7.2 4.4 3.5 4.7v13.6c3.7-.3 6.5.3 8.5 1.7 2-1.4 4.8-2 8.5-1.7V4.7c-3.7-.3-6.5.3-8.5 1.7z" fill="#fff"/><path d="M12 6.6v13" stroke="var(--c2)" stroke-width="1.3" opacity=".55"/><path d="M6 8.3c1.6-.1 3 .2 4 .7M6 11c1.6-.1 3 .2 4 .7M14 9c1-.5 2.4-.8 4-.7" stroke="var(--c2)" stroke-width="1" stroke-linecap="round" opacity=".4"/>',
+ spirit:'<path d="M12 3.2c2.3 2.7 3.3 4.7 3.3 6.3a3.3 3.3 0 0 1-6.6 0c0-1.6 1-3.6 3.3-6.3z" fill="#FFE7A6"/><path d="M12 7.3c.9 1.1 1.3 1.9 1.3 2.6a1.3 1.3 0 0 1-2.6 0c0-.7.4-1.5 1.3-2.6z" fill="#fff"/><path d="M3 14.2c2.3 1 5.5 1.6 9 1.6s6.7-.6 9-1.6c0 3.4-4 5.8-9 5.8s-9-2.4-9-5.8z" fill="#fff"/>',
+ family:'<circle cx="8" cy="7.4" r="2.6" fill="#fff"/><circle cx="16.4" cy="8.4" r="2.1" fill="#fff" opacity=".85"/><path d="M3.4 19.5c.4-3.6 2.2-5.7 4.6-5.7s4.2 2.1 4.6 5.7z" fill="#fff"/><path d="M12.6 19.5c.3-2.8 1.8-4.5 3.8-4.5s3.5 1.7 3.8 4.5z" fill="#fff" opacity=".85"/>',
+ money:'<ellipse cx="12" cy="17" rx="7.5" ry="2.8" fill="#fff" opacity=".7"/><ellipse cx="12" cy="13" rx="7.5" ry="2.8" fill="#fff" opacity=".85"/><ellipse cx="12" cy="9" rx="7.5" ry="2.8" fill="#fff"/><ellipse cx="12" cy="9" rx="3.4" ry="1.1" fill="#FFD27A"/>',
+ career:'<path d="M9 4h6a2 2 0 0 1 2 2v1.2h3a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8.2a1 1 0 0 1 1-1h3V6a2 2 0 0 1 2-2zm.3 2v1.2h5.4V6z" fill="#fff"/><path d="M3 12.3h18" stroke="var(--c2)" stroke-width="1.2" opacity=".5"/><rect x="10.6" y="11.3" width="2.8" height="2.2" rx=".5" fill="#FFD27A"/>'};
+const badge=(k,sz=46)=>{const [a,b]=MOOD[k]||MOOD.career;return`<span class="badge" style="--c1:${a};--c2:${b};width:${sz}px;height:${sz}px"><svg viewBox="0 0 24 24" width="${Math.round(sz*.58)}" height="${Math.round(sz*.58)}" aria-hidden="true">${GL[k]||GL.career}</svg></span>`};
+function paneSky(){try{const [lat,lon]=loc(),r=calc(todayIST(),lat,lon),ph=window.SKY_PHASE;let h=skySVG(r,true);window.SKY_PHASE=ph;const sfx='_'+Math.random().toString(36).slice(2,6);
+  return h.replace(/id="([\w-]+)"/g,`id="$1${sfx}"`).replace(/url\(#([\w-]+)\)/g,`url(#$1${sfx})`).replace(/href="#([\w-]+)"/g,`href="#$1${sfx}"`)}catch(e){return''}}
+function paneHead(tab,eyebrow,title,canBack,mood){const m=mood&&MOOD[mood];return`<header class="card hero phero${canBack?' sub':''}"${m?` style="--c1:${m[0]};--c2:${m[1]}"`:''}><div class="sky psky">${paneSky()}</div>${m?'<div class="ptint"></div>':''}<button type="button" class="pill gear pgear" data-gear aria-label="Settings">${gearHTML()}</button>
+  <div class="pbody">${canBack?`<button type="button" class="back" data-back="${tab}">${IC.back}Back</button>`:''}<div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div></header>`}
 function wire(el,tab){el.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{view[tab].pop();draw(tab);scrollTo(0,0)});
   el.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=>openSheet())}
 function go2(tab,v){view[tab].push(v);draw(tab);scrollTo(0,0)}
 
-function catTiles(keys,tab){return`<div class="cgrid">${keys.map(k=>`<button type="button" class="cat card" data-cat="${k}"><span class="ci">${IC[ACT[k].ic]}</span><span><b>${ACT[k].t}</b><small>${ACT[k].s}</small></span></button>`).join('')}</div>`}
-function actList(k){return`<div class="card alist">${ACT[k].a.map(a=>{const q=a.special?{tq:'mixed',lab:'Check'}:quick(a);return`<button type="button" class="arow" data-act="${k}:${a.id}"><span><b>${a.t}</b><small>${a.d}</small></span><span style="display:flex;align-items:center;gap:8px"><span class="tq ${VK[q.tq]}">${q.lab}</span><span class="chv">›</span></span></button>`}).join('')}</div>`}
+function nextFor(k){const t=todayIST();let best=null;for(const a of ACT[k].a){if(a.special)continue;const L=findTimes(a,BIRTH,30);if(L.length&&(!best||L[0].ds<best))best=L[0].ds;if(best===t)break}return best}
+function catTiles(keys,tab){return`<div class="cgrid">${keys.map(k=>{const [a,b]=MOOD[k],n=nextFor(k);return`<button type="button" class="cat card" data-cat="${k}" style="--c1:${a};--c2:${b}">${badge(k)}<span class="ct"><b>${ACT[k].t}</b><small>${ACT[k].s}</small></span><span class="cnext">${n?(n===todayIST()?'<i></i>Good today':'<i></i>Next good · '+dayLabel(n).replace('Tomorrow','Tmrw')):'Quiet month'}</span></button>`}).join('')}</div>`}
+function actList(k){const [c1,c2]=MOOD[k]||MOOD.career;return`<div class="card alist" style="--c1:${c1};--c2:${c2}">${ACT[k].a.map(a=>{const q=a.special?{tq:'mixed',lab:'Check'}:quick(a);return`<button type="button" class="arow" data-act="${k}:${a.id}"><span class="adot"></span><span><b>${a.t}</b><small>${a.d}</small></span><span style="display:flex;align-items:center;gap:8px"><span class="tq ${VK[q.tq]}">${q.lab}</span><span class="chv">›</span></span></button>`}).join('')}</div>`}
 function wireCats(el,tab){el.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>go2(tab,'cat:'+b.dataset.cat));el.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>go2(tab,'act:'+b.dataset.act))}
 function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,BIRTH,30),t=todayIST(),td=L.find(x=>x.ds===t);
   const best=L.slice().sort((x,y)=>y.s-x.s||x.ds.localeCompare(y.ds))[0];
@@ -157,11 +172,11 @@ function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,
   else top=`<span class="kpill k-slow">${VI.slow.replace(/width="\d+" height="\d+"/,'width="16" height="16"')}Quiet month</span><div class="ans">No standout days in the next 30.</div><div class="when">Choose any calm, good window from the Today tab.</div>`;
   const slots=L.slice(0,8).map(x=>{const d=dObj(x.ds);return`<div class="slot"><div class="d"><small>${WDS[x.r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div><div class="t">${hm(x.w[0].a)} – ${fmt(x.w[0].b)}${x===best?'<span class="tagb">Best pick</span>':''}</div><div class="w">${x.why.slice(0,3).join(' · ')||'A supportive day'}${x.w[1]?` · also ${hm(x.w[1].a)} – ${fmt(x.w[1].b)}`:''}</div></div></div>`}).join('');
   CAL.k=k;CAL.id=id;CAL.m=0;CAL.sel=null;
-  return paneHead(tab,ACT[k].t,a.t,true)+`<div class="card res-top">${top}</div><h2 class="sec-t">Calendar</h2><div class="card calc" id="calBox"></div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
+  return paneHead(tab,ACT[k].t,a.t,true,k)+`<div class="card res-top">${top}</div><h2 class="sec-t">Calendar</h2><div class="card calc" id="calBox"></div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
 
 function drawPlan(){const el=$('pane-plan'),v=view.plan[view.plan.length-1];let h;
   if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">Pick what you're planning. We'll find the kindest times in the next 30 days for ${ME.self?'you':ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+`<p class="note2">Work and money decisions are also in Professional.</p>`;
-  else if(v.startsWith('cat:')){const k=v.slice(4);h=paneHead('plan','Plan',ACT[k].t,true)+actList(k)}
+  else if(v.startsWith('cat:')){const k=v.slice(4);h=paneHead('plan','Plan',ACT[k].t,true,k)+actList(k)}
   else{const [k,id]=v.slice(4).split(':');if(id==='compat')return drawCompat();h=resultView('plan',k,id)}
   el.innerHTML=h;wire(el,'plan');wireCats(el,'plan');if($('calBox'))drawCal()}
 const CAL={k:'',id:'',m:0,sel:null,cache:{}};
@@ -188,7 +203,7 @@ function drawCompat(){const el=$('pane-plan'),P=people(),opts=$('loc').innerHTML
   if(!CMP.b)CMP.b=(P.find(p=>p.rel==='Partner')||P[0]||{id:'new'}).id;
   const who=(sel,val,me)=>`<select id="${sel}">${me?`<option value="me"${val==='me'?' selected':''}>${ME.self?'You':esc(ME.name)}</option>`:''}${P.map(p=>`<option value="${p.id}"${val===p.id?' selected':''}>${esc(p.name)} · ${p.rel}</option>`).join('')}${me?'':`<option value="new"${val==='new'?' selected':''}>Someone new…</option>`}</select>`;
   const nb=CMP.nb;
-  let h=paneHead('plan','Love & marriage','Compatibility',true)+`<p class="pane-lead">See how two people's stars meet, the traditional way. Gentle guidance, not a verdict.</p><div class="card form">
+  let h=paneHead('plan','Love & marriage','Compatibility',true,'love')+`<p class="pane-lead">See how two people's stars meet, the traditional way. Gentle guidance, not a verdict.</p><div class="card form">
    <div class="frow"><label class="l">First person</label>${who('cA',CMP.a,true)}</div>
    <div class="frow"><label class="l">Second person</label>${who('cB',CMP.b,false)}</div>
    <div id="cNew" ${CMP.b==='new'?'':'hidden'}>
@@ -222,7 +237,7 @@ function showCompat(){const {A,B}=CMP.res,m=match(A,B),us=A.me||B.me,other=A.me?
 function workScore(r){const p=personDay(r,BIRTH),tq=TARA[p.tara.name][0];let s=(tq==='good'?2:tq==='bad'?-2:0)+(p.chandra.q==='good'?1:p.chandra.q==='bad'?-1:0)+([3,4].includes(r.wd)?1:0)-(r.yoga.bad?1:0);if(p.chandra.ashtama)s=-3;
   return s>=2?['good','Strong day for work']:s>=0?['mixed','Steady day for work']:['slow','Keep work routine']}
 function drawWork(){const el=$('pane-work'),v=view.work[view.work.length-1];
-  if(v!=='home'){if(v.startsWith('act:')){const [k,id]=v.slice(4).split(':');el.innerHTML=resultView('work',k,id);setTimeout(drawCal)}else{const k=v.slice(4);el.innerHTML=paneHead('work','Professional',ACT[k].t,true)+actList(k)}wire(el,'work');wireCats(el,'work');return}
+  if(v!=='home'){if(v.startsWith('act:')){const [k,id]=v.slice(4).split(':');el.innerHTML=resultView('work',k,id);setTimeout(drawCal)}else{const k=v.slice(4);el.innerHTML=paneHead('work','Professional',ACT[k].t,true,k)+actList(k)}wire(el,'work');wireCats(el,'work');return}
   const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[vc,vt]=workScore(r),now=Date.now();
   const W=windows(r,{},now).filter(g=>g.cls!=='ok');const focus=W.slice().sort((a,b)=>a.a-b.a)[0];
   const rahuLeft=+r.rahu[1]>now;
@@ -231,7 +246,7 @@ function drawWork(){const el=$('pane-work'),v=view.work[view.work.length-1];
   el.innerHTML=paneHead('work','Work & money','Professional')+`<div class="two"><div><div class="card gcard"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>${vt}</h3>${vPill(vc,{good:'Strong',mixed:'Steady',slow:'Routine'}[vc]+' day')}</div><p>${line}</p>
     <div class="chips3"><div><span>Best for focus</span><b>${focus?hm(focus.a)+' – '+fmt(focus.b):'Tomorrow morning'}</b></div><div><span>${rahuLeft?'Avoid signing':'Rahu Kaal'}</span><b>${hm(r.rahu[0])} – ${fmt(r.rahu[1])}</b></div></div></div>
     <div class="card gcard"><h3>This week at work</h3><div class="week">${wk}</div><div class="wkey"><span><i style="background:var(--good)"></i>Strong</span><span><i style="background:var(--best)"></i>Steady</span><span><i style="background:var(--avoid)"></i>Routine</span></div></div></div>
-    <div><h2 class="sec-t"><span class="hic">${IC.work}</span>Career</h2>${actList('career')}<h2 class="sec-t"><span class="hic">${IC.coin}</span>Money</h2>${actList('money')}<p class="note2">Traditional timing to help you choose a good moment. It isn't financial advice: check the numbers, and talk to an advisor for big decisions.</p></div></div>`;
+    <div><h2 class="sec-t">${badge('career',30)}Career</h2>${actList('career')}<h2 class="sec-t">${badge('money',30)}Money</h2>${actList('money')}<p class="note2">Traditional timing to help you choose a good moment. It isn't financial advice: check the numbers, and talk to an advisor for big decisions.</p></div></div>`;
   wire(el,'work');wireCats(el,'work')}
 
 /* ---------- Personal ---------- */
