@@ -62,7 +62,7 @@ const LORD=[2,5,3,1,0,3,5,2,4,6,6,4];// Su0 Mo1 Ma2 Me3 Ju4 Ve5 Sa6
 const FR=[[0,1,1,0,1,-1,-1],[1,0,0,1,0,0,0],[1,1,0,-1,1,0,0],[1,-1,0,0,0,1,0],[1,1,1,-1,0,-1,0],[-1,-1,0,1,0,0,1],[-1,-1,-1,1,0,1,0]];
 function match(a,b){const out=[];
   const n=((b.rashi-a.rashi+12)%12)+1,bh=[1,7,3,11,4,10].includes(n)?3:(LORD[a.rashi]===LORD[b.rashi]||FR[LORD[a.rashi]][LORD[b.rashi]]>0)?2:1;
-  out.push(['Emotional bond',bh,bh===3?'Your Moon signs sit in an easy, supportive pattern. You tend to feel understood by each other.':bh===2?'Your Moon signs differ, but their ruling planets get along, which softens the gap.':'Your moods can run on different rhythms. Saying what you feel, early and kindly, keeps you close.']);
+  out.push(['Emotional bond',bh,bh===3?'Your Moon signs sit in an easy, supportive pattern. You tend to feel understood by each other.':bh===2?'Your Moon signs differ, but their ruling planets get along, which softens the gap.':'Your moods can run on different rhythms. Talking about feelings early and kindly keeps the bond close.']);
   const f1=FR[LORD[a.rashi]][LORD[b.rashi]],f2=FR[LORD[b.rashi]][LORD[a.rashi]],gm=(f1>=0&&f2>=0)?(f1+f2>=1?3:2):1;
   out.push(['Friendship',gm,gm===3?'The planets ruling your Moon signs are natural friends. Easy companionship.':gm===2?'A steady, respectful friendship that grows with shared plans.':'You see the world a little differently. Curiosity about each other\'s view helps a lot.']);
   const ga=GANA[a.nak],gb=GANA[b.nak],gn=ga===gb?3:(ga+gb===1)?2:1;
@@ -80,6 +80,7 @@ const DH=[3,11,20,25],CH=[6,14,21,22,23],LG=[0,7,12],MR=[4,13,16,26];
 const U=(...a)=>[...new Set(a.flat())];
 const ACT={
  love:{t:'Love & marriage',s:'dates, proposals, wedding talks',ic:'heart',a:[
+  {id:'compat',t:'Compatibility finder',d:'see how two people match',special:1},
   {id:'date',t:'A date or a heart-to-heart',d:'first date, saying how you feel',naks:U(MR,LG,[3,11,14]),wds:[1,3,5]},
   {id:'propose',t:'Proposal or engagement',d:'asking the big question, roka',naks:[3,4,9,11,12,14,16,18,20,25,26],wds:[1,3,4,5],grow:1},
   {id:'talk',t:'An important conversation',d:'clearing the air, big decisions together',naks:U(LG,MR,[3,21]),wds:[1,3,4]},
@@ -146,7 +147,7 @@ function wire(el,tab){el.querySelectorAll('[data-back]').forEach(b=>b.onclick=()
 function go2(tab,v){view[tab].push(v);draw(tab);scrollTo(0,0)}
 
 function catTiles(keys,tab){return`<div class="cgrid">${keys.map(k=>`<button type="button" class="cat card" data-cat="${k}"><span class="ci">${IC[ACT[k].ic]}</span><span><b>${ACT[k].t}</b><small>${ACT[k].s}</small></span></button>`).join('')}</div>`}
-function actList(k){return`<div class="card alist">${ACT[k].a.map(a=>{const q=quick(a);return`<button type="button" class="arow" data-act="${k}:${a.id}"><span><b>${a.t}</b><small>${a.d}</small></span><span style="display:flex;align-items:center;gap:8px"><span class="tq ${VK[q.tq]}">${q.lab}</span><span class="chv">›</span></span></button>`}).join('')}</div>`}
+function actList(k){return`<div class="card alist">${ACT[k].a.map(a=>{const q=a.special?{tq:'mixed',lab:'Check'}:quick(a);return`<button type="button" class="arow" data-act="${k}:${a.id}"><span><b>${a.t}</b><small>${a.d}</small></span><span style="display:flex;align-items:center;gap:8px"><span class="tq ${VK[q.tq]}">${q.lab}</span><span class="chv">›</span></span></button>`}).join('')}</div>`}
 function wireCats(el,tab){el.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>go2(tab,'cat:'+b.dataset.cat));el.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>go2(tab,'act:'+b.dataset.act))}
 function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,BIRTH,30),t=todayIST(),td=L.find(x=>x.ds===t);
   const best=L.slice().sort((x,y)=>y.s-x.s||x.ds.localeCompare(y.ds))[0];
@@ -160,8 +161,42 @@ function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,
 function drawPlan(){const el=$('pane-plan'),v=view.plan[view.plan.length-1];let h;
   if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">Pick what you're planning. We'll find the kindest times in the next 30 days for ${ME.self?'you':ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+`<p class="note2">Work and money decisions are also in Professional.</p>`;
   else if(v.startsWith('cat:')){const k=v.slice(4);h=paneHead('plan','Plan',ACT[k].t,true)+actList(k)}
-  else{const [k,id]=v.slice(4).split(':');h=resultView('plan',k,id)}
+  else{const [k,id]=v.slice(4).split(':');if(id==='compat')return drawCompat();h=resultView('plan',k,id)}
   el.innerHTML=h;wire(el,'plan');wireCats(el,'plan')}
+const CMP={a:'me',b:'',nb:{name:'',dob:'',time:'',place:'28.4595,77.0266'},res:null};
+function drawCompat(){const el=$('pane-plan'),P=people(),opts=$('loc').innerHTML.replace(/ selected(="")?/g,'').replace(/<option[^>]*id="nearOpt"[^>]*>.*?<\/option>/,'');
+  if(!CMP.b)CMP.b=(P.find(p=>p.rel==='Partner')||P[0]||{id:'new'}).id;
+  const who=(sel,val,me)=>`<select id="${sel}">${me?`<option value="me"${val==='me'?' selected':''}>${ME.self?'You':esc(ME.name)}</option>`:''}${P.map(p=>`<option value="${p.id}"${val===p.id?' selected':''}>${esc(p.name)} · ${p.rel}</option>`).join('')}${me?'':`<option value="new"${val==='new'?' selected':''}>Someone new…</option>`}</select>`;
+  const nb=CMP.nb;
+  let h=paneHead('plan','Love & marriage','Compatibility',true)+`<p class="pane-lead">See how two people's stars meet, the traditional way. Gentle guidance, not a verdict.</p><div class="card form">
+   <div class="frow"><label class="l">First person</label>${who('cA',CMP.a,true)}</div>
+   <div class="frow"><label class="l">Second person</label>${who('cB',CMP.b,false)}</div>
+   <div id="cNew" ${CMP.b==='new'?'':'hidden'}>
+    <div class="frow"><label class="l">Their name</label><input type="text" id="cName" value="${esc(nb.name)}" placeholder="Name" autocomplete="off"></div>
+    <div class="frow"><label class="l">Date of birth</label><input type="date" id="cDob" value="${nb.dob}"></div>
+    <div class="frow"><label class="l">Time of birth</label><input type="time" id="cTime" value="${nb.time}"><label class="chk2"><input type="checkbox" id="cNoT" ${nb.dob&&!nb.time?'checked':''}> I don't know the time</label></div>
+    <div class="frow"><label class="l">Place of birth</label><select id="cPlace">${opts}</select></div></div></div>
+   <button type="button" class="btnp" id="cGo">Check compatibility</button><div id="cRes"></div>`;
+  el.innerHTML=h;wire(el,'plan');const pl=$('cPlace');pl.value=nb.place;if(!pl.value)pl.selectedIndex=0;
+  const keep=()=>{CMP.a=$('cA').value;CMP.b=$('cB').value;Object.assign(CMP.nb,{name:$('cName').value,dob:$('cDob').value,time:$('cNoT').checked?'':$('cTime').value,place:pl.value})};
+  $('cB').onchange=()=>{keep();$('cNew').hidden=CMP.b!=='new';CMP.res=null;$('cRes').innerHTML=''};$('cA').onchange=()=>{keep();CMP.res=null;$('cRes').innerHTML=''};
+  ['cName','cDob','cTime','cPlace'].forEach(i=>$(i).addEventListener('change',keep));$('cNoT').onchange=()=>{if($('cNoT').checked)$('cTime').value='';keep()};
+  $('cGo').onclick=()=>{keep();const get=v=>v==='me'?{name:ME.self?'You':ME.name,nak:BIRTH.nak,rashi:BIRTH.rashi,me:1}:P.find(p=>p.id===v);
+    let A=get(CMP.a),B;if(CMP.b==='new'){if(!nb.name.trim()){$('cName').focus();return}if(!nb.dob){$('cDob').focus();return}const [la,lo]=nb.place.split(',').map(Number);B=Object.assign({name:nb.name.trim(),fresh:1},birthChart(nb.dob,nb.time,la,lo))}else B=get(CMP.b);
+    if(!A||!B)return;if(A.id&&A.id===B.id){$('cRes').innerHTML='<p class="note2" style="margin-top:14px">Pick two different people.</p>';return}
+    CMP.res={A,B};showCompat();haptic(2);setTimeout(()=>{const r=$('cRes');if(r)r.scrollIntoView({behavior:'smooth',block:'start'})},60)};
+  if(CMP.res)showCompat()}
+function showCompat(){const {A,B}=CMP.res,m=match(A,B),us=A.me||B.me,other=A.me?B:A;
+  const fix=t=>us?t:t.replace(/\bOne of you\b/g,'One of them').replace(/\bYour\b/g,'Their').replace(/\byour\b/g,'their').replace(/\bYou\b/g,'They').replace(/\byou\b/g,'they');
+  const nm=us?`You and ${esc(other.name)}`:`${esc(A.name)} and ${esc(B.name)}`;
+  $('cRes').innerHTML=`<div class="card gcard" style="margin-top:22px"><div class="sub">${nm}</div><h3 style="margin-top:2px">${m.head}</h3>
+   <div class="chips3"><div><span>${esc(A.me?'You':A.name)}</span><b>${RS[A.rashi]} Moon</b><span>${NAKN[A.nak]}</span></div><div><span>${esc(B.me?'You':B.name)}</span><b>${RS[B.rashi]} Moon</b><span>${NAKN[B.nak]}</span></div></div>
+   <div style="margin-top:8px">${m.out.map(([k,l,tx])=>`<div class="asp"><b>${k}</b><span class="lvl l${l}"><i></i><i></i><i></i></span><p>${fix(tx)}</p></div>`).join('')}</div>
+   ${B.unsure?'<p class="note2" style="margin:8px 0 0">The Moon changed stars on that birth date, so a birth time would make this more exact.</p>':''}
+   ${B.fresh?`<button type="button" class="btnp" id="cSave" style="margin-top:14px;background:var(--g-row);color:var(--ink);border:1px solid var(--g-edge)">Save ${esc(B.name)} to Personal</button>`:''}</div>
+   <p class="note2" style="margin-top:14px">Based on Moon signs and birth stars (five parts of the traditional Ashtakoot match). For a wedding, families usually also consult a pandit for the full 36-point match. Every relationship is built by the two people in it.</p>`;
+  const sv2=$('cSave');if(sv2)sv2.onclick=()=>{const nb=CMP.nb,rec=Object.assign({id:Date.now().toString(36),name:B.name,rel:partner()?'Friend':'Partner',dob:nb.dob,time:nb.time,place:nb.place},birthChart(nb.dob,nb.time,...nb.place.split(',').map(Number)));
+    const L=people();L.push(rec);savePeople(L);CMP.b=rec.id;CMP.res.B=rec;sv2.outerHTML='<p class="note2" style="margin-top:12px">Saved to Personal ✓</p>';renderGlance()}}
 
 /* ---------- Professional ---------- */
 function workScore(r){const p=personDay(r,BIRTH),tq=TARA[p.tara.name][0];let s=(tq==='good'?2:tq==='bad'?-2:0)+(p.chandra.q==='good'?1:p.chandra.q==='bad'?-1:0)+([3,4].includes(r.wd)?1:0)-(r.yoga.bad?1:0);if(p.chandra.ashtama)s=-3;
@@ -266,12 +301,12 @@ function init(){const app=document.querySelector('.app');
   const c3=document.querySelector('.c3');if(c3){c3.prepend(gl);const dd=document.querySelector('.d-det'),dc=document.querySelector('.d-chart');if(dd)c3.appendChild(dd);if(dc)c3.appendChild(dc)}else app.appendChild(gl);gl.style.order=5;
   const nav=document.createElement('nav');nav.className='tabbar';nav.setAttribute('role','tablist');
   nav.innerHTML=TABS.map(([k,l,i])=>`<button type="button" role="tab" data-t="${k}" aria-selected="${k==='today'}">${i}<span>${l}</span></button>`).join('');
-  document.body.appendChild(nav);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+  document.body.appendChild(nav);const fitL=()=>nav.querySelectorAll('span').forEach(sp=>{const b=sp.parentElement;if(b.dataset.t==='work'){sp.textContent='Professional';if(sp.scrollWidth>sp.clientWidth+1)sp.textContent='Work'}});requestAnimationFrame(fitL);addEventListener('resize',fitL);if(document.fonts)document.fonts.ready.then(fitL);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
   document.body.dataset.tab='today';
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{renderGlance();if(cur!=='today'&&!(view[cur]&&view[cur].length>1&&cur==='personal'))draw(cur)}catch(e){console.error(e)}return x};
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
   try{renderGlance();drawKind()}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
