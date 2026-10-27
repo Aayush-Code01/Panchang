@@ -368,8 +368,8 @@ function init(){const app=document.querySelector('.app');
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{introBar();nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
-  try{nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
+  try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

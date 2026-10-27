@@ -280,3 +280,4 @@ html[data-theme="dark"] .tl-intro .tl-track::after{background:linear-gradient(10
 .tl-seg:last-child{border-right:0}
 .tl-lab span:last-child{transform:translateX(-78%)}
 .tl-lab span:first-child{transform:translateX(-30%)}
+.tl-track .tl-seg:has(+ .tl-past),.tl-track .tl-seg:has(+ :not(.tl-seg)){border-right:0}
