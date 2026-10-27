@@ -154,7 +154,8 @@ const GL={love:'<path d="M12 20.5s-7.6-4.6-9.4-9.1C1.2 7.8 3.5 4.6 6.9 4.6c2 0 3
 const badge=(k,sz=46)=>{const [a,b]=MOOD[k]||MOOD.career;return`<span class="badge" style="--c1:${a};--c2:${b};width:${sz}px;height:${sz}px"><svg viewBox="0 0 24 24" width="${Math.round(sz*.58)}" height="${Math.round(sz*.58)}" aria-hidden="true">${GL[k]||GL.career}</svg></span>`};
 function paneSky(){try{const [lat,lon]=loc(),r=calc(todayIST(),lat,lon),ph=window.SKY_PHASE;let h=skySVG(r,true);window.SKY_PHASE=ph;const sfx='_'+Math.random().toString(36).slice(2,6);
   return h.replace(/id="([\w-]+)"/g,`id="$1${sfx}"`).replace(/url\(#([\w-]+)\)/g,`url(#$1${sfx})`).replace(/href="#([\w-]+)"/g,`href="#$1${sfx}"`)}catch(e){return''}}
-function paneHead(tab,eyebrow,title,canBack,mood){const m=mood&&MOOD[mood];return`<header class="card hero phero${canBack?' sub':''}"${m?` style="--c1:${m[0]};--c2:${m[1]}"`:''}><div class="sky psky">${paneSky()}</div>${m?'<div class="ptint"></div>':''}<button type="button" class="pill gear pgear" data-gear aria-label="Settings">${gearHTML()}</button>
+const TABMOOD={plan:'spirit',personal:'love',work:'career',practice:'health'};
+function paneHead(tab,eyebrow,title,canBack,mood){const m=MOOD[mood||TABMOOD[tab]]||MOOD.spirit;return`<header class="card hero phero${canBack?' sub':''}" style="--c1:${m[0]};--c2:${m[1]}"><div class="pmesh"></div><button type="button" class="pill gear pgear" data-gear aria-label="Settings">${gearHTML()}</button>
   <div class="pbody">${canBack?`<button type="button" class="back" data-back="${tab}">${IC.back}Back</button>`:''}<div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div></header>`}
 function wire(el,tab){el.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{view[tab].pop();draw(tab);scrollTo(0,0)});
   el.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=>openSheet())}
