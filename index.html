@@ -1093,7 +1093,11 @@ if(document.getElementById('nearOpt')&&document.getElementById('nearOpt').select
 else if(!ls.get('locAsked2',false)){const el=$('locmsg');el.querySelector('span').textContent='Use your location for exact timings wherever you are?';el.querySelector('.ask').hidden=false;el.hidden=false}
 $('date').onchange=()=>{if($('date').value)go()};
 $('locAsk').onclick=()=>{ls.set('locAsked2',true);hideLocMsg();locate(false)};$('locX').onclick=()=>{ls.set('locAsked2',true);hideLocMsg()};
-function addNear(la,lo){let o=document.getElementById('nearOpt');if(!o){o=document.createElement('option');o.id='nearOpt';$('loc').querySelector('option[value="gps"]').after(o)}o.value=(+la).toFixed(4)+','+(+lo).toFixed(4);o.textContent='Near me';return o.value}
+function addNear(la,lo){let o=document.getElementById('nearOpt');if(!o){o=document.createElement('option');o.id='nearOpt';$('loc').querySelector('option[value="gps"]').after(o)}o.value=(+la).toFixed(4)+','+(+lo).toFixed(4);o.textContent=placeName(+la,+lo,o);return o.value}
+function nearestCity(la,lo){let best=null,bd=1e9;$('loc').querySelectorAll('option').forEach(op=>{if(op.id==='nearOpt'||!/^-?\d/.test(op.value))return;const [a,b]=op.value.split(',').map(Number),R=Math.PI/180,d=6371*Math.acos(Math.min(1,Math.sin(la*R)*Math.sin(a*R)+Math.cos(la*R)*Math.cos(a*R)*Math.cos((lo-b)*R)));if(d<bd){bd=d;best=op.textContent}});return bd<40?best.replace(/ \(.*\)$/,''):null}
+function placeName(la,lo,o){const k='place:'+la.toFixed(2)+','+lo.toFixed(2),c=ls.get(k,null);if(c)return c;const guess=nearestCity(la,lo)||'Your location';
+  if(navigator.onLine&&!window._pnBusy){window._pnBusy=1;fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=en`).then(r=>r.json()).then(j=>{window._pnBusy=0;let n=(j.city||j.locality||j.principalSubdivision||'').replace(/ (Municipal Corporation|District|Tahsil|Tehsil)$/i,'').trim();if(!n)return;if(n.length>18)n=n.split(/[ ,]/)[0];ls.set(k,n);o.textContent=n;if(o.selected){const cn=$('cityName');if(cn)cn.textContent=n}}).catch(()=>{window._pnBusy=0})}
+  return guess}
 var locBusy=false;
 function locFail(silent,msg){locBusy=false;const prev=ls.get('loc','28.4595,77.0266');$('loc').value=(prev==='gps'||!prev)?'28.4595,77.0266':prev;if(!$('loc').value)$('loc').value='28.4595,77.0266';go();if(!silent)showLocMsg(msg)}
 function locate(silent){
