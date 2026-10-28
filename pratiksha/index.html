@@ -811,7 +811,7 @@ const calDateIST=()=>ist(new Date()).toISOString().slice(0,10);
 const todayIST=()=>{const d=calDateIST();try{const v=(document.getElementById('loc')||{}).value||'';const [la,lo]=(/^-?\d/.test(v)?v:'28.4595,77.0266').split(',').map(Number);const r=calc(d,la,lo);if(Date.now()<+r.rise){const p=new Date(d+'T00:00:00Z');p.setUTCDate(p.getUTCDate()-1);return p.toISOString().slice(0,10)}}catch(e){}return d};
 const ls={get(k,v){k='p:'+k;try{const x=localStorage.getItem(k);return x==null?v:JSON.parse(x)}catch(e){return v}},set(k,v){k='p:'+k;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-const SYNC_RE=/^((ritual|japa|aff|sankalp|reflect|habit):|people$)/,SYNC_FILE='panchang-pratiksha.json',LSP='p:',SY={busy:false,err:'',t:0};
+const SYNC_RE=/^((ritual|japa|aff|sankalp|reflect|habit|breath):|people$)/,SYNC_FILE='panchang-pratiksha.json',LSP='p:',SY={busy:false,err:'',t:0};
 const _lsSet=ls.set;ls.set=function(k,v){_lsSet(k,v);if(SYNC_RE.test(k)){const m=ls.get('syncMeta',{});m[k]=Date.now();_lsSet('syncMeta',m);syncSoon()}};
 async function gh(path,opt={}){const r=await fetch('https://api.github.com'+path,Object.assign({},opt,{cache:'no-store',headers:Object.assign({Authorization:'Bearer '+ls.get('ghTok',''),Accept:'application/vnd.github+json'},opt.body?{'Content-Type':'application/json'}:{})}));if(!r.ok){const e=new Error(r.status);e.code=r.status;throw e}return r.json()}
 async function findGist(){let id=ls.get('ghGist','');if(id)return id;

@@ -24,7 +24,7 @@ const IC={
  plus:sv('<path d="M12 5v14M5 12h14"/>',18),
  check:'<svg width="13" height="10" viewBox="0 0 13 10"><path d="M1.5 5l3.5 3.5L11.5 1.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 };
-IC.lotus=I.lotus;IC.spark=I.spark;
+IC.lotus=I.lotus;IC.spark=I.spark;IC.wind=sv('<path d="M3 9h11a3 3 0 1 0-3-3M3 13h15a3 3 0 1 1-3 3M3 17h7"/>',20);
 const gearHTML=()=>{const g=$('gearBtn');return g?g.innerHTML:''};
 
 /* ---------- helpers ---------- */
@@ -306,6 +306,46 @@ function drawKind(){const box=$('kindBox');if(!box)return;const ds=$('date').val
   box.innerHTML=acts.map((a,i)=>`<button type="button" class="ka${done.includes(i)?' done':''}" data-i="${i}"><span class="cb">${done.includes(i)?IC.check:''}</span><span><b>${esc(a[0])}</b><small>${esc(a[1])}</small></span></button>`).join('');
   box.querySelectorAll('.ka').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,d=ls.get(k,[]),j=d.indexOf(i);if(j<0)d.push(i);else d.splice(j,1);ls.set(k,d);if(j<0&&d.length===acts.length)haptic(2);drawKind();renderGlance()})}
 
+/* ---------- Practice: breathing ---------- */
+const BR=[
+ {id:'calm',t:'Calm breath',s:'4 in · 6 out · to relax',c:['#9CC9D9','#4F8FB0'],p:[['in',4],['out',6]],how:'Breathe in gently through the nose, and out a little longer. A longer out-breath tells the body it is safe to relax.'},
+ {id:'box',t:'Box breathing',s:'4 · 4 · 4 · 4 · before big moments',c:['#B4B2E6','#6B68B8'],p:[['in',4],['hold',4],['out',4],['hold',4]],how:'Even breaths with short pauses. Steadies the mind before a meeting, call or decision.'},
+ {id:'anulom',t:'Anulom Vilom',s:'alternate nostril · balance',c:['#A9D3A0','#4F9467'],p:[['in',4,'through the left nostril'],['out',4,'through the right nostril'],['in',4,'through the right nostril'],['out',4,'through the left nostril']],how:'Use your right thumb to close the right nostril and your ring finger to close the left. Switch sides as the guide says. No holding.'},
+ {id:'bhramari',t:'Bhramari',s:'humming bee · eases the mind',c:['#F4C77A','#D98A3C'],p:[['in',4],['out',7,'with a soft hum, like a bee']],how:'Sit tall, close your eyes, and hum softly on the out-breath with your lips closed. Feel the gentle buzz in your head.'}];
+const BL={in:'Breathe in',out:'Breathe out',hold:'Hold'};
+function drawBreath(){const box=$('breathBox');if(!box)return;const ds=todayIST(),m=ls.get('breath:'+ds,0);$('brToday').textContent=m?`${m} min today`:'';
+  box.innerHTML=BR.map(b=>`<button type="button" class="arow brow" data-b="${b.id}" style="--c1:${b.c[0]};--c2:${b.c[1]}"><span class="borb"></span><span><b>${b.t}</b><small>${b.s}</small></span><span class="chv">›</span></button>`).join('');
+  box.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>openBreath(BR.find(b=>b.id===x.dataset.b)))}
+let BS=null,BWL=null;
+function brOverlay(){let o=$('brOv');if(o)return o;o=document.createElement('div');o.id='brOv';o.className='brov';o.hidden=true;document.body.appendChild(o);return o}
+function tone(f){try{audioInit();if(!AC||!ls.get('brSound',true))return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.05);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+1.7)}catch(e){}}
+function openBreath(b){const o=brOverlay();const mins=ls.get('brMins',3);o.style.setProperty('--c1',b.c[0]);o.style.setProperty('--c2',b.c[1]);o.classList.toggle('shunya',!!ls.get('shunya',false));
+  o.innerHTML=`<div class="brtop"><button type="button" class="brx" data-x>Close</button><button type="button" class="brdark" data-dk>${ls.get('shunya',false)?'Shunya on':'Shunya'}</button></div>
+   <div class="brmain"><div class="brname">${b.t}</div><div class="brstage"><div class="brring"></div><div class="brorb" id="brOrb"></div><div class="brtxt"><b id="brPh">Ready</b><span id="brCt"></span></div></div><div class="brsub" id="brSub">${b.how}</div></div>
+   <div class="brbot" id="brBot"><div class="seg brmins">${[1,3,5,10].map(x=>`<button type="button" data-m="${x}" aria-pressed="${x===mins}">${x} min</button>`).join('')}</div><button type="button" class="btnp" data-go>Begin</button><label class="chk2 brsnd"><input type="checkbox" ${ls.get('brSound',true)?'checked':''} data-snd> Soft chime when the breath changes</label><p class="brsafe">Breathe comfortably. Stop if you feel dizzy.</p></div>`;
+  o.hidden=false;document.documentElement.style.overflow='hidden';requestAnimationFrame(()=>o.classList.add('on'));
+  o.querySelector('[data-x]').onclick=closeBreath;
+  o.querySelector('[data-dk]').onclick=e=>{const on=!ls.get('shunya',false);ls.set('shunya',on);o.classList.toggle('shunya',on);e.target.textContent=on?'Shunya on':'Shunya'};
+  o.querySelectorAll('[data-m]').forEach(x=>x.onclick=()=>{ls.set('brMins',+x.dataset.m);o.querySelectorAll('[data-m]').forEach(y=>y.setAttribute('aria-pressed',y===x))});
+  o.querySelector('[data-snd]').onchange=e=>ls.set('brSound',e.target.checked);
+  o.querySelector('[data-go]').onclick=()=>startBreath(b)}
+function startBreath(b){audioInit();const o=$('brOv'),mins=ls.get('brMins',3),end=Date.now()+mins*60e3;o.classList.add('run');$('brBot').innerHTML='<button type="button" class="brstop" data-stop>Finish early</button>';
+  o.querySelector('[data-stop]').onclick=()=>finishBreath(b,true);try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>BWL=l).catch(()=>{})}catch(e){}
+  BS={b,i:0,end,start:Date.now(),t:null,ct:null};const orb=$('brOrb');let scale=.55;orb.style.transition='none';orb.style.transform=`scale(${scale})`;
+  const step=()=>{if(!BS)return;if(Date.now()>=BS.end&&BS.i%b.p.length===0)return finishBreath(b,false);const [ph,sec,note]=b.p[BS.i%b.p.length];BS.i++;
+    if(ph==='in')scale=1;else if(ph==='out')scale=.55;orb.style.transition=`transform ${sec}s cubic-bezier(.45,.05,.55,.95)`;orb.style.transform=`scale(${scale})`;
+    $('brPh').textContent=BL[ph];$('brSub').textContent=note?note.charAt(0).toUpperCase()+note.slice(1):(ph==='hold'?'Stay soft and still':'');
+    tone(ph==='in'?392:ph==='out'?294:330);if(navigator.vibrate)navigator.vibrate(ph==='hold'?8:15);
+    let left=sec;$('brCt').textContent=left;clearInterval(BS.ct);BS.ct=setInterval(()=>{left--;if(left>0)$('brCt').textContent=left},1000);
+    BS.t=setTimeout(step,sec*1000)};
+  step()}
+function finishBreath(b,early){if(!BS)return;clearTimeout(BS.t);clearInterval(BS.ct);const m=Math.max(early?0:1,Math.round((Date.now()-BS.start)/60e3));BS=null;try{BWL&&BWL.release()}catch(e){}BWL=null;
+  if(m>0){const k='breath:'+todayIST();ls.set(k,ls.get(k,0)+m)}
+  const o=$('brOv');o.classList.remove('run');const orb=$('brOrb');orb.style.transition='transform 1.2s ease';orb.style.transform='scale(.78)';$('brPh').textContent=m?'Well done':'Rest a moment';$('brCt').textContent='';
+  $('brSub').textContent=m?`${m} minute${m>1?'s':''} of ${b.t.toLowerCase()}. Notice how you feel.`:'Come back whenever you like.';
+  $('brBot').innerHTML='<button type="button" class="btnp" data-x>Done</button>';$('brBot').querySelector('[data-x]').onclick=closeBreath;if(m)haptic(2);drawBreath();renderGlance()}
+function closeBreath(){if(BS){clearTimeout(BS.t);clearInterval(BS.ct);BS=null}try{BWL&&BWL.release()}catch(e){}const o=$('brOv');o.classList.remove('on','run');setTimeout(()=>{o.hidden=true},300);document.documentElement.style.overflow=''}
+
 /* ---------- Today: at a glance ---------- */
 function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
   const ds=$('date').value||t,done=ls.get('ritual:'+ds,[]).length,tot=document.querySelectorAll('#prac .pi').length||4,kd=ls.get('habit:'+ds,[]).length;
@@ -357,7 +397,7 @@ function init(){const app=document.querySelector('.app');
   pp.innerHTML=paneHead('practice','Small acts, every day','Practice')+'<div class="two"><div id="ppL"></div><div id="ppR"></div></div>';
   wire(pp,'practice');
   const kind=document.createElement('section');kind.className='s-kind';kind.innerHTML=`<div class="sec-title"><h2><span class="hic">${IC.heart}</span>Kind acts</h2><span>3 for today</span></div><div class="card kact" id="kindBox"></div>`;
-  $('ppL').appendChild(sp);$('ppR').appendChild(kind);$('ppR').appendChild(sa);
+  $('ppL').appendChild(sp);const br=document.createElement('section');br.className='s-breath';br.innerHTML=`<div class="sec-title"><h2><span class="hic">${IC.wind}</span>Breathe</h2><span id="brToday"></span></div><div class="card alist" id="breathBox"></div>`;$('ppL').appendChild(br);$('ppR').appendChild(kind);$('ppR').appendChild(sa);drawBreath();
   // today: glance section in column 3
   const gl=document.createElement('section');gl.className='s-glance';gl.innerHTML='<div class="sec-title"><h2><span class="hic">'+IC.spark+'</span>At a glance</h2></div><div class="glance" id="glance"></div>';
   const c3=document.querySelector('.c3');if(c3){c3.prepend(gl);const dd=document.querySelector('.d-det'),dc=document.querySelector('.d-chart');if(dd)c3.appendChild(dd);if(dc)c3.appendChild(dc)}else app.appendChild(gl);gl.style.order=5;
