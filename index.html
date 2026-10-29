@@ -1095,8 +1095,8 @@ $('date').onchange=()=>{if($('date').value)go()};
 $('locAsk').onclick=()=>{ls.set('locAsked2',true);hideLocMsg();locate(false)};$('locX').onclick=()=>{ls.set('locAsked2',true);hideLocMsg()};
 function addNear(la,lo){let o=document.getElementById('nearOpt');if(!o){o=document.createElement('option');o.id='nearOpt';$('loc').querySelector('option[value="gps"]').after(o)}o.value=(+la).toFixed(4)+','+(+lo).toFixed(4);o.textContent=placeName(+la,+lo,o);return o.value}
 function nearestCity(la,lo){let best=null,bd=1e9;$('loc').querySelectorAll('option').forEach(op=>{if(op.id==='nearOpt'||!/^-?\d/.test(op.value))return;const [a,b]=op.value.split(',').map(Number),R=Math.PI/180,d=6371*Math.acos(Math.min(1,Math.sin(la*R)*Math.sin(a*R)+Math.cos(la*R)*Math.cos(a*R)*Math.cos((lo-b)*R)));if(d<bd){bd=d;best=op.textContent}});return bd<40?best.replace(/ \(.*\)$/,''):null}
-function placeName(la,lo,o){const k='place:'+la.toFixed(2)+','+lo.toFixed(2),c=ls.get(k,null);if(c)return c;const guess=nearestCity(la,lo)||'Your location';
-  if(navigator.onLine&&!window._pnBusy){window._pnBusy=1;fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=en`).then(r=>r.json()).then(j=>{window._pnBusy=0;let n=(j.city||j.locality||j.principalSubdivision||'').replace(/ (Municipal Corporation|District|Tahsil|Tehsil)$/i,'').trim();if(!n)return;if(n.length>18)n=n.split(/[ ,]/)[0];ls.set(k,n);o.textContent=n;if(o.selected){const cn=$('cityName');if(cn)cn.textContent=n}}).catch(()=>{window._pnBusy=0})}
+function placeName(la,lo,o){const k='place2:'+la.toFixed(2)+','+lo.toFixed(2),c=ls.get(k,null);if(c)return c;const guess=nearestCity(la,lo)||'Your location';
+  if(navigator.onLine&&!window._pnBusy){window._pnBusy=1;fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${la}&longitude=${lo}&localityLanguage=en`).then(r=>r.json()).then(j=>{window._pnBusy=0;let n=((j.city&&/(Nagar|District)$/i.test(j.city)&&j.locality&&!/^(Sector|Block|Phase)\b/i.test(j.locality))?j.locality:(j.city||j.locality||j.principalSubdivision||'')).replace(/ (Municipal Corporation|District|Tahsil|Tehsil)$/i,'').trim();if(!n)return;if(n.length>18)n=n.split(/[ ,]/)[0];ls.set(k,n);o.textContent=n;if(o.selected){const cn=$('cityName');if(cn)cn.textContent=n}}).catch(()=>{window._pnBusy=0})}
   return guess}
 var locBusy=false;
 function locFail(silent,msg){locBusy=false;const prev=ls.get('loc','28.4595,77.0266');$('loc').value=(prev==='gps'||!prev)?'28.4595,77.0266':prev;if(!$('loc').value)$('loc').value='28.4595,77.0266';go();if(!silent)showLocMsg(msg)}
@@ -1256,7 +1256,7 @@ function skySVG(r,isToday){
   const hr=ist(new Date(t)).getUTCHours();
   let label={night:'Night',dawn:'Sunrise',day:hr<12?'Morning':hr<16?'Afternoon':'Late afternoon',golden:'Golden hour',dusk:'Sunset'}[phase];
   const WXC=isToday?wxNow():null,WK=wxKind(WXC),cc=WXC?WXC.cc:null,wet=WK==='rain'||WK==='storm'||WK==='drizzle'||WK==='snow';
-  const dimSM=WK==='overcast'||wet||WK==='fog'?.18:WK==='cloudy'?.75:WK==='haze'?.9:1,starOp=WK==='overcast'||wet||WK==='fog'?0:WK==='cloudy'?.45:WK==='haze'?.5:1;
+  let LPOS=null;const dimSM=WK==='overcast'?.62:wet?.32:WK==='fog'?.22:WK==='cloudy'?.75:WK==='haze'?.9:1,starOp=WK==='overcast'||wet||WK==='fog'?0:WK==='cloudy'?.45:WK==='haze'?.5:1;
   const SK={
     night:['#070B1F','#0F1633','#1A2147','#262C55'],
     dawn:['#24305E','#5E5D8A','#C48C8C','#F1C49A'],
@@ -1278,7 +1278,7 @@ function skySVG(r,isToday){
    <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset=".1" stop-color="#FFFBF0" stop-opacity=".9"/><stop offset=".3" stop-color="#FFF1D6" stop-opacity=".42"/><stop offset=".6" stop-color="#E9F2FF" stop-opacity=".12"/><stop offset="1" stop-color="#E9F2FF" stop-opacity="0"/></radialGradient>
    <radialGradient id="hzGlow" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#FFD9A3" stop-opacity=".75"/><stop offset=".5" stop-color="#F7B98C" stop-opacity=".25"/><stop offset="1" stop-color="#F7B98C" stop-opacity="0"/></radialGradient>
   </defs><rect y="-${H}" width="${W}" height="${H+2}" fill="${SK[0]}"/><rect width="${W}" height="${H}" fill="url(#skg)"/>`;
-  if(WXC&&(WK==='overcast'||wet||WK==='fog'||WK==='cloudy'||WK==='haze')){const g=WK==='haze'?(phase==='night'?'#5A5E70':'#E4EAEE'):phase==='night'?'#2E3342':phase==='dusk'||phase==='dawn'?'#6E6A78':(wet?'#6F7A88':'#8D97A3'),op=WK==='storm'?.8:WK==='rain'?.68:WK==='haze'?(phase==='night'?.18:.22):WK==='overcast'||WK==='snow'?.5:WK==='drizzle'?.55:WK==='fog'?.42:.18;s+=`<rect width="${W}" height="${H}" fill="${g}" opacity="${op}"/>`}
+  if(WXC&&(WK==='overcast'||wet||WK==='fog'||WK==='cloudy'||WK==='haze')){const g=WK==='haze'?(phase==='night'?'#5A5E70':'#E4EAEE'):phase==='night'?'#2E3342':phase==='dusk'||phase==='dawn'?'#6E6A78':(wet?'#6F7A88':'#8D97A3'),op=WK==='storm'?.8:WK==='rain'?.68:WK==='haze'?(phase==='night'?.18:.22):WK==='overcast'?.26:WK==='snow'?.5:WK==='drizzle'?.55:WK==='fog'?.42:.18;s+=`<rect width="${W}" height="${H}" fill="${g}" opacity="${op}"/>`}
   // horizon warmth near sunrise / sunset
   if(phase==='dawn'||phase==='dusk'||phase==='golden'){const hx=phase==='dawn'?90:310;s+=`<ellipse cx="${hx}" cy="${H+10}" rx="260" ry="150" fill="url(#hzGlow)" opacity="${phase==='golden'?.6:1}"/>`}
   // stars
@@ -1295,7 +1295,7 @@ function skySVG(r,isToday){
   if(t>=rise-30*M&&t<=set+25*M&&phase!=='night'){const f=clamp((t-rise)/(set-rise),-.05,1.05);
     const x=lerp(64,W-64,clamp(f,0,1)),y=phase==='day'?lerp(134,98,Math.sin(Math.PI*clamp(f,0,1))):H*.62+(phase==='dusk'||phase==='dawn'?24:0);
     const clear=!WXC||WK==='clear'||WK==='fewclouds'||WK==='haze'||WK==='cloudy',bright=phase==='day'||phase==='golden';
-    s+=`<circle cx="${x}" cy="${y}" r="${bright?190:130}" fill="url(#sunGlow)" opacity="${phase==='day'?.95:.85}"/>`;
+    LPOS=LPOS||[x,y,'s'];s+=`<circle cx="${x}" cy="${y}" r="${bright?190:130}" fill="url(#sunGlow)" opacity="${phase==='day'?.95:.85}"/>`;
     if(bright&&clear){
       const ray=(ang,len,w,o)=>`<path d="M${x} ${y-w} L${(x+Math.cos(ang)*len).toFixed(1)} ${(y+Math.sin(ang)*len).toFixed(1)} L${x} ${y+w}Z" transform="rotate(${0} ${x} ${y})" fill="url(#rayG)" opacity="${o}"/>`;
       let rays='';for(let i=0;i<28;i++){const a=i/28*Math.PI*2+.11,l=(i%3===0?92:i%2?46:64)*(.85+((i*37)%10)/30),w=i%3===0?.05:.08;rays+=`<path d="M${x} ${y} L${(x+Math.cos(a-w)*l).toFixed(1)} ${(y+Math.sin(a-w)*l).toFixed(1)} L${(x+Math.cos(a+w)*l).toFixed(1)} ${(y+Math.sin(a+w)*l).toFixed(1)}Z" fill="#FFFFFF" opacity="${i%3===0?.2:.12}"/>`}
@@ -1308,7 +1308,7 @@ function skySVG(r,isToday){
   if(phase==='night'||phase==='dusk'||phase==='dawn'){
     const e=((r.tithi.idx+.5)*12)%360,k=(1-Math.cos(e*Math.PI/180))/2,wax=e<180;
     let f;if(t>=+r.set&&t<next){f=(t-r.set)/(next-r.set)}else{f=.85}f=clamp(f,0,1);
-    const R=29,cx=lerp(120,300,f),cy=lerp(150,132,Math.sin(Math.PI*f)),MT=MOON_URI;
+    const R=29,cx=lerp(120,300,f),cy=lerp(150,132,Math.sin(Math.PI*f)),MT=MOON_URI;LPOS=[cx,cy,'m'];
     const rx=Math.abs(1-2*k)*R,top=`${cx} ${cy-R}`,bot=`${cx} ${cy+R}`;
     const d=wax?`M${top} A${R} ${R} 0 0 1 ${bot} A${rx} ${R} 0 0 ${k<.5?0:1} ${top}Z`:`M${top} A${R} ${R} 0 0 0 ${bot} A${rx} ${R} 0 0 ${k<.5?1:0} ${top}Z`;
     const maria=[[-9,-8,7,5,.5],[-1,-11,5,3.5,.38],[7,-6,6,5,.42],[10,4,7.5,8,.5],[-2,5,6,4.5,.36],[-13,3,3.5,5,.34],[3,14,4,2.5,.28],[-7,15,2.5,2,.3]];
@@ -1333,7 +1333,13 @@ function skySVG(r,isToday){
   if(WXC){const spots=[[300,70,1],[90,150,.75],[220,190,.6],[150,58,.95],[30,96,.85],[352,150,1.1],[250,120,1],[110,228,1.2],[330,236,1.3],[200,30,.8]];
     const n=WK==='clear'?0:WK==='fewclouds'?2:WK==='cloudy'?4:WK==='haze'?2:10;
     if(WK==='overcast'||wet||WK==='fog'){C[0]=phase==='night'?'#3D4252':phase==='day'||phase==='golden'?'#D9DDE2':'#9A92A2';C[1]=phase==='night'?'#232634':'#7C8591';C[2]=WK==='storm'?.95:.85}
-    spots.slice(0,n).forEach(([x,y,sc],i)=>s+=cloud(x,y,sc*(n>6?1.25:1),1-i*.04))}
+    if(WK==='overcast'&&LPOS){const [lx,ly]=LPOS,nt=phase==='night',dk=nt?'#2A2F40':'#9AA3AE',md=nt?'#3E4458':'#C3CAD2',lt=nt?'#59607A':'#E6EAEE';
+      let sd=7;const R2=()=>(sd=(sd*16807)%2147483647)/2147483647;
+      const bands=[[ly-70,.7,md],[ly-34,.55,lt],[ly+22,.8,md],[ly+56,.88,dk],[ly+96,.92,md],[ly+138,.96,dk],[ly-112,.6,dk]];if(!nt)bands.push([ly-150,.85,md],[ly+180,.95,md],[ly-5,.5,lt],[ly+75,.9,lt],[ly+118,.9,lt]);
+      s+=`<g filter="url(#soft4)">`+bands.map(([y,o,c])=>{let g='';for(let x=-60;x<W+60;x+=nt?46+R2()*40:26+R2()*20){const rx=40+R2()*46,ry=10+R2()*12,yy=y+(R2()-.5)*14;if(Math.hypot(x-lx,yy-ly)<40&&y<ly+20)continue;g+=`<ellipse cx="${x.toFixed(0)}" cy="${yy.toFixed(0)}" rx="${rx.toFixed(0)}" ry="${ry.toFixed(0)}" fill="${c}" opacity="${o}"/>`;
+        const d=Math.hypot(x-lx,yy-ly);if(d<150)g+=`<ellipse cx="${x.toFixed(0)}" cy="${(yy-ry*.6).toFixed(0)}" rx="${(rx*.7).toFixed(0)}" ry="${(ry*.35).toFixed(0)}" fill="${lt}" opacity="${(o*.9*(1-d/150)).toFixed(2)}"/>`}return g}).join('')+`</g>`;
+      s+=`<ellipse cx="${lx}" cy="${ly}" rx="120" ry="70" fill="${nt?'#C9D2F0':'#FFF8E6'}" opacity="${nt?.16:.32}" filter="url(#soft)"/><ellipse cx="${lx}" cy="${ly}" rx="56" ry="40" fill="${nt?'#E4E9FA':'#FFFFFF'}" opacity="${nt?.14:.3}" filter="url(#soft4)"/>`}
+    else spots.slice(0,n).forEach(([x,y,sc],i)=>s+=cloud(x,y,sc*(n>6?1.25:1),1-i*.04))}
   else{if(phase==='day')s+=cloud(300,70,1,1)+cloud(90,150,.75,.85)+cloud(220,190,.6,.6);
   else if(phase==='golden')s+=cloud(290,80,1,.9)+cloud(80,170,.8,.7);
   else if(phase==='dusk'||phase==='dawn')s+=cloud(300,170,1.1,.85)+cloud(60,200,.8,.7);
