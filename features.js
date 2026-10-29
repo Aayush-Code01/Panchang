@@ -455,6 +455,12 @@ function init(){const app=document.querySelector('.app');
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.bpbtn'))openBP()});
   // mantra rules: tap a sign to read it
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.rule');if(!b)return;const box=b.closest('.mrules'),on=!b.classList.contains('sel');box.querySelectorAll('.rule').forEach(x=>x.classList.toggle('sel',x===b&&on));box.querySelector('.rtxt').textContent=on?b.dataset.t:'Tap a sign to read more. Simple name chants can also be said silently in the mind, any time.';box.classList.toggle('open',on)});
+  // after eyes-closed mode, sync the small counters with what was counted
+  {const fc=$('focusClose');if(fc)fc.addEventListener('click',()=>setTimeout(()=>{const ds=$('date').value||todayIST(),c=ls.get('japa:'+ds,{});
+    document.querySelectorAll('#prac .pi').forEach(p=>{const t=p.querySelector('.tap2');if(!t)return;const n=+p.dataset.n,id=p.dataset.id,v=c[id==='free'?'free':id]||0,cur=id==='free'?(v&&v%n===0?n:v%n):Math.min(v,n);
+      t.querySelector('.cnt').innerHTML=cur+'<small> / '+n+'</small>';t.querySelector('.fill').style.width=Math.min(100,cur/n*100)+'%';t.classList.toggle('full',id==='free'?!!v&&v%n===0:v>=n);
+      const fs=p.querySelector('.fjs');if(fs){const r=Math.floor(v/n);fs.innerHTML=v?`<b>${v}</b> today${r?` · ${r} ${r>1?'rounds':'round'} of ${n}`:''}`:`Any mantra · bell every ${n}`}});
+    if(typeof SY!=='undefined'&&SY.pending){SY.pending=false;const y=scrollY;go();scrollTo(0,y)}},0))}
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks

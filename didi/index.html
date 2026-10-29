@@ -830,7 +830,7 @@ async function syncNow(){if(!ls.get('ghTok','')||SY.busy||!navigator.onLine)retu
     _lsSet('syncMeta',meta);
     if(outC)await gh('/gists/'+id,{method:'PATCH',body:JSON.stringify({files:{[SYNC_FILE]:{content:JSON.stringify(remote)}}})});
     SY.err='';SY.t=Date.now();_lsSet('syncAt',SY.t);
-    if(inC){const a=document.activeElement;if(a&&a.tagName==='TEXTAREA')SY.pending=true;else{const y=scrollY;go();scrollTo(0,y)}}
+    if(inC){const a=document.activeElement;if((a&&a.tagName==='TEXTAREA')||!$('focus').hidden)SY.pending=true;else{const y=scrollY;go();scrollTo(0,y)}}
   }catch(e){SY.err=e.code===401?'GitHub didn’t accept the token. Set it up again.':'Couldn’t sync just now. Will retry.'}
   finally{SY.busy=false;syncUI()}}
 function ago(t){if(!t)return'never';const s=(Date.now()-t)/1e3;return s<60?'just now':s<3600?Math.round(s/60)+' min ago':s<86400?Math.round(s/3600)+' h ago':new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}
@@ -1118,7 +1118,7 @@ $('loc').onchange=()=>{if($('loc').value==='gps')locate(false);else go()};
 $('totop').innerHTML=I.up;$('totop').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 window.addEventListener('scroll',()=>$('totop').classList.toggle('show',scrollY>500),{passive:true});
 let shownToday=todayIST();
-function tick(force){const t=todayIST();if($('date').value===shownToday&&t!==shownToday){$('date').value=t;shownToday=t;go();return}
+function tick(force){if(!$('focus').hidden)return;const t=todayIST();if($('date').value===shownToday&&t!==shownToday){$('date').value=t;shownToday=t;go();return}
   shownToday=t;if($('date').value!==t)return;const ae=document.activeElement;if(ae&&(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT'&&ae.type!=='checkbox'))return;if(!force&&(document.querySelector('.pi.open')||document.querySelector('.past.open')))return;go()}
 
 document.addEventListener('click',e=>{if(!e.isTrusted)return;const t=e.target;if(!t||!t.closest)return;const lb=t.closest('label');if(lb&&lb.querySelector('input[switch]'))return;
