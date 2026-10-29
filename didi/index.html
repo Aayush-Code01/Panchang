@@ -1278,7 +1278,7 @@ function skySVG(r,isToday){
    <radialGradient id="halo"><stop offset="0" stop-color="#DDE3FF" stop-opacity=".28"/><stop offset=".35" stop-color="#C9D2F5" stop-opacity=".1"/><stop offset="1" stop-color="#C9D2F5" stop-opacity="0"/></radialGradient>
    <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset=".1" stop-color="#FFFBF0" stop-opacity=".9"/><stop offset=".3" stop-color="#FFF1D6" stop-opacity=".42"/><stop offset=".6" stop-color="#E9F2FF" stop-opacity=".12"/><stop offset="1" stop-color="#E9F2FF" stop-opacity="0"/></radialGradient>
    <radialGradient id="hzGlow" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#FFD9A3" stop-opacity=".75"/><stop offset=".5" stop-color="#F7B98C" stop-opacity=".25"/><stop offset="1" stop-color="#F7B98C" stop-opacity="0"/></radialGradient>
-  </defs><rect width="${W}" height="${H}" fill="url(#skg)"/>`;
+  </defs><rect y="-${H}" width="${W}" height="${H+2}" fill="${SK[0]}"/><rect width="${W}" height="${H}" fill="url(#skg)"/>`;
   if(WXC&&(WK==='overcast'||wet||WK==='fog'||WK==='cloudy'||WK==='haze')){const g=WK==='haze'?(phase==='night'?'#5A5E70':'#E4EAEE'):phase==='night'?'#2E3342':phase==='dusk'||phase==='dawn'?'#6E6A78':(wet?'#6F7A88':'#8D97A3'),op=WK==='storm'?.8:WK==='rain'?.68:WK==='haze'?(phase==='night'?.18:.22):WK==='overcast'||WK==='snow'?.5:WK==='drizzle'?.55:WK==='fog'?.42:.18;s+=`<rect width="${W}" height="${H}" fill="${g}" opacity="${op}"/>`}
   // horizon warmth near sunrise / sunset
   if(phase==='dawn'||phase==='dusk'||phase==='golden'){const hx=phase==='dawn'?90:310;s+=`<ellipse cx="${hx}" cy="${H+10}" rx="260" ry="150" fill="url(#hzGlow)" opacity="${phase==='golden'?.6:1}"/>`}
