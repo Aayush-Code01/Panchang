@@ -801,7 +801,7 @@ function openToggle(p,cb){const h=p.querySelector('.ph')||p,y0=h.getBoundingClie
   const sc=scroller(p),d=h.getBoundingClientRect().top-y0;if(Math.abs(d)>1){if(sc)sc.scrollTop+=d;else window.scrollBy(0,d)}
   if(p.classList.contains('open'))requestAnimationFrame(()=>{const r=p.getBoundingClientRect(),box=sc?sc.getBoundingClientRect():{top:0,bottom:innerHeight-(document.body.classList.contains('has-sk')?150:110)};
     const over=r.bottom-box.bottom;if(over>0){const by=Math.min(over+12,r.top-box.top-12);if(by>0){if(sc)sc.scrollBy({top:by,behavior:'smooth'});else window.scrollBy({top:by,behavior:'smooth'})}}})}
-var _hLast=0;function haptic(n=1){const _n=Date.now();if(n===1&&_n-_hLast<60)return;_hLast=_n;try{if(navigator.vibrate&&navigator.vibrate(n>1?[12,60,12]:10))return;for(let i=0;i<n;i++)setTimeout(()=>$('hapt').click(),i*110)}catch(e){}}
+var _hLast=0;function haptic(n=1){const _n=Date.now();if(n===1&&_n-_hLast<60)return;_hLast=_n;try{if(navigator.vibrate&&navigator.vibrate(n>1?[12,60,12]:10))return;const ae=document.activeElement,keep=ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='checkbox';const tap=()=>{const a2=document.activeElement,k2=a2&&/^(INPUT|TEXTAREA|SELECT)$/.test(a2.tagName)&&a2.type!=='checkbox';$('hapt').click();if(k2)a2.focus({preventScroll:true})};tap();for(let i=1;i<n;i++)setTimeout(tap,i*110)}catch(e){}}
 const ist=d=>new Date(+d+TZ*3600e3);
 const fmt=d=>{const x=ist(d);let h=x.getUTCHours(),m=x.getUTCMinutes();const a=h>=12?'pm':'am';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+a};
 const hm=d=>{const x=ist(d);return (x.getUTCHours()%12||12)+':'+String(x.getUTCMinutes()).padStart(2,'0')};
@@ -1153,7 +1153,7 @@ function freeJap(ds,ck,save){const old=document.querySelector('.pi.fj');if(old)o
   el.querySelector('.bellt').onclick=()=>{ls.set('bell',!ls.get('bell',true));document.querySelectorAll('.bellt').forEach(b=>b.innerHTML=bellLbl())};
   el.querySelector('.reset').onclick=()=>{const c=ls.get(ck,{});c.free=0;ls.set(ck,c);upd(0)};
   const inp=el.querySelector('.fjt input'),setN=x=>{x=Math.round(+x);if(!(x>=1))return;ls.set('japTarget',x);window._fjOpen=true;freeJap(ds,ck,save)};
-  el.querySelectorAll('.fjt button').forEach(b=>b.onclick=()=>{if(b.dataset.n==='c'){inp.hidden=false;inp.value=cust?n:'';inp.focus();return}setN(b.dataset.n)});
+  el.querySelectorAll('.fjt button').forEach(b=>b.onclick=()=>{if(b.dataset.n==='c'){inp.hidden=false;inp.value=cust?n:'';inp.focus();setTimeout(()=>{if(document.activeElement!==inp)inp.focus()},60);return}setN(b.dataset.n)});
   inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();inp.blur()}};inp.onblur=()=>{if(inp.value)setN(inp.value);else inp.hidden=true}}
 function chantTap(p,ck,save){const n=+p.dataset.n,c=ls.get(ck,{});let v=c[p.dataset.id]||0;if(v>=n)return v;v++;c[p.dataset.id]=v;ls.set(ck,c);
   if(navigator.vibrate)navigator.vibrate(v===n?[40,90,40,90,40]:10);

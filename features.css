@@ -311,3 +311,6 @@ html[data-theme="dark"] .tl-intro .tl-track::after{background:linear-gradient(10
 .brov.shunya .btnp{background:#141414;color:#8C8274}
 .brov.shunya .brmins{background:#0E0E0E}.brov.shunya .brmins button{color:#6B655C}.brov.shunya .brmins button[aria-pressed="true"]{background:#1E1E1E;color:#8C8274;box-shadow:none}
 .brov.shunya .brring{border-color:#1E1E1E}
+
+.cat b{font-size:16.5px;letter-spacing:-.02em}
+@media (max-width:380px){.cat b{font-size:15.5px}}
