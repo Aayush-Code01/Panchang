@@ -414,3 +414,12 @@ html[data-theme="dark"] .rule{background:rgba(255,255,255,.05)}
 .sky .wx-p,.sky .wx-flash,.sky .wx-fog,.sky .wx-haze{z-index:2}
 .sky .sky-l{z-index:3}
 @media (prefers-reduced-motion:reduce){.sky .cl-move{animation:none}}
+/* Apple-like sun: breathing glare, shimmering halo, drifting flare */
+.sky .sglare{animation:sglare 9s ease-in-out infinite}
+@keyframes sglare{0%,100%{transform:rotate(0deg) scale(1);opacity:.95}50%{transform:rotate(7deg) scale(1.07);opacity:1}}
+.sky .shalo{animation:shalo 7s ease-in-out infinite}
+@keyframes shalo{0%,100%{opacity:.85;transform:scale(1)}50%{opacity:1;transform:scale(1.025)}}
+.sky .sflare{animation:sflare 11s ease-in-out infinite}
+@keyframes sflare{0%,100%{transform:translate(0,0);opacity:.9}50%{transform:translate(var(--fx),var(--fy));opacity:1}}
+.sky .sunrays{display:none}
+@media (prefers-reduced-motion:reduce){.sky .sglare,.sky .shalo,.sky .sflare{animation:none}}

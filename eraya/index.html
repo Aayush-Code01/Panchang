@@ -1302,11 +1302,18 @@ function skySVG(r,isToday){
       <radialGradient id="sCore" gradientUnits="userSpaceOnUse" cx="${x}" cy="${y}" r="22"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#FFFFFF"/><stop offset=".75" stop-color="#FFFDF4" stop-opacity=".85"/><stop offset="1" stop-color="${warm}" stop-opacity="0"/></radialGradient></defs>`;
     s+=`<circle cx="${x}" cy="${y}" r="${bright?210:150}" fill="url(#sBloom)"/>`;
     if(bright&&clear){
-      s+=`<circle cx="${x}" cy="${y}" r="96" fill="url(#sHalo)"/>`;
-      let st='';for(let i=0;i<12;i++){const a=i/12*Math.PI*2+.26,l=i%3===0?150:i%2?70:105;st+=`<line x1="${x}" y1="${y}" x2="${(x+Math.cos(a)*l).toFixed(1)}" y2="${(y+Math.sin(a)*l).toFixed(1)}" stroke="#FFFFFF" stroke-width="${i%3===0?1.6:1}" stroke-linecap="round" opacity="${i%3===0?.22:.12}"/>`}
-      s+=`<g class="sunrays" style="transform-origin:${x}px ${y}px" filter="url(#soft15)">${st}</g>`;
-      const vx=200-x,vy=170-y;[[.45,5,.10,'#FFF6E0'],[.75,14,.06,'#E3F0FF'],[1.05,4,.12,'#FFFFFF'],[1.3,22,.045,'#F2E6FF'],[1.6,9,.07,'#E6FFF4']].forEach(([k,rr,o,c])=>{s+=`<circle cx="${(x+vx*k).toFixed(1)}" cy="${(y+vy*k).toFixed(1)}" r="${rr}" fill="${c}" opacity="${o}" filter="url(#soft1)"/>`});
-      s+=`<circle cx="${x}" cy="${y}" r="22" fill="url(#sCore)"/>`}
+      const HR=118;
+      s+=`<defs><radialGradient id="sRain" gradientUnits="userSpaceOnUse" cx="${x}" cy="${y}" r="${HR}"><stop offset=".72" stop-color="#fff" stop-opacity="0"/><stop offset=".8" stop-color="#FF9A6A" stop-opacity=".10"/><stop offset=".85" stop-color="#FFE29A" stop-opacity=".13"/><stop offset=".89" stop-color="#C8F0B4" stop-opacity=".11"/><stop offset=".93" stop-color="#9CC8FF" stop-opacity=".12"/><stop offset=".97" stop-color="#B9A2F0" stop-opacity=".08"/><stop offset="1" stop-color="#B9A2F0" stop-opacity="0"/></radialGradient>
+        <radialGradient id="sHaze" gradientUnits="userSpaceOnUse" cx="${x}" cy="${y}" r="${HR}"><stop offset="0" stop-color="#F4F7FB" stop-opacity=".55"/><stop offset=".55" stop-color="#E6EEF7" stop-opacity=".22"/><stop offset=".8" stop-color="#E6EEF7" stop-opacity=".06"/><stop offset="1" stop-color="#E6EEF7" stop-opacity="0"/></radialGradient>
+        <radialGradient id="sGhost"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset=".6" stop-color="#fff" stop-opacity=".35"/><stop offset=".85" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <filter id="sBlur8" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8"/></filter></defs>`;
+      s+=`<circle cx="${x}" cy="${y}" r="${HR}" fill="url(#sHaze)"/><g class="shalo" style="transform-origin:${x}px ${y}px"><circle cx="${x}" cy="${y}" r="${HR}" fill="url(#sRain)"/></g>`;
+      let sp='';for(let i=0;i<8;i++){const a=i/8*Math.PI*2+.2,l=i%2?44:60,w=i%2?.16:.12;sp+=`<path d="M${x} ${y} L${(x+Math.cos(a-w)*l).toFixed(1)} ${(y+Math.sin(a-w)*l).toFixed(1)} L${(x+Math.cos(a)*l*1.12).toFixed(1)} ${(y+Math.sin(a)*l*1.12).toFixed(1)} L${(x+Math.cos(a+w)*l).toFixed(1)} ${(y+Math.sin(a+w)*l).toFixed(1)}Z" fill="#FFFFFF" opacity="${i%2?.45:.6}"/>`}
+      s+=`<g class="sglare" style="transform-origin:${x}px ${y}px" filter="url(#sBlur8)">${sp}<circle cx="${x}" cy="${y}" r="34" fill="#FFFFFF" opacity=".75"/></g>`;
+      const vx=200-x,vy=230-y,ln=Math.hypot(vx,vy)||1,ux=vx/ln,uy=vy/ln;
+      let fl='';[[48,9,.16,'#D9D0FF'],[96,14,.08,'#FFFFFF'],[150,7,.12,'#CFE6FF'],[205,20,.06,'#FFFFFF'],[260,11,.09,'#E6DCFF'],[320,16,.05,'#FFFFFF']].forEach(([d,rr,o,c])=>{fl+=`<circle cx="${(x+ux*d).toFixed(1)}" cy="${(y+uy*d).toFixed(1)}" r="${rr}" fill="${c}" opacity="${o}"/><circle cx="${(x+ux*d).toFixed(1)}" cy="${(y+uy*d).toFixed(1)}" r="${rr}" fill="url(#sGhost)" opacity="${o*1.4}"/>`});
+      s+=`<g class="sflare" style="--fx:${(ux*6).toFixed(1)}px;--fy:${(uy*6).toFixed(1)}px">${fl}</g>`;
+      s+=`<circle cx="${x}" cy="${y}" r="24" fill="url(#sCore)"/><circle cx="${x}" cy="${y}" r="13" fill="#FFFFFF"/>`}
     else if(phase!=='dusk')s+=`<circle cx="${x}" cy="${y}" r="${phase==='day'?13:13}" fill="#FFFDF4" filter="url(#soft1)" opacity="${phase==='dawn'?.85:1}"/>`}
   // moon: textured, real phase, sits in the middle band (not at the top edge)
   if(phase==='night'||phase==='dusk'||phase==='dawn'){
