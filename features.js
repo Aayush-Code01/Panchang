@@ -349,6 +349,21 @@ function finishBreath(b,early){if(!BS)return;clearTimeout(BS.t);clearInterval(BS
   $('brBot').innerHTML='<button type="button" class="btnp" data-x>Done</button>';$('brBot').querySelector('[data-x]').onclick=closeBreath;if(m)haptic(2);drawBreath();renderGlance()}
 function closeBreath(){if(BS){clearTimeout(BS.t);clearInterval(BS.ct);clearInterval(BS.lt);BS=null}try{BWL&&BWL.release()}catch(e){}const o=$('brOv');o.classList.remove('on','run');setTimeout(()=>{o.hidden=true},300);document.documentElement.style.overflow=''}
 
+/* ---------- Mantra best practices ---------- */
+function openBP(){let o=$('bpOv');if(!o){o=document.createElement('div');o.id='bpOv';o.className='bpov';o.hidden=true;document.body.appendChild(o)}
+  const it=(ic,t,d)=>`<div class="bpi"><span class="bpic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ic}</svg></span><div><b>${t}</b><p>${d}</p></div></div>`;
+  o.innerHTML=`<div class="bpbg" data-x></div><div class="bpsh" role="dialog" aria-label="Best practices"><div class="grab"></div><div class="bph"><h3>Best practices</h3><button type="button" data-x>Done</button></div>
+   <p class="bplead">These are ideals, not conditions. Do what fits your day. A sincere, attentive chant matters most.</p>
+   ${it('<path d="M12 3.5c3 4 5 6.6 5 9.2a5 5 0 0 1-10 0c0-2.6 2-5.2 5-9.2z"/>','Freshen up','A bath is ideal, especially in the morning. At other times, washing your hands, feet and face, and sipping a little water (achamana), is the traditional quick way to begin.')}
+   <div class="bpmantra"><div class="bpk">When you can’t wash</div><div class="hi">ॐ अपवित्रः पवित्रो वा सर्वावस्थां गतोऽपि वा।<br>यः स्मरेत् पुण्डरीकाक्षं स बाह्याभ्यन्तरः शुचिः॥</div><p>“Pure or impure, in whatever state, whoever remembers the lotus-eyed Lord becomes pure inside and out.” Say this once (Padma Purana), or simply picture clean light washing over you.</p></div>
+   ${it('<path d="M3.5 19h17M6 19l1.2-3h9.6l1.2 3"/><circle cx="12" cy="6.5" r="2.2"/><path d="M8.8 15.5c0-2.6 1.4-4.6 3.2-4.6s3.2 2 3.2 4.6"/>','A clean seat','Sit on a mat, folded cloth or cushion kept for the purpose, rather than the bare floor or the bed.')}
+   ${it('<circle cx="12" cy="12" r="8.5"/><path d="M14.9 9.1 13 13l-3.9 1.9L11 11z"/>','Face east or north','If you can. Sit upright and steady, with a calm breath.')}
+   ${it('<path d="M3 12c2-3.2 4-3.2 6 0s4 3.2 6 0 4-3.2 6 0"/>','Slow and clear','Say each word clearly, without hurrying. If you’re unsure of a word, listen first or learn from a teacher.')}
+   ${it('<path d="M12 4c-4 0-7 3-7 7 0 3 2 5.5 5 6.6V20h4v-2.4c3-1.1 5-3.6 5-6.6 0-4-3-7-7-7z"/><path d="M9.5 11h5"/>','In your mind, any time','Name chants like Om Namah Shivaya can be repeated silently anywhere: on a walk, in traffic, before sleep. No rules apply to the mind.')}
+   <p class="bpnote">Customs vary between families and traditions. Follow your own elders where they differ.</p></div>`;
+  o.hidden=false;document.documentElement.style.overflow='hidden';requestAnimationFrame(()=>o.classList.add('on'));
+  o.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{o.classList.remove('on');setTimeout(()=>{o.hidden=true},280);document.documentElement.style.overflow=''})}
+
 /* ---------- Today: at a glance ---------- */
 function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
   const ds=$('date').value||t,done=ls.get('ritual:'+ds,[]).length,tot=document.querySelectorAll('#prac .pi').length||4,kd=ls.get('habit:'+ds,[]).length;
@@ -408,6 +423,8 @@ function init(){const app=document.querySelector('.app');
   nav.innerHTML='<span class="tind"></span>'+TABS.map(([k,l,i])=>`<button type="button" role="tab" data-t="${k}" aria-selected="${k==='today'}">${i}<span>${l}</span></button>`).join('');
   document.body.appendChild(nav);const fitL=()=>nav.querySelectorAll('span').forEach(sp=>{const b=sp.parentElement;if(b.dataset.t==='work'){sp.textContent='Professional';if(sp.scrollWidth>sp.clientWidth+1)sp.textContent='Work'}});requestAnimationFrame(fitL);addEventListener('resize',fitL);if(document.fonts)document.fonts.ready.then(fitL);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));dragTabs(nav);requestAnimationFrame(placeInd);if(document.fonts)document.fonts.ready.then(placeInd);
   document.body.dataset.tab='today';
+  // best practices sheet for mantras
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.bpbtn'))openBP()});
   // mantra rules: tap a sign to read it
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.rule');if(!b)return;const box=b.closest('.mrules'),on=!b.classList.contains('sel');box.querySelectorAll('.rule').forEach(x=>x.classList.toggle('sel',x===b&&on));box.querySelector('.rtxt').textContent=on?b.dataset.t:'Tap a sign to read more. Simple name chants can also be said silently in the mind, any time.';box.classList.toggle('open',on)});
   // sankalp chip opens Practice
