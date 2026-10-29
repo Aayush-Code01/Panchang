@@ -31,6 +31,7 @@ const gearHTML=()=>{const g=$('gearBtn');return g?g.innerHTML:''};
 function loc(){const v=($('loc')||{}).value||'28.4595,77.0266';const [a,b]=v.split(',').map(Number);return isFinite(a)?[a,b]:[28.4595,77.0266]}
 const addDays=(ds,n)=>new Date(+new Date(ds+'T00:00:00Z')+n*864e5).toISOString().slice(0,10);
 const dObj=ds=>new Date(ds+'T00:00:00Z');
+const SEL=()=>{const d=$('date')&&$('date').value;return d||todayIST()};
 function dayLabel(ds){const d=Math.round((dObj(ds)-dObj(todayIST()))/864e5);if(d===0)return'Today';if(d===1)return'Tomorrow';return dObj(ds).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'})}
 const hIST=t=>ist(t).getUTCHours()+ist(t).getUTCMinutes()/60;
 function personDay(r,b){const t=((r.nak.idx-b.nak+27)%27)%9,house=((r.moonRashi.idx-b.rashi+12)%12)+1;
@@ -134,10 +135,10 @@ function scoreDay(r,a,b){const p=personDay(r,b);if(p.chandra.ashtama)return{s:-9
 function windows(r,a,after){const ok=new Set(['best','good'].concat(a.travel?['ok']:[]));
   return segments(r).filter(g=>ok.has(g.cls)).map(g=>({a:Math.max(g.a,after||0),b:g.b,cls:g.cls,tag:g.tag})).filter(g=>g.b-g.a>=20*60e3&&hIST(g.a)>=6&&hIST(g.a)<21.5)
     .sort((x,y)=>(y.cls==='best')-(x.cls==='best')||(y.b-y.a)-(x.b-x.a))}
-function findTimes(a,b,days=30){const [lat,lon]=loc(),t0=todayIST(),now=Date.now(),out=[];
-  for(let i=0;i<days;i++){const ds=addDays(t0,i),r=calc(ds,lat,lon),sc=scoreDay(r,a,b||BIRTH);if(sc.s<3)continue;const w=windows(r,a,i===0?now:0);if(!w.length)continue;out.push({ds,r,s:sc.s,why:sc.why,w})}
+function findTimes(a,b,days=30){const [lat,lon]=loc(),t0=SEL()>todayIST()?SEL():todayIST(),now=Date.now(),out=[];
+  for(let i=0;i<days;i++){const ds=addDays(t0,i),r=calc(ds,lat,lon),sc=scoreDay(r,a,b||BIRTH);if(sc.s<3)continue;const w=windows(r,a,ds===todayIST()?now:0);if(!w.length)continue;out.push({ds,r,s:sc.s,why:sc.why,w})}
   return out}
-function quick(a){const L=findTimes(a,BIRTH,30),t=todayIST(),td=L.find(x=>x.ds===t);return td?{tq:'good',lab:'Today'}:L.length?{tq:'mixed',lab:shortD(L[0].ds).replace(/ \w+$/,'').replace('Tomorrow','Tmrw')}:{tq:'slow',lab:'Later'}}
+function quick(a){const L=findTimes(a,BIRTH,30),t=SEL()>todayIST()?SEL():todayIST(),td=L.find(x=>x.ds===t);return td?{tq:'good',lab:'Today'}:L.length?{tq:'mixed',lab:shortD(L[0].ds).replace(/ \w+$/,'').replace('Tomorrow','Tmrw')}:{tq:'slow',lab:'Later'}}
 
 /* ---------- views ---------- */
 const view={plan:['home'],personal:['home'],work:['home']};
@@ -155,8 +156,10 @@ const badge=(k,sz=46)=>{const [a,b]=MOOD[k]||MOOD.career;return`<span class="bad
 function paneSky(){try{const [lat,lon]=loc(),r=calc(todayIST(),lat,lon),ph=window.SKY_PHASE;let h=skySVG(r,true);window.SKY_PHASE=ph;const sfx='_'+Math.random().toString(36).slice(2,6);
   return h.replace(/id="([\w-]+)"/g,`id="$1${sfx}"`).replace(/url\(#([\w-]+)\)/g,`url(#$1${sfx})`).replace(/href="#([\w-]+)"/g,`href="#$1${sfx}"`)}catch(e){return''}}
 const TABMOOD={plan:'spirit',personal:'love',work:'career',practice:'health'};
+function dateLine(){const d=SEL(),t=todayIST(),x=dObj(d),lab=x.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}),rel=d===t?'Today':d===addDays(t,1)?'Tomorrow':d===addDays(t,-1)?'Yesterday':'';
+  return`<div class="pdate${d!==t?' other':''}"><span>${IC.plan.replace(/width="\d+" height="\d+"/,'width="15" height="15"')}${rel?rel+' · ':''}${lab}</span>${d!==t?'<button type="button" data-totoday>Back to today</button>':''}</div>`}
 function paneHead(tab,eyebrow,title,canBack,mood){const m=MOOD[mood||TABMOOD[tab]]||MOOD.spirit;return`<header class="card hero phero${canBack?' sub':''}" style="--c1:${m[0]};--c2:${m[1]}"><div class="pmesh"></div><button type="button" class="pill gear pgear" data-gear aria-label="Settings">${gearHTML()}</button>
-  <div class="pbody">${canBack?`<button type="button" class="back" data-back="${tab}">${IC.back}Back</button>`:''}<div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div></header>`}
+  <div class="pbody">${canBack?`<button type="button" class="back" data-back="${tab}">${IC.back}Back</button>`:''}<div class="eyebrow">${eyebrow}</div><h1>${title}</h1>${dateLine()}</div></header>`}
 function wire(el,tab){el.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{view[tab].pop();draw(tab);scrollTo(0,0)});
   el.querySelectorAll('[data-gear]').forEach(b=>b.onclick=()=>openSheet())}
 function go2(tab,v){view[tab].push(v);draw(tab);scrollTo(0,0)}
@@ -240,7 +243,7 @@ function workScore(r){const p=personDay(r,BIRTH),tq=TARA[p.tara.name][0];let s=(
   return s>=2?['good','Strong day for work']:s>=0?['mixed','Steady day for work']:['slow','Keep work routine']}
 function drawWork(){const el=$('pane-work'),v=view.work[view.work.length-1];
   if(v!=='home'){if(v.startsWith('act:')){const [k,id]=v.slice(4).split(':');el.innerHTML=resultView('work',k,id);setTimeout(drawCal)}else{const k=v.slice(4);el.innerHTML=paneHead('work','Professional',ACT[k].t,true,k)+actList(k)}wire(el,'work');wireCats(el,'work');return}
-  const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[vc,vt]=workScore(r),now=Date.now();
+  const [lat,lon]=loc(),t=SEL(),r=calc(t,lat,lon),[vc,vt]=workScore(r),now=Date.now();
   const W=windows(r,{},now).filter(g=>g.cls!=='ok');const focus=W.slice().sort((a,b)=>a.a-b.a)[0];
   const rahuLeft=+r.rahu[1]>now;
   const line=vc==='good'?'Good energy for bold moves: pitch, negotiate, decide.':vc==='mixed'?'A steady day. Good for progress on what\'s already moving.':'A day for routine work and preparation. Save big moves for a stronger day.';
@@ -252,7 +255,7 @@ function drawWork(){const el=$('pane-work'),v=view.work[view.work.length-1];
   wire(el,'work');wireCats(el,'work')}
 
 /* ---------- Personal ---------- */
-function personSummary(p){const [lat,lon]=loc(),r=calc(todayIST(),lat,lon),[vc,vt]=vFor(r,p);return{vc,vt,line:TARA[personDay(r,p).tara.name][1].replace(/for you/,'for '+p.name).replace(/your/g,'their')}}
+function personSummary(p){const [lat,lon]=loc(),r=calc(SEL(),lat,lon),[vc,vt]=vFor(r,p);return{vc,vt,line:TARA[personDay(r,p).tara.name][1].replace(/for you/,'for '+p.name).replace(/your/g,'their')}}
 function drawPersonal(){const el=$('pane-personal'),v=view.personal[view.personal.length-1];let h='';
   if(v==='home'){const P=people();h=paneHead('personal','Love & family','Personal');
     h+=`<p class="pane-lead">${P.length?'How today looks for the people you love.':'Add your partner, children or family to see how each day looks for them, and the best days for you together.'}</p>`;
@@ -260,7 +263,7 @@ function drawPersonal(){const el=$('pane-personal'),v=view.personal[view.persona
     el.innerHTML=h;wire(el,'personal');el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>go2('personal','p:'+b.dataset.p));el.querySelector('[data-add]').onclick=()=>go2('personal','edit:new');return}
   if(v.startsWith('edit:'))return drawForm(v.slice(5));
   const p=people().find(x=>x.id===v.slice(2));if(!p){view.personal=['home'];return drawPersonal()}
-  const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[vc,vt]=vFor(r,p),me=verdict(personDay(r,BIRTH));
+  const [lat,lon]=loc(),t=SEL(),r=calc(t,lat,lon),[vc,vt]=vFor(r,p),me=verdict(personDay(r,BIRTH));
   h=paneHead('personal',p.rel,esc(p.name),true);
   h+=`<div class="two"><div><div class="card gcard"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Today for ${esc(p.name)}</h3>${vPill(vc,vt)}</div><p>${personSummary(p).line}.</p>
    <div class="chips3"><div><span>Moon sign</span><b>${RS[p.rashi]}</b></div><div><span>Birth star</span><b>${NAKN[p.nak]}</b></div>${p.lagna!=null?`<div><span>Rising</span><b>${RS[p.lagna]}</b></div>`:''}</div>${p.unsure?'<p class="note2" style="margin:10px 0 0">The Moon changed stars on this birth date. Adding a birth time makes this exact.</p>':''}</div>`;
@@ -393,7 +396,7 @@ function drawCmp(){if(!CMPS||CMPS.h==null)return;const h=CMPS.h,dial=$('cmpDial'
 function closeCompass(){if(CMPS&&CMPS.fn){window.removeEventListener('deviceorientationabsolute',CMPS.fn);window.removeEventListener('deviceorientation',CMPS.fn)}CMPS=null;const o=$('cmpOv');o.classList.remove('on');setTimeout(()=>{o.hidden=true},280)}
 
 /* ---------- Today: at a glance ---------- */
-function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
+function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=SEL(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
   const ds=$('date').value||t,done=ls.get('ritual:'+ds,[]).length,tot=document.querySelectorAll('#prac .pi').length||4,kd=ls.get('habit:'+ds,[]).length;
   const dot=c=>`<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c==='good'?'var(--good)':c==='mixed'?'var(--best)':'var(--avoid)'}"></i>`;
   let ph;if(p){const [vc,vt]=vFor(r,p);ph=`<button type="button" class="gl card" data-go="personal"><span class="k">${IC.heart}${esc(p.name)}</span><b>${dot(vc)} ${vt}</b><small>${personSummary(p).line}</small></button>`}
@@ -461,10 +464,11 @@ function init(){const app=document.querySelector('.app');
       t.querySelector('.cnt').innerHTML=cur+'<small> / '+n+'</small>';t.querySelector('.fill').style.width=Math.min(100,cur/n*100)+'%';t.classList.toggle('full',id==='free'?!!v&&v%n===0:v>=n);
       const fs=p.querySelector('.fjs');if(fs){const r=Math.floor(v/n);fs.innerHTML=v?`<b>${v}</b> today${r?` · ${r} ${r>1?'rounds':'round'} of ${n}`:''}`:`Any mantra · bell every ${n}`}});
     if(typeof SY!=='undefined'&&SY.pending){SY.pending=false;const y=scrollY;go();scrollTo(0,y)}},0))}
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('[data-totoday]')){$('date').value=todayIST();go()}});
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();document.querySelectorAll('.pane .pdate').forEach(x=>{x.outerHTML=dateLine()});renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
   try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

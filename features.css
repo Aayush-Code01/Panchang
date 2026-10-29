@@ -423,3 +423,8 @@ html[data-theme="dark"] .rule{background:rgba(255,255,255,.05)}
 @keyframes sflare{0%,100%{transform:translate(0,0);opacity:.9}50%{transform:translate(var(--fx),var(--fy));opacity:1}}
 .sky .sunrays{display:none}
 @media (prefers-reduced-motion:reduce){.sky .sglare,.sky .shalo,.sky .sflare{animation:none}}
+
+.pdate{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:14px;color:var(--muted);font-weight:600}
+.pdate span{display:inline-flex;align-items:center;gap:6px}
+.pdate.other span{color:var(--best-ink);background:var(--best-bg);padding:4px 10px;border-radius:999px}
+.pdate button{font-size:13.5px;font-weight:600;color:var(--brass);padding:4px 2px}
