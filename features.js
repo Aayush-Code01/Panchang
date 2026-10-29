@@ -408,6 +408,8 @@ function init(){const app=document.querySelector('.app');
   nav.innerHTML='<span class="tind"></span>'+TABS.map(([k,l,i])=>`<button type="button" role="tab" data-t="${k}" aria-selected="${k==='today'}">${i}<span>${l}</span></button>`).join('');
   document.body.appendChild(nav);const fitL=()=>nav.querySelectorAll('span').forEach(sp=>{const b=sp.parentElement;if(b.dataset.t==='work'){sp.textContent='Professional';if(sp.scrollWidth>sp.clientWidth+1)sp.textContent='Work'}});requestAnimationFrame(fitL);addEventListener('resize',fitL);if(document.fonts)document.fonts.ready.then(fitL);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));dragTabs(nav);requestAnimationFrame(placeInd);if(document.fonts)document.fonts.ready.then(placeInd);
   document.body.dataset.tab='today';
+  // mantra rules: tap a sign to read it
+  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.rule');if(!b)return;const box=b.closest('.mrules'),on=!b.classList.contains('sel');box.querySelectorAll('.rule').forEach(x=>x.classList.toggle('sel',x===b&&on));box.querySelector('.rtxt').textContent=on?b.dataset.t:'Tap a sign to read more. Simple name chants can also be said silently in the mind, any time.';box.classList.toggle('open',on)});
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks

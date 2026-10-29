@@ -332,3 +332,17 @@ html[data-theme="dark"] .bgood i{color:var(--c1)}
 .ylink{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border-radius:999px;font-size:14.5px;font-weight:600;color:var(--ink);text-decoration:none;background:var(--g-row);border:1px solid var(--g-edge)}
 .mcare{margin:0;padding:11px 13px;border-radius:14px;font-size:13.5px;line-height:1.45;color:var(--text);background:var(--best-bg);border:1px solid color-mix(in srgb,var(--best) 35%,transparent)}
 .mcare b{color:var(--best-ink)}
+
+/* mantra: learn + rules */
+.mlearn{align-items:center}
+.ylink{align-self:center!important;padding:9px 16px 9px 12px!important;line-height:1}
+.ylink svg{flex:0 0 auto;display:block}
+.mrules{width:100%;padding:12px 12px 10px;border-radius:16px;background:var(--best-bg);border:1px solid color-mix(in srgb,var(--best) 35%,transparent);text-align:center}
+.mrt{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--best-ink);margin-bottom:8px}
+.rrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.rule{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 2px 7px;border-radius:12px;color:var(--best-ink);background:rgba(255,255,255,.45);border:1px solid transparent;transition:background .2s,border-color .2s}
+html[data-theme="dark"] .rule{background:rgba(255,255,255,.05)}
+.rule span{font-size:11.5px;font-weight:600;line-height:1.15;color:var(--text)}
+.rule.sel{background:var(--card-solid);border-color:color-mix(in srgb,var(--best) 55%,transparent)}
+.rtxt{margin:9px 2px 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.mrules.open .rtxt{color:var(--text)}
