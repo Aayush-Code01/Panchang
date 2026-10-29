@@ -322,3 +322,8 @@ html[data-theme="dark"] .tl-intro .tl-track::after{background:linear-gradient(10
 .brov.shunya .brleft{color:#4B463F}
 .brov.shunya.run .brring{background:conic-gradient(#4A3C1C calc(var(--p) * 360deg),#141414 0)}
 .brtxt b{font-size:25px}
+
+.bgood{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.bgood i{font-style:normal;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;color:var(--c2);background:color-mix(in srgb,var(--c1) 22%,transparent)}
+html[data-theme="dark"] .bgood i{color:var(--c1)}
+.brname small{display:block;margin-top:4px;font-family:var(--sans);font-style:normal;font-size:13.5px;color:var(--muted)}

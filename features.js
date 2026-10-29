@@ -308,20 +308,23 @@ function drawKind(){const box=$('kindBox');if(!box)return;const ds=$('date').val
 
 /* ---------- Practice: breathing ---------- */
 const BR=[
- {id:'calm',t:'Calm breath',s:'4 in · 6 out · to relax',c:['#9CC9D9','#4F8FB0'],p:[['in',4],['out',6]],how:'Breathe in gently through the nose, and out a little longer. A longer out-breath tells the body it is safe to relax.'},
- {id:'box',t:'Box breathing',s:'4 · 4 · 4 · 4 · before big moments',c:['#B4B2E6','#6B68B8'],p:[['in',4],['hold',4],['out',4],['hold',4]],how:'Even breaths with short pauses. Steadies the mind before a meeting, call or decision.'},
- {id:'anulom',t:'Anulom Vilom',s:'alternate nostril · balance',c:['#A9D3A0','#4F9467'],p:[['in',4,'through the left nostril'],['out',4,'through the right nostril'],['in',4,'through the right nostril'],['out',4,'through the left nostril']],how:'Use your right thumb to close the right nostril and your ring finger to close the left. Switch sides as the guide says. No holding.'},
- {id:'bhramari',t:'Bhramari',s:'humming bee · eases the mind',c:['#F4C77A','#D98A3C'],p:[['in',4],['out',7,'with a soft hum, like a bee']],how:'Sit tall, close your eyes, and hum softly on the out-breath with your lips closed. Feel the gentle buzz in your head.'}];
+ {id:'calm',t:'Calm breath',g:['Anxiety','Stress','Sleep'],s:'4 in · 6 out',c:['#9CC9D9','#4F8FB0'],p:[['in',4],['out',6]],how:'Breathe in gently through the nose, and out a little longer. A longer out-breath tells the body it is safe to relax.'},
+ {id:'box',t:'Box breathing',g:['Nervousness','Focus'],s:'4 · 4 · 4 · 4 · before big moments',c:['#B4B2E6','#6B68B8'],p:[['in',4],['hold',4],['out',4],['hold',4]],how:'Even breaths with short pauses. Steadies the mind before a meeting, call or decision.'},
+ {id:'anulom',t:'Anulom Vilom',g:['Balance','Clarity','Mornings'],s:'alternate nostril',c:['#A9D3A0','#4F9467'],p:[['in',4,'through the left nostril'],['out',4,'through the right nostril'],['in',4,'through the right nostril'],['out',4,'through the left nostril']],how:'Use your right thumb to close the right nostril and your ring finger to close the left. Switch sides as the guide says. No holding.'},
+ {id:'bhramari',t:'Bhramari',g:['Racing thoughts','Anger','Winding down'],s:'humming bee',c:['#F4C77A','#D98A3C'],p:[['in',4],['out',7,'with a soft hum, like a bee']],how:'Sit tall, close your eyes, and hum softly on the out-breath with your lips closed. Feel the gentle buzz in your head.'}];
 const BL={in:'Breathe in',out:'Breathe out',hold:'Hold'};
 function drawBreath(){const box=$('breathBox');if(!box)return;const ds=todayIST(),m=ls.get('breath:'+ds,0);$('brToday').textContent=m?`${m} min today`:'';
-  box.innerHTML=BR.map(b=>`<button type="button" class="arow brow" data-b="${b.id}" style="--c1:${b.c[0]};--c2:${b.c[1]}"><span class="borb"></span><span><b>${b.t}</b><small>${b.s}</small></span><span class="chv">›</span></button>`).join('');
+  box.innerHTML=BR.map(b=>`<button type="button" class="arow brow" data-b="${b.id}" style="--c1:${b.c[0]};--c2:${b.c[1]}"><span class="borb"></span><span><b>${b.t}</b><small>${b.s}</small><span class="bgood">${b.g.map(x=>`<i>${x}</i>`).join('')}</span></span><span class="chv">›</span></button>`).join('');
   box.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>openBreath(BR.find(b=>b.id===x.dataset.b)))}
 let BS=null,BWL=null;
 function brOverlay(){let o=$('brOv');if(o)return o;o=document.createElement('div');o.id='brOv';o.className='brov';o.hidden=true;document.body.appendChild(o);return o}
 function tone(f){try{audioInit();if(!AC||!ls.get('brSound',true))return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.05);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+1.7)}catch(e){}}
+function endChime(){try{audioInit();if(!AC)return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(_){}const out=AC.createGain();out.gain.value=.6;out.connect(AC.destination);const t0=AC.currentTime+.05;
+  [[523.25,0],[659.25,.22],[783.99,.44],[1046.5,.7]].forEach(([f,dt])=>{[[1,.22,2.6],[2.76,.05,1.2]].forEach(([m,g,d])=>{const o=AC.createOscillator(),v=AC.createGain();o.type='sine';o.frequency.value=f*m;v.gain.setValueAtTime(0,t0+dt);v.gain.linearRampToValueAtTime(g,t0+dt+.01);v.gain.exponentialRampToValueAtTime(.0001,t0+dt+d);o.connect(v);v.connect(out);o.start(t0+dt);o.stop(t0+dt+d+.05)})});
+  if(navigator.vibrate)navigator.vibrate([30,80,30,80,60]);setTimeout(()=>{try{if(navigator.audioSession)navigator.audioSession.type='auto'}catch(_){}},5000)}catch(e){}}
 function openBreath(b){const o=brOverlay();const mins=ls.get('brMins',3);o.style.setProperty('--c1',b.c[0]);o.style.setProperty('--c2',b.c[1]);o.classList.toggle('shunya',!!ls.get('shunya',false));
   o.innerHTML=`<div class="brtop"><button type="button" class="brx" data-x>Close</button><div class="brleft" id="brLeft"></div><button type="button" class="brdark" data-dk>${ls.get('shunya',false)?'Shunya on':'Shunya'}</button></div>
-   <div class="brmain"><div class="brname">${b.t}</div><div class="brstage"><div class="brring"></div><div class="brorb" id="brOrb"></div><div class="brtxt"><b id="brPh">Ready</b><span id="brCt"></span></div></div><div class="brsub" id="brSub">${b.how}</div></div>
+   <div class="brmain"><div class="brname">${b.t}<small>Good for ${b.g.join(', ').toLowerCase()}</small></div><div class="brstage"><div class="brring"></div><div class="brorb" id="brOrb"></div><div class="brtxt"><b id="brPh">Ready</b><span id="brCt"></span></div></div><div class="brsub" id="brSub">${b.how}</div></div>
    <div class="brbot" id="brBot"><div class="seg brmins">${[1,3,5,10].map(x=>`<button type="button" data-m="${x}" aria-pressed="${x===mins}">${x} min</button>`).join('')}</div><button type="button" class="btnp" data-go>Begin</button><label class="chk2 brsnd"><input type="checkbox" ${ls.get('brSound',true)?'checked':''} data-snd> Soft chime when the breath changes</label><p class="brsafe">Breathe comfortably. Stop if you feel dizzy.</p></div>`;
   o.hidden=false;document.documentElement.style.overflow='hidden';requestAnimationFrame(()=>o.classList.add('on'));
   o.querySelector('[data-x]').onclick=closeBreath;
@@ -340,7 +343,7 @@ function startBreath(b){audioInit();const o=$('brOv'),mins=ls.get('brMins',3),en
     BS.t=setTimeout(step,sec*1000)};
   step()}
 function finishBreath(b,early){if(!BS)return;clearTimeout(BS.t);clearInterval(BS.ct);clearInterval(BS.lt);$('brLeft').textContent='';const m=Math.max(early?0:1,Math.round((Date.now()-BS.start)/60e3));BS=null;try{BWL&&BWL.release()}catch(e){}BWL=null;
-  if(m>0){const k='breath:'+todayIST();ls.set(k,ls.get(k,0)+m)}
+  if(m>0){const k='breath:'+todayIST();ls.set(k,ls.get(k,0)+m)}if(!early)endChime();
   const o=$('brOv');o.classList.remove('run');const orb=$('brOrb');orb.style.transition='transform 1.2s ease';orb.style.transform='scale(.78)';$('brPh').textContent=m?'Well done':'Rest a moment';$('brCt').textContent='';
   $('brSub').textContent=m?`${m} minute${m>1?'s':''} of ${b.t.toLowerCase()}. Notice how you feel.`:'Come back whenever you like.';
   $('brBot').innerHTML='<button type="button" class="btnp" data-x>Done</button>';$('brBot').querySelector('[data-x]').onclick=closeBreath;if(m)haptic(2);drawBreath();renderGlance()}
