@@ -373,3 +373,31 @@ html[data-theme="dark"] .rule{background:rgba(255,255,255,.05)}
 .mlrow svg{width:16px;height:16px}
 .mlrow{gap:6px}
 @media (max-width:389px){.mlrow .ylink,.mlrow .bpbtn{font-size:12.5px;padding:7px 9px 7px 8px!important;gap:5px}}
+
+/* sheet: sticky header */
+.bph{position:sticky;top:-10px;z-index:2;background:var(--bg);margin:-10px -20px 6px;padding:14px 20px 10px;border-bottom:1px solid var(--line)}
+.bpsh .grab{position:sticky;top:-10px;z-index:3}
+.bpen{margin-top:6px;font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.5;color:var(--text)}
+.cmpbtn{display:inline-flex;align-items:center;gap:7px;margin:0 0 10px 50px;padding:8px 13px 8px 10px;border-radius:999px;font-size:14px;font-weight:600;color:var(--best-ink);background:var(--best-bg);border:1px solid color-mix(in srgb,var(--best) 40%,transparent)}
+/* compass */
+.cmpov{position:fixed;inset:0;z-index:75;display:flex;flex-direction:column;background:var(--bg);opacity:0;transition:opacity .25s;padding:calc(12px + env(safe-area-inset-top,0px)) 20px calc(20px + env(safe-area-inset-bottom,0px))}
+.cmpov.on{opacity:1}
+.cmptop{display:flex;justify-content:flex-end}
+.cmptop button{height:36px;padding:0 16px;border-radius:18px;font-size:15px;font-weight:600;color:var(--ink);background:var(--g-row);border:1px solid var(--g-edge)}
+.cmpmain{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center}
+.cmpname{font-family:var(--serif);font-size:30px;color:var(--ink)}
+.cmpsub{font-size:17px;font-weight:600;color:var(--text);min-height:1.4em;transition:color .2s}
+.cmpov.aligned .cmpsub{color:var(--good-ink)}
+.cmpwrap{position:relative;width:min(80vw,320px);aspect-ratio:1;margin:10px 0;color:var(--ink)}
+.cmpdial{width:100%;height:100%;transition:transform .12s linear}
+.cmpface{fill:var(--card-solid);stroke:var(--line-strong);stroke-width:1}
+.cmpdial text{font-family:var(--sans);font-size:20px;font-weight:700;fill:var(--muted)}
+.cmpdial text.cN{fill:#C0453A}.cmpdial text.cEt{fill:var(--best-ink);font-size:24px}
+.cmpE{fill:var(--best)}
+.cmpptr{position:absolute;left:50%;top:-14px;width:4px;height:30px;margin-left:-2px;border-radius:2px;background:var(--ink);z-index:2;transition:background .2s}
+.cmpov.aligned .cmpptr{background:var(--good-ink)}
+.cmpov.aligned .cmpface{stroke:var(--good);stroke-width:3}
+.cmpdeg{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--serif);font-size:40px;color:var(--ink);pointer-events:none}
+.cmphint{max-width:32ch;font-size:13.5px;color:var(--muted);line-height:1.45}
+.cmpbot{display:flex;flex-direction:column;gap:8px}
+.cmpnote{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}

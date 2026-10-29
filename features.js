@@ -355,14 +355,42 @@ function openBP(){let o=$('bpOv');if(!o){o=document.createElement('div');o.id='b
   o.innerHTML=`<div class="bpbg" data-x></div><div class="bpsh" role="dialog" aria-label="Best practices"><div class="grab"></div><div class="bph"><h3>Best practices</h3><button type="button" data-x>Done</button></div>
    <p class="bplead">These are ideals, not conditions. Do what fits your day. A sincere, attentive chant matters most.</p>
    ${it('<path d="M12 3.5c3 4 5 6.6 5 9.2a5 5 0 0 1-10 0c0-2.6 2-5.2 5-9.2z"/>','Freshen up','A bath is ideal, especially in the morning. At other times, washing your hands, feet and face, and sipping a little water (achamana), is the traditional quick way to begin.')}
-   <div class="bpmantra"><div class="bpk">When you can’t wash</div><div class="hi">ॐ अपवित्रः पवित्रो वा सर्वावस्थां गतोऽपि वा।<br>यः स्मरेत् पुण्डरीकाक्षं स बाह्याभ्यन्तरः शुचिः॥</div><p>“Pure or impure, in whatever state, whoever remembers the lotus-eyed Lord becomes pure inside and out.” Say this once (Padma Purana), or simply picture clean light washing over you.</p></div>
+   <div class="bpmantra"><div class="bpk">When you can’t wash</div><div class="hi">ॐ अपवित्रः पवित्रो वा सर्वावस्थां गतोऽपि वा।<br>यः स्मरेत् पुण्डरीकाक्षं स बाह्याभ्यन्तरः शुचिः॥</div><div class="bpen">Om apavitrah pavitro va,<br>sarvavastham gato’pi va.<br>Yah smaret pundarikaksham,<br>sa bahyabhyantarah shuchih.</div><p>“Pure or impure, in whatever state, whoever remembers the lotus-eyed Lord becomes pure inside and out.” Say this once (Padma Purana), or simply picture clean light washing over you.</p></div>
    ${it('<path d="M3.5 19h17M6 19l1.2-3h9.6l1.2 3"/><circle cx="12" cy="6.5" r="2.2"/><path d="M8.8 15.5c0-2.6 1.4-4.6 3.2-4.6s3.2 2 3.2 4.6"/>','A clean seat','Sit on a mat, folded cloth or cushion kept for the purpose, rather than the bare floor or the bed.')}
-   ${it('<circle cx="12" cy="12" r="8.5"/><path d="M14.9 9.1 13 13l-3.9 1.9L11 11z"/>','Face east or north','If you can. Sit upright and steady, with a calm breath.')}
+   ${it('<circle cx="12" cy="12" r="8.5"/><path d="M14.9 9.1 13 13l-3.9 1.9L11 11z"/>','Face east or north','If you can. Sit upright and steady, with a calm breath.')}<button type="button" class="cmpbtn" data-cmp><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.9 9.1 13 13l-3.9 1.9L11 11z"/></svg>Find east with the compass</button>
    ${it('<path d="M3 12c2-3.2 4-3.2 6 0s4 3.2 6 0 4-3.2 6 0"/>','Slow and clear','Say each word clearly, without hurrying. If you’re unsure of a word, listen first or learn from a teacher.')}
    ${it('<path d="M12 4c-4 0-7 3-7 7 0 3 2 5.5 5 6.6V20h4v-2.4c3-1.1 5-3.6 5-6.6 0-4-3-7-7-7z"/><path d="M9.5 11h5"/>','In your mind, any time','Name chants like Om Namah Shivaya can be repeated silently anywhere: on a walk, in traffic, before sleep. No rules apply to the mind.')}
    <p class="bpnote">Customs vary between families and traditions. Follow your own elders where they differ.</p></div>`;
   o.hidden=false;document.documentElement.style.overflow='hidden';requestAnimationFrame(()=>o.classList.add('on'));
-  o.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{o.classList.remove('on');setTimeout(()=>{o.hidden=true},280);document.documentElement.style.overflow=''})}
+  o.querySelectorAll('[data-x]').forEach(x=>x.onclick=()=>{o.classList.remove('on');setTimeout(()=>{o.hidden=true},280);document.documentElement.style.overflow=''});
+  o.querySelector('[data-cmp]').onclick=()=>openCompass()}
+
+/* ---------- Compass ---------- */
+let CMPS=null;
+function openCompass(){let o=$('cmpOv');if(!o){o=document.createElement('div');o.id='cmpOv';o.className='cmpov';o.hidden=true;document.body.appendChild(o)}
+  let ticks='';for(let d=0;d<360;d+=5){const L=d%30===0?14:d%15===0?9:5,w=d%30===0?1.6:1;ticks+=`<line x1="150" y1="${18}" x2="150" y2="${18+L}" transform="rotate(${d} 150 150)" stroke="currentColor" stroke-width="${w}" opacity="${d%30===0?.7:.35}"/>`}
+  const lab=(t,d,cls='')=>`<text x="150" y="58" text-anchor="middle" transform="rotate(${d} 150 150)" class="${cls}">${t}</text>`;
+  o.innerHTML=`<div class="cmptop"><button type="button" data-x>Done</button></div><div class="cmpmain"><div class="cmpname">Face east</div><div class="cmpsub" id="cmpMsg">Hold your phone flat in front of you.</div>
+   <div class="cmpwrap"><div class="cmpptr"></div><svg class="cmpdial" id="cmpDial" viewBox="0 0 300 300"><circle cx="150" cy="150" r="140" class="cmpface"/>${ticks}
+   <path d="M150 6 l9 16 h-18z" transform="rotate(90 150 150)" class="cmpE"/>${lab('N',0,'cN')}${lab('E',90,'cEt')}${lab('S',180)}${lab('W',270)}
+   <circle cx="150" cy="150" r="4" fill="currentColor" opacity=".5"/></svg><div class="cmpdeg" id="cmpDeg">–</div></div>
+   <div class="cmphint">Gold marks east, towards sunrise. North is fine too. Keep away from metal and magnets for a steady reading.</div></div><div class="cmpbot" id="cmpBot"></div>`;
+  o.hidden=false;requestAnimationFrame(()=>o.classList.add('on'));
+  o.querySelector('[data-x]').onclick=closeCompass;
+  const start=()=>{CMPS={h:null,last:0,ok:false};const on=e=>{let h=null;if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;else if(e.absolute&&e.alpha!=null)h=360-e.alpha;if(h==null)return;CMPS.got=1;
+      if(CMPS.h==null)CMPS.h=h;else{let d=((h-CMPS.h+540)%360)-180;CMPS.h=(CMPS.h+d*.18+360)%360}drawCmp()};
+    CMPS.fn=on;window.addEventListener('deviceorientationabsolute',on);window.addEventListener('deviceorientation',on);$('cmpBot').innerHTML='';
+    setTimeout(()=>{if(CMPS&&!CMPS.got)$('cmpMsg').textContent='No compass found on this device. Try on your phone.'},2500)};
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    $('cmpBot').innerHTML='<button type="button" class="btnp" id="cmpGo">Start compass</button><p class="cmpnote">Your phone will ask to use motion and orientation. It stays on your phone.</p>';
+    $('cmpGo').onclick=()=>DeviceOrientationEvent.requestPermission().then(st=>{if(st==='granted')start();else $('cmpMsg').textContent='Compass access was declined. You can allow it in Settings → Safari → Motion & Orientation.'}).catch(()=>{$('cmpMsg').textContent='Couldn’t start the compass.'})}
+  else start()}
+function drawCmp(){if(!CMPS||CMPS.h==null)return;const h=CMPS.h,dial=$('cmpDial');if(!dial)return;dial.style.transform=`rotate(${-h}deg)`;$('cmpDeg').textContent=Math.round(h)+'°';
+  const dE=((90-h+540)%360)-180,dN=((0-h+540)%360)-180,ok=Math.abs(dE)<=8,okN=Math.abs(dN)<=8,m=$('cmpMsg'),o=$('cmpOv');
+  o.classList.toggle('aligned',ok||okN);
+  m.textContent=ok?'You’re facing east ✓':okN?'You’re facing north ✓ (east is ideal)':`Turn ${dE>0?'right':'left'} ${Math.abs(Math.round(dE))}°`;
+  if((ok||okN)&&!CMPS.ok){CMPS.ok=true;if(navigator.vibrate)navigator.vibrate([20,60,20])}else if(!ok&&!okN)CMPS.ok=false}
+function closeCompass(){if(CMPS&&CMPS.fn){window.removeEventListener('deviceorientationabsolute',CMPS.fn);window.removeEventListener('deviceorientation',CMPS.fn)}CMPS=null;const o=$('cmpOv');o.classList.remove('on');setTimeout(()=>{o.hidden=true},280)}
 
 /* ---------- Today: at a glance ---------- */
 function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
