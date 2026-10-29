@@ -462,11 +462,10 @@ function init(){const app=document.querySelector('.app');
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.bpbtn'))openBP()});
   // mantra rules: tap a sign to read it
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.rule');if(!b)return;const box=b.closest('.mrules'),on=!b.classList.contains('sel');box.querySelectorAll('.rule').forEach(x=>x.classList.toggle('sel',x===b&&on));box.querySelector('.rtxt').textContent=on?b.dataset.t:'Tap a sign to read more. Simple name chants can also be said silently in the mind, any time.';box.classList.toggle('open',on)});
-  addEventListener('scroll',skyParQ,{passive:true});{const h=document.querySelector('.hero');if(h)h.addEventListener('scroll',skyParQ,{passive:true})}
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{skyPar();{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
   try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();

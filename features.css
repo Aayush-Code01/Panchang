@@ -402,3 +402,15 @@ html[data-theme="dark"] .rule{background:rgba(255,255,255,.05)}
 .cmpbot{display:flex;flex-direction:column;gap:8px}
 .cmpnote{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}
 .hero .sky .lyr{overflow:visible!important}
+
+/* sky parallax: compositor-driven (no JS), only where the browser supports scroll timelines */
+@supports (animation-timeline: scroll()){
+  html{scroll-timeline:--skyscroll block}
+  @media (min-width:1080px) and (min-height:620px){.c1 .hero{scroll-timeline:--skyscroll block}}
+  @media (prefers-reduced-motion:no-preference){
+    #sky .lyr{animation:skypar linear both;animation-timeline:--skyscroll;animation-range:0 340px}
+    #sky .lyr:nth-of-type(1){--py:187px}#sky .lyr:nth-of-type(2){--py:163px}#sky .lyr:nth-of-type(3){--py:136px}#sky .lyr:nth-of-type(4){--py:109px}
+    #sky .sky-l{animation:skypar linear both;animation-timeline:--skyscroll;animation-range:0 340px;--py:170px}
+  }
+}
+@keyframes skypar{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,var(--py),0)}}
