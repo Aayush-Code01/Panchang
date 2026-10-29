@@ -327,3 +327,8 @@ html[data-theme="dark"] .tl-intro .tl-track::after{background:linear-gradient(10
 .bgood i{font-style:normal;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;color:var(--c2);background:color-mix(in srgb,var(--c1) 22%,transparent)}
 html[data-theme="dark"] .bgood i{color:var(--c1)}
 .brname small{display:block;margin-top:4px;font-family:var(--sans);font-style:normal;font-size:13.5px;color:var(--muted)}
+
+.mlearn{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.ylink{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border-radius:999px;font-size:14.5px;font-weight:600;color:var(--ink);text-decoration:none;background:var(--g-row);border:1px solid var(--g-edge)}
+.mcare{margin:0;padding:11px 13px;border-radius:14px;font-size:13.5px;line-height:1.45;color:var(--text);background:var(--best-bg);border:1px solid color-mix(in srgb,var(--best) 35%,transparent)}
+.mcare b{color:var(--best-ink)}
