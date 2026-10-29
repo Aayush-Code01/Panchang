@@ -314,3 +314,11 @@ html[data-theme="dark"] .tl-intro .tl-track::after{background:linear-gradient(10
 
 .cat b{font-size:16.5px;letter-spacing:-.02em}
 @media (max-width:380px){.cat b{font-size:15.5px}}
+
+.brtxt span:empty{display:none}
+.brtop{align-items:center}
+.brleft{font-size:15px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.brov.run .brring{border:0;--p:0;background:conic-gradient(var(--c2) calc(var(--p) * 360deg),color-mix(in srgb,var(--c2) 18%,transparent) 0);-webkit-mask:radial-gradient(closest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px));mask:radial-gradient(closest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px))}
+.brov.shunya .brleft{color:#4B463F}
+.brov.shunya.run .brring{background:conic-gradient(#4A3C1C calc(var(--p) * 360deg),#141414 0)}
+.brtxt b{font-size:25px}

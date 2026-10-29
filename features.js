@@ -320,7 +320,7 @@ let BS=null,BWL=null;
 function brOverlay(){let o=$('brOv');if(o)return o;o=document.createElement('div');o.id='brOv';o.className='brov';o.hidden=true;document.body.appendChild(o);return o}
 function tone(f){try{audioInit();if(!AC||!ls.get('brSound',true))return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.05);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+1.7)}catch(e){}}
 function openBreath(b){const o=brOverlay();const mins=ls.get('brMins',3);o.style.setProperty('--c1',b.c[0]);o.style.setProperty('--c2',b.c[1]);o.classList.toggle('shunya',!!ls.get('shunya',false));
-  o.innerHTML=`<div class="brtop"><button type="button" class="brx" data-x>Close</button><button type="button" class="brdark" data-dk>${ls.get('shunya',false)?'Shunya on':'Shunya'}</button></div>
+  o.innerHTML=`<div class="brtop"><button type="button" class="brx" data-x>Close</button><div class="brleft" id="brLeft"></div><button type="button" class="brdark" data-dk>${ls.get('shunya',false)?'Shunya on':'Shunya'}</button></div>
    <div class="brmain"><div class="brname">${b.t}</div><div class="brstage"><div class="brring"></div><div class="brorb" id="brOrb"></div><div class="brtxt"><b id="brPh">Ready</b><span id="brCt"></span></div></div><div class="brsub" id="brSub">${b.how}</div></div>
    <div class="brbot" id="brBot"><div class="seg brmins">${[1,3,5,10].map(x=>`<button type="button" data-m="${x}" aria-pressed="${x===mins}">${x} min</button>`).join('')}</div><button type="button" class="btnp" data-go>Begin</button><label class="chk2 brsnd"><input type="checkbox" ${ls.get('brSound',true)?'checked':''} data-snd> Soft chime when the breath changes</label><p class="brsafe">Breathe comfortably. Stop if you feel dizzy.</p></div>`;
   o.hidden=false;document.documentElement.style.overflow='hidden';requestAnimationFrame(()=>o.classList.add('on'));
@@ -331,7 +331,7 @@ function openBreath(b){const o=brOverlay();const mins=ls.get('brMins',3);o.style
   o.querySelector('[data-go]').onclick=()=>startBreath(b)}
 function startBreath(b){audioInit();const o=$('brOv'),mins=ls.get('brMins',3),end=Date.now()+mins*60e3;o.classList.add('run');$('brBot').innerHTML='<button type="button" class="brstop" data-stop>Finish early</button>';
   o.querySelector('[data-stop]').onclick=()=>finishBreath(b,true);try{navigator.wakeLock&&navigator.wakeLock.request('screen').then(l=>BWL=l).catch(()=>{})}catch(e){}
-  BS={b,i:0,end,start:Date.now(),t:null,ct:null};const orb=$('brOrb');let scale=.55;orb.style.transition='none';orb.style.transform=`scale(${scale})`;
+  BS={b,i:0,end,start:Date.now(),t:null,ct:null,lt:null};const ring=o.querySelector('.brring'),tot=mins*60e3,tickLeft=()=>{if(!BS)return;const ms=Math.max(0,BS.end-Date.now()),sec=Math.ceil(ms/1000);$('brLeft').textContent=ms>0?`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')} left`:'Last breath';ring.style.setProperty('--p',Math.min(1,1-ms/tot).toFixed(4))};tickLeft();BS.lt=setInterval(tickLeft,500);const orb=$('brOrb');let scale=.55;orb.style.transition='none';orb.style.transform=`scale(${scale})`;
   const step=()=>{if(!BS)return;if(Date.now()>=BS.end&&BS.i%b.p.length===0)return finishBreath(b,false);const [ph,sec,note]=b.p[BS.i%b.p.length];BS.i++;
     if(ph==='in')scale=1;else if(ph==='out')scale=.55;orb.style.transition=`transform ${sec}s cubic-bezier(.45,.05,.55,.95)`;orb.style.transform=`scale(${scale})`;
     $('brPh').textContent=BL[ph];$('brSub').textContent=note?note.charAt(0).toUpperCase()+note.slice(1):(ph==='hold'?'Stay soft and still':'');
@@ -339,12 +339,12 @@ function startBreath(b){audioInit();const o=$('brOv'),mins=ls.get('brMins',3),en
     let left=sec;$('brCt').textContent=left;clearInterval(BS.ct);BS.ct=setInterval(()=>{left--;if(left>0)$('brCt').textContent=left},1000);
     BS.t=setTimeout(step,sec*1000)};
   step()}
-function finishBreath(b,early){if(!BS)return;clearTimeout(BS.t);clearInterval(BS.ct);const m=Math.max(early?0:1,Math.round((Date.now()-BS.start)/60e3));BS=null;try{BWL&&BWL.release()}catch(e){}BWL=null;
+function finishBreath(b,early){if(!BS)return;clearTimeout(BS.t);clearInterval(BS.ct);clearInterval(BS.lt);$('brLeft').textContent='';const m=Math.max(early?0:1,Math.round((Date.now()-BS.start)/60e3));BS=null;try{BWL&&BWL.release()}catch(e){}BWL=null;
   if(m>0){const k='breath:'+todayIST();ls.set(k,ls.get(k,0)+m)}
   const o=$('brOv');o.classList.remove('run');const orb=$('brOrb');orb.style.transition='transform 1.2s ease';orb.style.transform='scale(.78)';$('brPh').textContent=m?'Well done':'Rest a moment';$('brCt').textContent='';
   $('brSub').textContent=m?`${m} minute${m>1?'s':''} of ${b.t.toLowerCase()}. Notice how you feel.`:'Come back whenever you like.';
   $('brBot').innerHTML='<button type="button" class="btnp" data-x>Done</button>';$('brBot').querySelector('[data-x]').onclick=closeBreath;if(m)haptic(2);drawBreath();renderGlance()}
-function closeBreath(){if(BS){clearTimeout(BS.t);clearInterval(BS.ct);BS=null}try{BWL&&BWL.release()}catch(e){}const o=$('brOv');o.classList.remove('on','run');setTimeout(()=>{o.hidden=true},300);document.documentElement.style.overflow=''}
+function closeBreath(){if(BS){clearTimeout(BS.t);clearInterval(BS.ct);clearInterval(BS.lt);BS=null}try{BWL&&BWL.release()}catch(e){}const o=$('brOv');o.classList.remove('on','run');setTimeout(()=>{o.hidden=true},300);document.documentElement.style.overflow=''}
 
 /* ---------- Today: at a glance ---------- */
 function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=todayIST(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
