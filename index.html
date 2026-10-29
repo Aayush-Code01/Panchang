@@ -1333,12 +1333,16 @@ function skySVG(r,isToday){
   if(WXC){const spots=[[300,70,1],[90,150,.75],[220,190,.6],[150,58,.95],[30,96,.85],[352,150,1.1],[250,120,1],[110,228,1.2],[330,236,1.3],[200,30,.8]];
     const n=WK==='clear'?0:WK==='fewclouds'?2:WK==='cloudy'?4:WK==='haze'?2:10;
     if(WK==='overcast'||wet||WK==='fog'){C[0]=phase==='night'?'#3D4252':phase==='day'||phase==='golden'?'#D9DDE2':'#9A92A2';C[1]=phase==='night'?'#232634':'#7C8591';C[2]=WK==='storm'?.95:.85}
-    if(WK==='overcast'&&LPOS){const [lx,ly]=LPOS,nt=phase==='night',dk=nt?'#2A2F40':'#9AA3AE',md=nt?'#3E4458':'#C3CAD2',lt=nt?'#59607A':'#E6EAEE';
-      let sd=7;const R2=()=>(sd=(sd*16807)%2147483647)/2147483647;
-      const bands=[[ly-70,.7,md],[ly-34,.55,lt],[ly+22,.8,md],[ly+56,.88,dk],[ly+96,.92,md],[ly+138,.96,dk],[ly-112,.6,dk]];if(!nt)bands.push([ly-150,.85,md],[ly+180,.95,md],[ly-5,.5,lt],[ly+75,.9,lt],[ly+118,.9,lt]);
-      s+=`<g filter="url(#soft4)">`+bands.map(([y,o,c])=>{let g='';for(let x=-60;x<W+60;x+=nt?46+R2()*40:26+R2()*20){const rx=40+R2()*46,ry=10+R2()*12,yy=y+(R2()-.5)*14;if(Math.hypot(x-lx,yy-ly)<40&&y<ly+20)continue;g+=`<ellipse cx="${x.toFixed(0)}" cy="${yy.toFixed(0)}" rx="${rx.toFixed(0)}" ry="${ry.toFixed(0)}" fill="${c}" opacity="${o}"/>`;
-        const d=Math.hypot(x-lx,yy-ly);if(d<150)g+=`<ellipse cx="${x.toFixed(0)}" cy="${(yy-ry*.6).toFixed(0)}" rx="${(rx*.7).toFixed(0)}" ry="${(ry*.35).toFixed(0)}" fill="${lt}" opacity="${(o*.9*(1-d/150)).toFixed(2)}"/>`}return g}).join('')+`</g>`;
-      s+=`<ellipse cx="${lx}" cy="${ly}" rx="120" ry="70" fill="${nt?'#C9D2F0':'#FFF8E6'}" opacity="${nt?.16:.32}" filter="url(#soft)"/><ellipse cx="${lx}" cy="${ly}" rx="56" ry="40" fill="${nt?'#E4E9FA':'#FFFFFF'}" opacity="${nt?.14:.3}" filter="url(#soft4)"/>`}
+    if(WK==='overcast'&&LPOS){const [lx,ly]=LPOS,nt=phase==='night';
+      const B=nt?'.16 .18 .25':'.80 .83 .86',L=nt?'.62 .66 .78':'.97 .975 .985',ab=nt?'2.7 0 0 0 -.62':'3.2 0 0 0 -.7',al=nt?'2.4 0 0 0 -.9':'2.6 0 0 0 -.85';
+      const cm=(c,a)=>{const [r,g,bb]=c.split(' ');return`0 0 0 0 ${r}  0 0 0 0 ${g}  0 0 0 0 ${bb}  ${a}`};
+      s+=`<defs><filter id="ocA" filterUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><feTurbulence type="fractalNoise" baseFrequency="0.0042 0.013" numOctaves="5" seed="17"/><feColorMatrix values="${cm(B,ab)}"/></filter>
+        <filter id="ocB" filterUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.017" numOctaves="4" seed="5"/><feColorMatrix values="${cm(L,al)}"/></filter>
+        <radialGradient id="ocG" gradientUnits="userSpaceOnUse" cx="${lx}" cy="${ly}" r="${nt?170:220}"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <radialGradient id="ocT" gradientUnits="userSpaceOnUse" cx="${lx}" cy="${ly}" r="${nt?80:110}"><stop offset="0" stop-color="${nt?'#999':'#bfbfbf'}"/><stop offset=".55" stop-color="${nt?'#ccc':'#e6e6e6'}"/><stop offset="1" stop-color="#fff"/></radialGradient><mask id="ocN" maskUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" fill="#fff"/><circle cx="${lx}" cy="${ly}" r="${nt?80:110}" fill="url(#ocT)"/></mask><mask id="ocM" maskUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" fill="url(#ocG)"/></mask></defs>
+       <circle cx="${lx}" cy="${ly}" r="${nt?95:150}" fill="${nt?'#D5DCF4':'#FFFBEF'}" opacity="${nt?.28:.5}" filter="url(#soft)"/>
+       <rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" filter="url(#ocA)" mask="url(#ocN)"/>
+       <rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" filter="url(#ocB)" mask="url(#ocM)"/>`}
     else spots.slice(0,n).forEach(([x,y,sc],i)=>s+=cloud(x,y,sc*(n>6?1.25:1),1-i*.04))}
   else{if(phase==='day')s+=cloud(300,70,1,1)+cloud(90,150,.75,.85)+cloud(220,190,.6,.6);
   else if(phase==='golden')s+=cloud(290,80,1,.9)+cloud(80,170,.8,.7);
