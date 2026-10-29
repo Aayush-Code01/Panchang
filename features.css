@@ -403,3 +403,14 @@ html[data-theme="dark"] .rule{background:rgba(255,255,255,.05)}
 .cmpnote{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}
 .hero .sky .lyr{overflow:visible!important}
 
+/* ===== weather: slow-moving photographic clouds ===== */
+.sky .clouds{position:absolute;left:0;right:0;top:-8%;height:116%;overflow:hidden;pointer-events:none;z-index:1}
+.sky .cl-move{position:absolute;top:0;left:0;height:100%;width:calc(100% + var(--tw) * 2);background-repeat:repeat-x;background-size:var(--tw) 100%;animation:cldrift linear infinite;will-change:transform}
+.sky .cl-move.far{opacity:.55;top:-6%}
+@keyframes cldrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(var(--tw) * -1),0,0)}}
+.sky .ck-few .cl-move{opacity:.95}
+.sky .ck-fog{top:auto;bottom:-6%;height:70%;-webkit-mask-image:linear-gradient(180deg,transparent,#000 45%);mask-image:linear-gradient(180deg,transparent,#000 45%)}
+.sky .lglow{z-index:1;mix-blend-mode:screen;pointer-events:none}
+.sky .wx-p,.sky .wx-flash,.sky .wx-fog,.sky .wx-haze{z-index:2}
+.sky .sky-l{z-index:3}
+@media (prefers-reduced-motion:reduce){.sky .cl-move{animation:none}}

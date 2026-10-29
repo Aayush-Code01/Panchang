@@ -1257,7 +1257,7 @@ function skySVG(r,isToday){
   const hr=ist(new Date(t)).getUTCHours();
   let label={night:'Night',dawn:'Sunrise',day:hr<12?'Morning':hr<16?'Afternoon':'Late afternoon',golden:'Golden hour',dusk:'Sunset'}[phase];
   const WXC=isToday?wxNow():null,WK=wxKind(WXC),cc=WXC?WXC.cc:null,wet=WK==='rain'||WK==='storm'||WK==='drizzle'||WK==='snow';
-  let LPOS=null;const dimSM=WK==='overcast'?.62:wet?.32:WK==='fog'?.22:WK==='cloudy'?.75:WK==='haze'?.9:1,starOp=WK==='overcast'||wet||WK==='fog'?0:WK==='cloudy'?.45:WK==='haze'?.5:1;
+  let LPOS=null;const dimSM=wet?.8:WK==='fog'?.45:WK==='haze'?.9:1,starOp=wet||WK==='fog'?0:WK==='haze'?.5:1;
   const SK={
     night:['#070B1F','#0F1633','#1A2147','#262C55'],
     dawn:['#24305E','#5E5D8A','#C48C8C','#F1C49A'],
@@ -1279,7 +1279,7 @@ function skySVG(r,isToday){
    <radialGradient id="sunGlow"><stop offset="0" stop-color="#FFFFFF" stop-opacity="1"/><stop offset=".1" stop-color="#FFFBF0" stop-opacity=".9"/><stop offset=".3" stop-color="#FFF1D6" stop-opacity=".42"/><stop offset=".6" stop-color="#E9F2FF" stop-opacity=".12"/><stop offset="1" stop-color="#E9F2FF" stop-opacity="0"/></radialGradient>
    <radialGradient id="hzGlow" cx=".5" cy="1" r="1"><stop offset="0" stop-color="#FFD9A3" stop-opacity=".75"/><stop offset=".5" stop-color="#F7B98C" stop-opacity=".25"/><stop offset="1" stop-color="#F7B98C" stop-opacity="0"/></radialGradient>
   </defs><rect y="-${H}" width="${W}" height="${H+2}" fill="${SK[0]}"/><rect width="${W}" height="${H}" fill="url(#skg)"/>`;
-  if(WXC&&(WK==='overcast'||wet||WK==='fog'||WK==='cloudy'||WK==='haze')){const g=WK==='haze'?(phase==='night'?'#5A5E70':'#E4EAEE'):phase==='night'?'#2E3342':phase==='dusk'||phase==='dawn'?'#6E6A78':(wet?'#6F7A88':'#8D97A3'),op=WK==='storm'?.8:WK==='rain'?.68:WK==='haze'?(phase==='night'?.18:.22):WK==='overcast'?.26:WK==='snow'?.5:WK==='drizzle'?.55:WK==='fog'?.42:.18;s+=`<rect width="${W}" height="${H}" fill="${g}" opacity="${op}"/>`}
+  if(WXC&&(wet||WK==='fog'||WK==='haze')){const g=WK==='haze'?(phase==='night'?'#4E4A50':'#D8C7A6'):phase==='night'?'#2A2E3C':phase==='dusk'||phase==='dawn'?'#5E5A6A':(WK==='fog'?'#C9CDD2':'#6F7A88'),op=WK==='storm'?.55:WK==='rain'?.42:WK==='drizzle'?.32:WK==='snow'?.25:WK==='fog'?.3:(phase==='night'?.3:.42);s+=`<rect y="-${H}" width="${W}" height="${2*H}" fill="${g}" opacity="${op}"/>`}
   // horizon warmth near sunrise / sunset
   if(phase==='dawn'||phase==='dusk'||phase==='golden'){const hx=phase==='dawn'?90:310;s+=`<ellipse cx="${hx}" cy="${H+10}" rx="260" ry="150" fill="url(#hzGlow)" opacity="${phase==='golden'?.6:1}"/>`}
   // stars
@@ -1324,39 +1324,35 @@ function skySVG(r,isToday){
     label+=' · '+(k<.03?'New moon':k>.97?'Full moon':(wax?'Waxing':'Waning')+' moon '+Math.round(k*100)+'%');
   }
   s+='</g></g>';
-  // soft, photographic clouds
+  // clouds are drawn as slow-moving texture layers below
   s+='<g class="pl pl3">';
-  const C={day:['#FFFFFF','#C9D9E6',.9],golden:['#FFF1DC','#D8AE8C',.85],dusk:['#F3B6A6','#6E4F72',.75],dawn:['#F6CDB6','#7C6E93',.7],night:['#5A6188','#1E2448',.22]}[phase];
-  const cloud=(x,y,sc,o)=>{let g=`<g class="cloud" transform="translate(${x} ${y}) scale(${sc})" opacity="${(C[2]*o).toFixed(2)}">`;
-    g+=`<g filter="url(#soft)">`;[[-40,10,46,14],[-6,2,40,18],[30,8,38,14],[0,16,70,12]].forEach(([dx,dy,a,b])=>g+=`<ellipse cx="${dx}" cy="${dy}" rx="${a}" ry="${b}" fill="${C[0]}"/>`);
-    g+=`<ellipse cx="0" cy="22" rx="70" ry="8" fill="${C[1]}" opacity=".7"/></g>`;
-    g+=`<g filter="url(#soft4)">`;[[-22,4,18,10],[4,-4,20,13],[24,4,15,9]].forEach(([dx,dy,a,b])=>g+=`<ellipse cx="${dx}" cy="${dy}" rx="${a}" ry="${b}" fill="${C[0]}" opacity=".9"/>`);g+=`</g></g>`;return g};
-  if(WXC){const spots=[[300,70,1],[90,150,.75],[220,190,.6],[150,58,.95],[30,96,.85],[352,150,1.1],[250,120,1],[110,228,1.2],[330,236,1.3],[200,30,.8]];
-    const n=WK==='clear'?0:WK==='fewclouds'?2:WK==='cloudy'?4:WK==='haze'?2:10;
-    if(WK==='overcast'||wet||WK==='fog'){C[0]=phase==='night'?'#3D4252':phase==='day'||phase==='golden'?'#D9DDE2':'#9A92A2';C[1]=phase==='night'?'#232634':'#7C8591';C[2]=WK==='storm'?.95:.85}
-    if(WK==='overcast'&&LPOS){const [lx,ly]=LPOS,nt=phase==='night';
-      const B=nt?'.16 .18 .25':'.80 .83 .86',L=nt?'.62 .66 .78':'.97 .975 .985',ab=nt?'2.7 0 0 0 -.62':'3.2 0 0 0 -.7',al=nt?'2.4 0 0 0 -.9':'2.6 0 0 0 -.85';
-      const cm=(c,a)=>{const [r,g,bb]=c.split(' ');return`0 0 0 0 ${r}  0 0 0 0 ${g}  0 0 0 0 ${bb}  ${a}`};
-      s+=`<defs><filter id="ocA" filterUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><feTurbulence type="fractalNoise" baseFrequency="0.0042 0.013" numOctaves="5" seed="17"/><feColorMatrix values="${cm(B,ab)}"/></filter>
-        <filter id="ocB" filterUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><feTurbulence type="fractalNoise" baseFrequency="0.006 0.017" numOctaves="4" seed="5"/><feColorMatrix values="${cm(L,al)}"/></filter>
-        <radialGradient id="ocG" gradientUnits="userSpaceOnUse" cx="${lx}" cy="${ly}" r="${nt?170:220}"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-        <radialGradient id="ocT" gradientUnits="userSpaceOnUse" cx="${lx}" cy="${ly}" r="${nt?80:110}"><stop offset="0" stop-color="${nt?'#999':'#bfbfbf'}"/><stop offset=".55" stop-color="${nt?'#ccc':'#e6e6e6'}"/><stop offset="1" stop-color="#fff"/></radialGradient><mask id="ocN" maskUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" fill="#fff"/><circle cx="${lx}" cy="${ly}" r="${nt?80:110}" fill="url(#ocT)"/></mask><mask id="ocM" maskUnits="userSpaceOnUse" x="-20" y="${-H}" width="${W+40}" height="${2*H}"><rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" fill="url(#ocG)"/></mask></defs>
-       <circle cx="${lx}" cy="${ly}" r="${nt?95:150}" fill="${nt?'#D5DCF4':'#FFFBEF'}" opacity="${nt?.28:.5}" filter="url(#soft)"/>
-       <rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" filter="url(#ocA)" mask="url(#ocN)"/>
-       <rect x="-20" y="${-H}" width="${W+40}" height="${2*H}" filter="url(#ocB)" mask="url(#ocM)"/>`}
-    else spots.slice(0,n).forEach(([x,y,sc],i)=>s+=cloud(x,y,sc*(n>6?1.25:1),1-i*.04))}
-  else{if(phase==='day')s+=cloud(300,70,1,1)+cloud(90,150,.75,.85)+cloud(220,190,.6,.6);
-  else if(phase==='golden')s+=cloud(290,80,1,.9)+cloud(80,170,.8,.7);
-  else if(phase==='dusk'||phase==='dawn')s+=cloud(300,170,1.1,.85)+cloud(60,200,.8,.7);
-  else s+=cloud(320,210,1.2,1)+cloud(60,235,.9,.8);}
   s+='</g>';
   s+=`</svg>`;
   {const open=s.slice(0,s.indexOf('>')+1).replace('preserveAspectRatio="xMidYMid slice"','preserveAspectRatio="xMidYMid slice" overflow="visible"'),defs=(s.match(/<defs>[\s\S]*?<\/defs>/)||[''])[0],body=s.slice(s.indexOf('</defs>')+7,s.lastIndexOf('</svg>'));
    const i1=body.indexOf('<g class="pl pl1">'),i2=body.indexOf('<g class="pl pl2">'),i3=body.indexOf('<g class="pl pl3">');
    const parts=[body.slice(0,i1),body.slice(i1,i2),body.slice(i2,i3),body.slice(i3)];
-   s=parts.map((p,i)=>`<div class="lyr" data-d="${[0,0,0,0][i]}">${open}${i===0||i===2||i===3?defs:''}${p}</svg></div>`).join('')+(WXC&&(wet)?`<div class="wx-p ${WK}" style="background-image:${wxTile(WK)}"></div><div class="wx-p ${WK} l2" style="background-image:${wxTile(WK)};background-size:90px 116px"></div>`:'')+(WK==='storm'?'<div class="wx-flash"></div>':'')+(WK==='fog'?'<div class="wx-fog"></div>':'')+(WK==='haze'?'<div class="wx-haze"></div>':'')+`<span class="sky-l">${label}${WXC?' · '+wxText(WXC)+' · '+WXC.temp+'°':''}</span>${tiltNeedsAsk()?'<button type="button" class="tilt-ask" id="tiltAsk">Turn on tilt</button>':''}`;}
+   s=parts.map((p,i)=>`<div class="lyr" data-d="${[0,0,0,0][i]}">${open}${i===0||i===2||i===3?defs:''}${p}</svg></div>`).join('')+cloudsHTML(WXC?({clear:'none',fewclouds:'few',cloudy:'part',overcast:'over',haze:'none',fog:'fog',drizzle:'wet',rain:'wet',storm:'storm',snow:'over'}[WK]||'few'):'few',phase,LPOS)+(WXC&&(wet)?`<div class="wx-p ${WK}" style="background-image:${wxTile(WK)}"></div><div class="wx-p ${WK} l2" style="background-image:${wxTile(WK)};background-size:90px 116px"></div>`:'')+(WK==='storm'?'<div class="wx-flash"></div>':'')+(WK==='fog'?'<div class="wx-fog"></div>':'')+(WK==='haze'?'<div class="wx-haze"></div>':'')+`<span class="sky-l">${label}${WXC?' · '+wxText(WXC)+' · '+WXC.temp+'°':''}</span>${tiltNeedsAsk()?'<button type="button" class="tilt-ask" id="tiltAsk">Turn on tilt</button>':''}`;}
   window.SKY_PHASE=phase;
   return s}
+const _CLC={};
+function cloudsHTML(ck,phase,L){if(ck==='none')return'';
+  const CC={day:[[.80,.83,.88],[1,1,1]],golden:[[.80,.70,.68],[1,.93,.84]],dawn:[[.62,.56,.68],[1,.86,.78]],dusk:[[.55,.46,.58],[1,.78,.68]],night:[[.20,.22,.30],[.40,.43,.54]]}[phase]||[[.64,.69,.77],[1,1,1]];
+  const k=ck==='wet'?[.72,.78]:ck==='storm'?[.5,.6]:ck==='over'?[.9,.92]:[1,1];const B=CC[0].map(v=>(v*k[0]).toFixed(3)),Hh=CC[1].map(v=>(v*k[1]).toFixed(3));
+  const P={few:[.011,.028,5.2,-3.05,150],part:[.010,.026,5,-2.45,140],over:[.0075,.02,4,-1.25,170],wet:[.0075,.02,4,-.95,120],storm:[.008,.022,4.2,-.75,80],fog:[.004,.03,3,-.95,240]}[ck];
+  const tile=(fx,fy,a,b,seed,TW,TH)=>{const key=[phase,ck,fx,fy,a,b,seed].join();if(_CLC[key])return _CLC[key];
+    const mat=(c,aa,bb)=>`0 0 0 0 ${c[0]} 0 0 0 0 ${c[1]} 0 0 0 0 ${c[2]} ${aa} 0 0 0 ${bb}`;
+    const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='${TW}' height='${TH}'><filter id='c' x='0' y='0' width='${TW}' height='${TH}' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='${fx} ${fy}' numOctaves='5' seed='${seed}' stitchTiles='stitch' result='n'/><feColorMatrix in='n' values='${mat(B,a,b)}' result='base'/><feOffset in='n' dy='-5' result='o'/><feColorMatrix in='o' values='${mat(Hh,a,b-.35)}' result='hi'/><feMerge><feMergeNode in='base'/><feMergeNode in='hi'/></feMerge></filter><rect width='${TW}' height='${TH}' filter='url(%23c)'/></svg>`;
+    return _CLC[key]=`url('data:image/svg+xml;utf8,${svg.replace(/"/g,"'").replace(/</g,'%3C').replace(/>/g,'%3E').replace(/'/g,'%27').replace(/\s+/g,' ')}')`};
+  const [fx,fy,a,b,dur]=P,TW=480,TH=240;
+  let mask='';if(L&&(ck==='over'||ck==='wet'||ck==='storm')){const nt=L[2]==='m',g=nt?.5:.62;
+    const m=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300' preserveAspectRatio='xMidYMid slice'><defs><radialGradient id='g' gradientUnits='userSpaceOnUse' cx='${L[0]}' cy='${L[1]}' r='${nt?70:100}'><stop offset='0' stop-color='white' stop-opacity='${g}'/><stop offset='1' stop-color='white'/></radialGradient></defs><rect x='-400' y='-300' width='1200' height='900' fill='white'/><rect x='-400' y='-300' width='1200' height='900' fill='black'/><rect x='-400' y='-300' width='1200' height='900' fill='url(%23g)'/></svg>`;
+    const mu=`url('data:image/svg+xml;utf8,${m.replace(/</g,'%3C').replace(/>/g,'%3E').replace(/'/g,'%27').replace(/\s+/g,' ')}')`;mask=`-webkit-mask-image:${mu};mask-image:${mu};-webkit-mask-size:100% 100%;mask-size:100% 100%;`}
+  const near=tile(fx,fy,a,b,7,TW,TH),far=ck==='few'||ck==='fog'?null:tile(fx*1.7,fy*1.5,a,b+.25,23,TW,TH);
+  let h=`<div class="clouds ck-${ck}" style="${mask}">`;
+  if(far)h+=`<div class="cl-move far" style="background-image:${far};--tw:${TW}px;animation-duration:${Math.round(dur*1.6)}s"></div>`;
+  h+=`<div class="cl-move" style="background-image:${near};--tw:${TW}px;animation-duration:${dur}s"></div></div>`;
+  if(L&&(ck==='over'||ck==='wet'||ck==='storm')){const nt=L[2]==='m';h+=`<div class="lyr lglow"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" overflow="visible"><defs><radialGradient id="lgG"><stop offset="0" stop-color="${nt?'#DCE3FF':'#FFFDF5'}" stop-opacity="${nt?.3:.6}"/><stop offset=".5" stop-color="${nt?'#C7D0F0':'#FFF6E0'}" stop-opacity="${nt?.08:.22}"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><circle cx="${L[0]}" cy="${L[1]}" r="${nt?110:160}" fill="url(#lgG)"/></svg></div>`}
+  return h}
 function wxKey(lat,lon){return (+lat).toFixed(2)+','+(+lon).toFixed(2)}
 function wxNow(){if(!ls.get('wxOn',true))return null;const c=ls.get('wx',null);if(!c)return null;const v=($('loc')||{}).value||'';if(!/^-?\d/.test(v))return null;const [la,lo]=v.split(',').map(Number);if(c.k!==wxKey(la,lo)||Date.now()-c.at>90*60e3)return null;return c}
 function wxKind(c){if(!c)return null;const k=c.code;if(k>=95)return'storm';if((k>=61&&k<=67)||(k>=80&&k<=82))return'rain';if(k>=51&&k<=57)return'drizzle';if((k>=71&&k<=77)||k===85||k===86)return'snow';if(k===45||k===48)return'fog';if(c.aqi!=null&&c.aqi>=150)return'haze';if(k===3||c.cc>=85)return'overcast';if(k===2||c.cc>=35)return'cloudy';if(c.cc>=12)return'fewclouds';return'clear'}
