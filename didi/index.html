@@ -38,7 +38,7 @@
 </head>
 <body>
 <script>window.ME={birth:{dob:"1982-07-29",time:"14:15",lat:26.8467,lon:80.9462,tz:"Asia/Kolkata"},first:"Shraddha",name:"You",self:true}</script>
-<div class="splash anim" id="splash" aria-hidden="true"><svg class="sp-mark" viewBox="226 316 572 356" aria-hidden="true"><defs><linearGradient id="spg" x1="0" y1="472" x2="0" y2="640" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F6BE5A"/><stop offset="1" stop-color="#EC8F37"/></linearGradient><clipPath id="spc"><rect x="0" y="0" width="1024" height="640"/></clipPath></defs><g clip-path="url(#spc)"><path class="sp-sun" d="M344,640 A168,168 0 0 1 680,640Z" fill="url(#spg)"/></g><line class="sp-r" style="--i:0" x1="308.7" y1="555.8" x2="262.6" y2="536.7" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:1" x1="356.4" y1="484.4" x2="321.1" y2="449.1" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:2" x1="427.8" y1="436.7" x2="408.7" y2="390.6" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:3" x1="512.0" y1="420.0" x2="512.0" y2="370.0" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r hi" style="--i:4" x1="596.2" y1="436.7" x2="633.7" y2="346.2" stroke="#F6EAD6" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:5" x1="667.6" y1="484.4" x2="702.9" y2="449.1" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:6" x1="715.3" y1="555.8" x2="761.4" y2="536.7" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-h" x1="250" y1="642" x2="774" y2="642" stroke="#F6EAD6" stroke-width="30" stroke-linecap="round"/></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
+<div class="splash anim" id="splash" aria-hidden="true"><svg class="sp-mark" viewBox="231 232 562 447" aria-hidden="true"><defs><linearGradient id="spg" x1="0" y1="377" x2="0" y2="660" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F6BE5A"/><stop offset="1" stop-color="#EC8F37"/></linearGradient><clipPath id="spc"><rect x="0" y="0" width="1024" height="633"/></clipPath></defs><g clip-path="url(#spc)"><g class="sp-sun"><circle cx="512" cy="545" r="168" fill="url(#spg)"/><path class="sp-s" d="M434,567 Q512,639 590,567" fill="none" stroke="#1E2140" stroke-width="28" stroke-linecap="round"/></g></g><line class="sp-r" style="--i:0" x1="308.7" y1="460.8" x2="262.6" y2="441.7" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:1" x1="356.4" y1="389.4" x2="321.1" y2="354.1" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:2" x1="427.8" y1="341.7" x2="408.7" y2="295.6" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:3" x1="512.0" y1="325.0" x2="512.0" y2="275.0" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r hi" style="--i:4" x1="596.2" y1="341.7" x2="633.7" y2="251.2" stroke="#F6EAD6" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:5" x1="667.6" y1="389.4" x2="702.9" y2="354.1" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-r" style="--i:6" x1="715.3" y1="460.8" x2="761.4" y2="441.7" stroke="#EC9A40" stroke-width="30" stroke-linecap="round"/><line class="sp-h" x1="250" y1="660" x2="774" y2="660" stroke="#F6EAD6" stroke-width="30" stroke-linecap="round"/></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
 <script>(function(){try{var h=(new Date(Date.now()+19800e3)).getUTCHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script>
 <meta name="color-scheme" content="light">
 <style>
@@ -96,20 +96,22 @@ html[data-size="large"] .app > :not(.sheet):not(.sheet-bg):not(.daynav):not(.foc
 /* ---------- splash ---------- */
 .splash{position:fixed;inset:0;z-index:100;overflow:hidden;background:#1E2140;transition:opacity .45s ease,visibility .45s}
 .splash.gone{opacity:0;visibility:hidden}
-.sp-mark{position:absolute;left:50%;top:calc(50% - 84px);width:150px;transform:translateX(-50%);overflow:visible}
-.sp-word{position:absolute;left:0;right:0;top:calc(50% + 14px);text-align:center;color:#F6EAD6}
+.sp-mark{position:absolute;left:50%;top:calc(50% - 118px);width:150px;transform:translateX(-50%);overflow:visible}
+.sp-word{position:absolute;left:0;right:0;top:calc(50% + 24px);text-align:center;color:#F6EAD6}
 .sp-word b{display:block;font-family:"Fraunces",var(--serif),Georgia,serif;font-size:44px;line-height:1.1;font-weight:500;letter-spacing:-.01em;font-variation-settings:"opsz" 96,"SOFT" 30}
 .sp-word i{display:block;margin-top:10px;font-family:"Fraunces",var(--serif),Georgia,serif;font-size:16px;color:rgba(246,234,214,.62);font-variation-settings:"opsz" 14,"SOFT" 80}
 .sp-hi{position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));text-align:center;font-size:15px;font-weight:600;color:rgba(246,234,214,.7);letter-spacing:.01em;opacity:0}
-.sp-h,.sp-r{transform-box:view-box;transform-origin:512px 640px}
+.sp-h,.sp-r{transform-box:view-box;transform-origin:512px 545px}.sp-h{transform-origin:512px 660px}
 .splash.anim .sp-sun{animation:spsun .75s cubic-bezier(.2,.8,.2,1) both}
 .splash.anim .sp-h{animation:sph .55s cubic-bezier(.3,0,.2,1) both}
 .splash.anim .sp-r{animation:spray .4s calc(.32s + var(--i)*.045s) cubic-bezier(.2,.8,.2,1) both}
+.splash.anim .sp-s{animation:spsm .45s .62s ease-out both}
 .splash.anim .sp-r.hi{animation:spray .45s .78s cubic-bezier(.3,1.5,.5,1) both}
 .splash.anim .sp-word b{animation:spfade .6s .2s ease-out both}
 .splash.anim .sp-word i{animation:spfade .6s .4s ease-out both}
 .splash.anim .sp-hi{animation:spfade .6s .6s ease-out both}
-@keyframes spsun{from{transform:translateY(172px)}to{transform:none}}
+@keyframes spsun{from{transform:translateY(290px)}to{transform:none}}
+@keyframes spsm{from{opacity:0}to{opacity:1}}
 @keyframes sph{from{opacity:0;transform:scaleX(.15)}to{opacity:1;transform:none}}
 @keyframes spray{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
 @keyframes spfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
