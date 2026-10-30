@@ -7,9 +7,10 @@ window.ShubhlyWake=function(svg){
  const eob=(p,c=1.2)=>p<=0?0:p>=1?1:1+(c+1)*Math.pow(p-1,3)+c*Math.pow(p-1,2), bump=p=>Math.sin(Math.PI*p);
  const top=CY-rH*Math.sin(Math.PI/3)-RW/2-6;
  svg.setAttribute('viewBox',`${cx-L-W/2-4} ${top.toFixed(0)} ${2*L+W+8} ${(hz+W/2+4-top).toFixed(0)}`);
- const fingers=k=>`<g class="f${k}"><rect class="fb" fill="${sun}"/><line class="c1" stroke="#C9712B" stroke-width="6" stroke-linecap="round"/><line class="c2" stroke="#C9712B" stroke-width="6" stroke-linecap="round"/></g>`;
+ const CR='#C9712B',NL='#F9CC94',FX=[-33,-11,11,33],FL=[27,34,38,35];
+ const fingers=k=>`<g class="f${k}">${FX.map((x,i)=>`<rect class="fi" data-i="${i}" x="${x-10}" y="-10" width="20" rx="10" fill="${sun}" stroke="${CR}" stroke-width="4"/><ellipse class="nl" data-i="${i}" cx="${x}" rx="5.5" ry="4.5" fill="${NL}"/>`).join('')}<rect class="th" x="38" y="-24" width="19" height="36" rx="9.5" fill="${sun}" stroke="${CR}" stroke-width="4" transform="rotate(-28 47 -6)"/></g>`;
  svg.innerHTML=`<defs><clipPath id="wkA"><rect x="0" y="0" width="1024" height="${hz-W/2-12}"/></clipPath><clipPath id="wkP"><rect x="0" y="0" width="1024" height="${LT+2}"/></clipPath></defs>
- <g clip-path="url(#wkA)"><path class="aL" fill="none" stroke="${sun}" stroke-linecap="round"/><path class="aR" fill="none" stroke="${sun}" stroke-linecap="round"/>
+ <g clip-path="url(#wkA)">
  <g class="bd"><circle class="sn" r="${R}" fill="${sun}"/>
  <path class="lL" fill="none" stroke="${ink}" stroke-width="16" stroke-linecap="round"/><path class="lR" fill="none" stroke="${ink}" stroke-width="16" stroke-linecap="round"/>
  <ellipse class="eL" fill="${ink}"/><ellipse class="eR" fill="${ink}"/><path class="mo" fill="none" stroke="${ink}" stroke-linecap="round"/></g></g>
@@ -19,7 +20,7 @@ window.ShubhlyWake=function(svg){
  ${fingers('L')}${fingers('R')}
  <line class="rh" stroke="var(--wk-line,#1E2140)" stroke-width="${RW}" stroke-linecap="round" opacity="0"/>`;
  const q$=c=>svg.querySelector('.'+c), A=(el,o)=>{for(const k in o)el.setAttribute(k,typeof o[k]==='number'?(+o[k].toFixed(2)):o[k])};
- const E={aL:q$('aL'),aR:q$('aR'),bd:q$('bd'),sn:q$('sn'),lL:q$('lL'),lR:q$('lR'),eL:q$('eL'),eR:q$('eR'),mo:q$('mo'),hz:q$('hz'),rh:q$('rh'),pL:q$('pL'),pR:q$('pR'),
+ const E={bd:q$('bd'),sn:q$('sn'),lL:q$('lL'),lR:q$('lR'),eL:q$('eL'),eR:q$('eR'),mo:q$('mo'),hz:q$('hz'),rh:q$('rh'),pL:q$('pL'),pR:q$('pR'),
   fL:q$('fL'),fR:q$('fR'),r:{0:q$('r0'),1:q$('r1'),2:q$('r2'),4:q$('r4')}};
  const rayAt=(el,a,len,op)=>A(el,{x1:cx+r1*Math.cos(a),y1:CY+r1*Math.sin(a),x2:cx+(r1+len)*Math.cos(a),y2:CY+(r1+len)*Math.sin(a),opacity:op});
  let blinkAt=-9;
@@ -39,12 +40,12 @@ window.ShubhlyWake=function(svg){
    const sa=d<0?Math.PI*.86:Math.PI*.14, shx=cx+R*.92*Math.cos(sa)*sxk, shy=hz+(sy+R*.92*Math.sin(sa)-hz)*syk;
    const hx=lerp(hx0,shx,go), hy=lerp(py0,shy,go), sc=1-go;
    A(E['p'+k],{cx:hx,cy:hy,rx:44*sc,ry:32*sc,opacity:t>.4&&go<1?1:0});
-   const c=curl*(1-uncurl), fg=E['f'+k], fw=74*sc, fh=(10+26*c)*sc;
-   A(fg.querySelector('.fb'),{x:hx-fw/2,y:hy+4*sc,width:fw,height:fh,rx:Math.min(fw,fh)/2});
-   [[fg.querySelector('.c1'),-12],[fg.querySelector('.c2'),12]].forEach(([el,o])=>A(el,{x1:hx+o*sc+d*0,y1:hy+(4+fh*.45)*1,x2:hx+o*sc,y2:hy+4*sc+fh-6*sc,opacity:c>.5?1:0}));
+   const c=curl*(1-uncurl), fg=E['f'+k], sx=(d<0?1:-1)*sc;
+   fg.setAttribute('transform',`translate(${hx.toFixed(1)} ${(hy+26*sc).toFixed(1)}) scale(${sx.toFixed(3)} ${sc.toFixed(3)})`);
+   fg.querySelectorAll('.fi').forEach(r=>r.setAttribute('height',(10+FL[r.dataset.i]*c).toFixed(1)));
+   fg.querySelectorAll('.nl').forEach(n=>{n.setAttribute('cy',(FL[n.dataset.i]*c-10).toFixed(1));n.setAttribute('opacity',c>.75?((c-.75)*4).toFixed(2):0)});
+   fg.querySelector('.th').setAttribute('opacity',c>.3?1:0);
    fg.setAttribute('opacity',c>.02&&go<1?1:0);
-   const mx=(shx+hx)/2,my=(shy+hy)/2,dx=hx-shx,dy=hy-shy,len=Math.hypot(dx,dy)||1,bend=30*sc;
-   A(E['a'+k],{d:`M${shx.toFixed(1)},${shy.toFixed(1)} Q${(mx+dy/len*bend*d).toFixed(1)},${(my-dx/len*bend*d).toFixed(1)} ${hx.toFixed(1)},${hy.toFixed(1)}`,'stroke-width':34*sc,opacity:t>.4&&go<1?1:0});
   }
   // 4. wakes: eyes open, one blink, smile grows
   const o=eob(seg(t,2.75,3.05),.8), lid=1-seg(t,2.72,2.8);
