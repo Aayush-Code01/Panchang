@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shubhly · Privacy</title>
+<meta name="description" content="How Shubhly handles your information. Your birth details stay on your phone.">
+<meta name="theme-color" content="#F4EFE6">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..600,0..100&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#F4EFE6;--card:#FBF8F2;--ink:#221E1A;--text:#4A433B;--muted:#857A6C;--line:rgba(60,45,30,.12);--accent:#C9652F;--serif:"Fraunces",Georgia,serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171512;--card:#211E1A;--ink:#F1EBE0;--text:#D6CDBF;--muted:#A89A86;--line:rgba(255,240,220,.12);--accent:#F0A06A}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.6 Inter,system-ui,-apple-system,sans-serif}
+.hero{background:linear-gradient(180deg,#2B2E6E 0%,#4A3C7E 45%,#B4637A 78%,#E79A7C 100%);color:#F6EAD6;padding:calc(36px + env(safe-area-inset-top,0px)) 20px 34px}
+.hero .in,main{max-width:680px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font:600 14px/1 Inter,sans-serif;letter-spacing:.02em;opacity:.9}
+.brand img{width:30px;height:30px;border-radius:8px}
+h1{font-family:var(--serif);font-weight:500;font-size:40px;line-height:1.05;letter-spacing:-.02em;margin:22px 0 10px;font-variation-settings:"opsz" 96,"SOFT" 30}
+.hero p{margin:0;font-size:17px;color:rgba(246,234,214,.82)}
+main{padding:8px 20px calc(48px + env(safe-area-inset-bottom,0px))}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 20px;margin:-20px 0 26px;position:relative;box-shadow:0 12px 30px -18px rgba(60,40,20,.3)}
+.sum ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.sum li{display:flex;gap:12px;align-items:flex-start}
+.sum li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:9px}
+h2{font-family:var(--serif);font-weight:500;font-size:23px;color:var(--ink);margin:30px 0 8px;letter-spacing:-.01em}
+p{margin:0 0 12px}
+table{width:100%;border-collapse:collapse;margin:8px 0 14px;font-size:14.5px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--ink);font-weight:600}
+td:first-child{color:var(--ink);font-weight:500;white-space:nowrap}
+a{color:var(--accent)}
+.meta{color:var(--muted);font-size:14px;margin-top:34px;border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:520px){h1{font-size:34px}td:first-child{white-space:normal}table{font-size:14px}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="in">
+ <div class="brand"><img src="icon-192.png" alt="">Shubhly</div>
+ <h1>Your privacy</h1>
+ <p>Shubhly works out your day on your phone. Your birth details stay with you.</p>
+</div></header>
+<main>
+ <div class="sum"><ul>
+  <li>Your name and birth details are saved only on your phone. We don't have a server that receives them.</li>
+  <li>No account, no ads, no analytics, no tracking. We never sell or share your information.</li>
+  <li>Your location is used only if you allow it, to give timings for where you are.</li>
+  <li>Delete the app, or clear its data, and everything it saved is gone.</li>
+ </ul></div>
+
+ <h2>Who we are</h2>
+ <p>Shubhly is published by Healway Global Private Limited, a company registered in India (“we”, “us”). This policy explains what the Shubhly app and website do with information about you.</p>
+
+ <h2>What stays on your phone</h2>
+ <p>When you set up Shubhly you enter your first name, date of birth, time of birth (optional) and place of birth. The app uses these to work out your birth star, moon sign and rising sign, and to personalise each day. They are stored in the app's own storage on your device, together with your settings, notes, intentions, practice and chant counts, and any profiles you add for family or a partner. None of this is sent to us.</p>
+
+ <h2>Your location</h2>
+ <p>If you tap “Use my location”, the app asks your phone's permission and uses your position to calculate sunrise, sunset and good times for where you are. You can say no and pick a city instead, and you can turn this off at any time in Settings or in your phone's settings. Your position is not sent to us.</p>
+
+ <h2>Services the app talks to</h2>
+ <p>A few features need the internet. In each case only what the feature needs is sent, directly from your phone to the service, and nothing that identifies you by name.</p>
+ <table>
+  <tr><th>Feature</th><th>Service</th><th>What is sent</th></tr>
+  <tr><td>Finding your birth place</td><td>Open-Meteo geocoding</td><td>The city name you type</td></tr>
+  <tr><td>Weather and air quality</td><td>Open-Meteo</td><td>Approximate coordinates of the place shown</td></tr>
+  <tr><td>Name of your current place</td><td>BigDataCloud</td><td>Your coordinates, only if you allowed location</td></tr>
+  <tr><td>Fonts and some images</td><td>Google Fonts, Wikimedia</td><td>A standard web request</td></tr>
+  <tr><td>Chant recordings</td><td>YouTube</td><td>Opens only when you tap a video link</td></tr>
+  <tr><td>Sync between devices (optional)</td><td>GitHub</td><td>Your chants, ticks and intentions, saved to a private gist in your own GitHub account, only if you set it up</td></tr>
+ </table>
+ <p>Like any website, these services can see your device's IP address when your phone contacts them. Their own privacy policies apply to what they do with it.</p>
+
+ <h2>What we don't do</h2>
+ <p>We don't run accounts, collect analytics, show ads, use advertising identifiers, track you across apps or websites, or sell, rent or share your information with anyone.</p>
+
+ <h2>Children</h2>
+ <p>Shubhly is not directed at children under 13, and we do not knowingly collect information from them. Parents can set up the app for a child; the details stay on the parent's phone.</p>
+
+ <h2>Your choices</h2>
+ <p>You can change your birth details at any time in Settings. To remove everything, delete the app or clear its data in your phone's settings. Because we don't hold your information on our side, there is nothing for us to export or delete, but you are always welcome to ask us about it.</p>
+
+ <h2>About the readings</h2>
+ <p>Shubhly offers traditional Hindu timing (panchang) and gentle guidance for reflection and planning. It is not medical, legal or financial advice.</p>
+
+ <h2>Changes and contact</h2>
+ <p>If this policy changes we will update this page and the date below. Questions or requests: <a href="mailto:hello@healway.net">hello@healway.net</a>.</p>
+ <p class="meta">Healway Global Private Limited, India · Last updated 30 October 2026</p>
+</main>
+</body>
+</html>

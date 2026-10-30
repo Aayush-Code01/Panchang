@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Shubhly">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#F3EEE5">
-<script>try{var m=JSON.parse(localStorage.getItem('e:theme')||'"auto"'),z=JSON.parse(localStorage.getItem('e:size')||'"normal"');document.documentElement.dataset.glass=JSON.parse(localStorage.getItem('e:glass')||'"subtle"');document.documentElement.dataset.theme=(m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';document.documentElement.dataset.size=z;var hh=(new Date(Date.now()+19800e3)).getUTCHours()+(new Date(Date.now()+19800e3)).getUTCMinutes()/60,ph=hh<5.6?'night':hh<7.2?'dawn':hh<16.3?'day':hh<17.3?'golden':hh<18.4?'dusk':'night',dk=document.documentElement.dataset.theme==='dark',AA=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}:{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']},aa=AA[ph];document.documentElement.style.setProperty('--amb1',aa[0]);document.documentElement.style.setProperty('--amb2',aa[1])}catch(e){}</script>
+<script>try{var m=JSON.parse(localStorage.getItem('e:theme')||'"auto"'),z=JSON.parse(localStorage.getItem('e:size')||'"normal"');document.documentElement.dataset.glass=JSON.parse(localStorage.getItem('e:glass')||'"subtle"');document.documentElement.dataset.theme=(m==='dark'||(m==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches))?'dark':'light';document.documentElement.dataset.size=z;var hh=(new Date()).getHours()+(new Date()).getMinutes()/60,ph=hh<5.6?'night':hh<7.2?'dawn':hh<16.3?'day':hh<17.3?'golden':hh<18.4?'dusk':'night',dk=document.documentElement.dataset.theme==='dark',AA=dk?{night:['#171B33','#1A1A22'],dawn:['#30232A','#1F1B1A'],day:['#1C2A33','#1C1C19'],golden:['#30271A','#1E1B17'],dusk:['#2E2133','#1E1A1E']}:{night:['#D5D8EC','#EAE6EC'],dawn:['#F6D6C2','#F6E7DA'],day:['#CFE4EE','#ECEFE6'],golden:['#F6DDB6','#F6EBDA'],dusk:['#EFCBCF','#F3E4DF']},aa=AA[ph];document.documentElement.style.setProperty('--amb1',aa[0]);document.documentElement.style.setProperty('--amb2',aa[1])}catch(e){}</script>
 <meta name="robots" content="noindex">
 <meta name="description" content="Eraya's daily panchang: good times, gentle guidance and simple practices.">
 <meta property="og:type" content="website">
@@ -40,7 +40,7 @@
 <body>
 <script>window.ME={birth:{dob:"2026-09-15",time:"08:09",lat:28.4595,lon:77.0266,tz:"Asia/Kolkata"},first:"Eraya",name:"Eraya",self:false,noWork:true}</script>
 <div class="splash" id="splash" aria-hidden="true"><svg class="sp-scene"></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
-<script>(function(){try{var h=(new Date(Date.now()+19800e3)).getUTCHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script><script>(function(){try{var s=document.querySelector('#splash .sp-scene'),w=innerWidth,h=innerHeight,r=Math.min(w*.2,92),sc=ShubhlyScene(s,{W:w,H:h,cx:w/2,hz:Math.round(h*.5),R:r,mode:'quick'});matchMedia('(prefers-reduced-motion: reduce)').matches?sc.frame(9):sc.play(false)}catch(e){}})()</script>
+<script>(function(){try{var h=(new Date()).getHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script><script>(function(){try{var s=document.querySelector('#splash .sp-scene'),w=innerWidth,h=innerHeight,r=Math.min(w*.2,92),sc=ShubhlyScene(s,{W:w,H:h,cx:w/2,hz:Math.round(h*.5),R:r,mode:'quick'});matchMedia('(prefers-reduced-motion: reduce)').matches?sc.frame(9):sc.play(false)}catch(e){}})()</script>
 <meta name="color-scheme" content="light">
 <style>
 /* Panchang — visual system v5
@@ -428,6 +428,7 @@ body.has-sk .app{padding-bottom:156px}
 .row .act{font-size:15px;font-weight:600;color:var(--brass)}
 .row .act.danger{color:var(--avoid-ink)}
 .sheet .ver{text-align:center;font-size:12.5px;color:var(--muted);margin-top:18px}
+.sheet .ver a,.onb-note a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 
 .sky .lyr{position:absolute;inset:0;will-change:transform;transform:translate3d(0,0,0)}
 .sky .lyr svg{position:absolute;inset:0;width:100%;height:100%}
@@ -660,7 +661,7 @@ html[data-theme="dark"] .it + .it,html[data-theme="dark"] .pi{border-color:var(-
       <div class="row"><span>Today's practice</span><button type="button" class="act" id="resetToday">Reset</button></div>
       <div class="row"><span>Streak and all ticks</span><button type="button" class="act danger" id="clearAll">Clear</button></div>
     </div>
-    <p class="ver">Shubhly · Lahiri system · calculated on your phone</p>
+    <p class="ver">Shubhly · Lahiri system · calculated on your phone · <a href="../privacy.html">Privacy</a></p>
   </div>
   <p class="foot">Worked out on your phone from the Sun and Moon's positions, using the Lahiri system Indian panchangs follow. Matches <a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a> within about a minute. Traditional guidance, not a promise of results.</p>
 </div>
@@ -786,7 +787,11 @@ function openToggle(p,cb){const h=p.querySelector('.ph')||p,y0=h.getBoundingClie
   if(p.classList.contains('open'))requestAnimationFrame(()=>{const r=p.getBoundingClientRect(),box=sc?sc.getBoundingClientRect():{top:0,bottom:innerHeight-(document.body.classList.contains('has-sk')?150:110)};
     const over=r.bottom-box.bottom;if(over>0){const by=Math.min(over+12,r.top-box.top-12);if(by>0){if(sc)sc.scrollBy({top:by,behavior:'smooth'});else window.scrollBy({top:by,behavior:'smooth'})}}})}
 var _hLast=0;function haptic(n=1){const _n=Date.now();if(n===1&&_n-_hLast<60)return;_hLast=_n;try{if(navigator.vibrate&&navigator.vibrate(n>1?[12,60,12]:10))return;const ae=document.activeElement,keep=ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&ae.type!=='checkbox';const tap=()=>{const a2=document.activeElement,k2=a2&&/^(INPUT|TEXTAREA|SELECT)$/.test(a2.tagName)&&a2.type!=='checkbox';$('hapt').click();if(k2)a2.focus({preventScroll:true})};tap();for(let i=1;i<n;i++)setTimeout(tap,i*110)}catch(e){}}
-const ist=d=>new Date(+d+TZ*3600e3);
+// Time zone: a chosen Indian city uses IST; 'Near me' uses this phone's own time zone (works abroad, handles daylight saving).
+const tzDev=()=>{const o=document.getElementById('nearOpt');return !!(o&&o.selected)};
+const tzAt=d=>tzDev()?-new Date(+d).getTimezoneOffset()/60:TZ;
+const tzDay=(y,m,d)=>tzDev()?-new Date(y,m-1,d,12).getTimezoneOffset()/60:TZ;
+const ist=d=>new Date(+d+tzAt(d)*3600e3);
 const fmt=d=>{const x=ist(d);let h=x.getUTCHours(),m=x.getUTCMinutes();const a=h>=12?'pm':'am';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+a};
 const hm=d=>{const x=ist(d);return (x.getUTCHours()%12||12)+':'+String(x.getUTCMinutes()).padStart(2,'0')};
 const apm=d=>ist(d).getUTCHours()>=12?'pm':'am';
@@ -910,7 +915,7 @@ function segments(r){
   return S}
 
 const cache={};
-function calc(ds,lat,lon){const k=ds+lat;if(!cache[k]){const [y,m,d]=ds.split('-').map(Number);cache[k]=Panchang.compute(y,m,d,lat,lon,TZ,BIRTH)}return cache[k]}
+function calc(ds,lat,lon){const k=ds+lat+','+lon+(tzDev()?'d':'i');if(!cache[k]){const [y,m,d]=ds.split('-').map(Number);cache[k]=Panchang.compute(y,m,d,lat,lon,tzDay(y,m,d),BIRTH)}return cache[k]}
 
 function bar(r,S,isToday){
   const t0=+r.rise,t1=S.length?S[S.length-1].b:+r.set,span=t1-t0,pc=t=>((t-t0)/span*100);
@@ -921,7 +926,7 @@ function bar(r,S,isToday){
   h+='</div>';
   if(isToday&&now>t0&&now<t1)h+=`<div class="tl-now" style="left:${pc(now)}%" title="Now"></div>`;
   const x=ist(r.rise);let lab='';
-  for(let hr=6;hr<=30;hr+=4){const t=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate(),hr)-TZ*3600e3;if(t<t0||t>t1)continue;
+  for(let hr=6;hr<=30;hr+=4){const t=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate(),hr)-tzDay(x.getUTCFullYear(),x.getUTCMonth()+1,x.getUTCDate())*3600e3;if(t<t0||t>t1)continue;
     lab+=`<span style="left:${pc(t)}%">${hr%12||12}${(hr%24)<12?'am':'pm'}</span>`}
   const sm=`<div class="tl-sun" style="left:${pc(+r.set)}%" title="Sunset ${fmt(r.set)}"></div>`;
   $('tl').innerHTML=h+sm+`<div class="tl-lab">${lab}</div><div class="tl-lift" id="tlLift" hidden></div><div class="tl-bub" id="tlBub" hidden></div>`;
@@ -941,7 +946,7 @@ function strip(sel,lat,lon){
 
 function render(ds,scrollStrip){
   const [lat,lon]=$('loc').value.split(',').map(Number);
-  $('cityName').textContent=$('loc').selectedOptions[0].text;
+  $('cityName').textContent=$('loc').selectedOptions[0].text+(!tzDev()&&new Date().getTimezoneOffset()!==-330?' · IST':'');
   const r=calc(ds,lat,lon),S=segments(r),isToday=ds===todayIST(),now=Date.now();
   const [vc,vt]=verdict(r),tq=TARA[r.tara.name];
   const dt=new Date(ds+'T00:00:00Z'),tom=new Date(+new Date(todayIST()+'T00:00:00Z')+86400e3).toISOString().slice(0,10);
