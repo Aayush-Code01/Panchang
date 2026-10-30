@@ -275,6 +275,7 @@ function drawPersonal(){const el=$('pane-personal'),v=view.personal[view.persona
   h+='</div><div>';
   if(ME.self&&p.rel==='Partner'){const m=match({nak:BIRTH.nak,rashi:BIRTH.rashi},p);
     h+=`<div class="card gcard"><h3>${m.head}</h3><div class="sub">Your connection, the traditional way</div><div style="margin-top:8px">${m.out.map(([k,l,tx])=>`<div class="asp"><b>${k}</b><span class="lvl l${l}"><i></i><i></i><i></i></span><p>${tx}</p></div>`).join('')}</div></div><p class="note2">Based on your Moon signs and birth stars (parts of the traditional Ashtakoot match). Every relationship is built by the two of you, not the stars.</p>`}
+  if(ADV()&&p.dob){const [pla,plo]=(p.place||'28.4595,77.0266').split(',').map(Number);h+=`<div class="card gcard"><h3>${esc(p.name)}’s chart</h3>${kundliHTML({dob:p.dob,time:p.time,lat:pla,lon:plo,tz:'Asia/Kolkata'},esc(p.name)+'’s')}</div>`}
   h+=`<button type="button" class="btnp" data-edit style="background:var(--g-row);color:var(--ink);border:1px solid var(--g-edge)">Edit details</button><button type="button" class="btnd" data-del>Remove ${esc(p.name)}</button></div></div>`;
   el.innerHTML=h;wire(el,'personal');el.querySelector('[data-edit]').onclick=()=>go2('personal','edit:'+p.id);
   el.querySelector('[data-del]').onclick=()=>{savePeople(people().filter(x=>x.id!==p.id));view.personal=['home'];drawPersonal();renderGlance()}}
@@ -402,7 +403,7 @@ const HORA_Q={Sun:'authority, government work',Moon:'travel, public dealings',Ma
 function horaAt(r,t){const rise=+r.rise,set=+r.set,next=+r.chog[15].b;let i,a,b;if(t>=rise&&t<set){const L=(set-rise)/12;i=Math.floor((t-rise)/L);a=rise+i*L;b=a+L}else if(t>=set&&t<next){const L=(next-set)/12;i=12+Math.floor((t-set)/L);a=set+(i-12)*L;b=a+L}else return null;
   const start=HORA_ORD.indexOf(DAYLORD[r.wd]);return{lord:HORA_ORD[(start+i)%7],a:new Date(a),b:new Date(b)}}
 const ORD=n=>n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
-function applyDepth(){document.documentElement.dataset.depth=ADV()?'advanced':'simple';
+function applyDepth(){document.documentElement.dataset.depth=ADV()?'advanced':'simple';try{chartPanel()}catch(e){console.error(e)}
   const [lat,lon]=loc(),ds=SEL(),r=calc(ds,lat,lon),p=personDay(r,BIRTH),why=$('why');
   document.querySelectorAll('.advx').forEach(x=>x.remove());
   if(!ADV())return;
@@ -422,6 +423,39 @@ function depthSetting(){const g=[...document.querySelectorAll('.grp-t')].find(x=
   g.nextElementSibling.insertAdjacentHTML('beforeend',`<div class="row"><span>Detail level<small>Advanced adds tara and chandra bala, hora and more</small></span><div class="seg" id="segDepth"><button type="button" data-v="simple">Simple</button><button type="button" data-v="advanced">Advanced</button></div></div>`);
   const sync=()=>$('segDepth').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===ls.get('depth','simple')));sync();
   $('segDepth').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('depth',b.dataset.v);sync();document.querySelectorAll('.d-det,.d-chart').forEach(d=>{delete d.dataset.auto;if(b.dataset.v==='simple')d.open=false});applyDepth();if(cur!=='today')draw(cur)}}
+
+/* ---------- Kundli (advanced): birth chart, navamsa, transits, planets, dasha ---------- */
+const GR=[['Su','Sun','Sun'],['Mo','Moon','Moon'],['Ma','Mars','Mars'],['Me','Mercury','Mercury'],['Ju','Jupiter','Jupiter'],['Ve','Venus','Venus'],['Sa','Saturn','Saturn'],['Ra','Rahu',null],['Ke','Ketu',null]];
+function tzOff(tz,y,m,d,hh,mm){try{const dt=new Date(Date.UTC(y,m-1,d,hh,mm));const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(dt).reduce((a,p)=>(a[p.type]=p.value,a),{});return(Date.UTC(+f.year,+f.month-1,+f.day,+f.hour,+f.minute)-dt)/60000}catch(e){return 330}}
+function birthDate(b){const [y,m,d]=b.dob.split('-').map(Number),[hh,mm]=(b.time||'12:00').split(':').map(Number);return new Date(Date.UTC(y,m-1,d,hh,mm)-tzOff(b.tz||'Asia/Kolkata',y,m,d,hh,mm)*60000)}
+function grahas(dt,lat,lon,withLagna){const A=Astronomy,ay=ayan(dt),out={};
+  GR.forEach(([k,,body])=>{if(!body)return;const L=t=>k==='Su'?A.SunPosition(t).elon:A.Ecliptic(A.GeoVector(body,t,true)).elon;const l=n360(L(dt)-ay),l2=n360(L(new Date(+dt+864e5))-ay);out[k]={lon:l,retro:k!=='Su'&&k!=='Mo'&&((l2-l+540)%360-180)<0}});
+  const T=(dt-Date.UTC(2000,0,1,12))/(36525*864e5),node=n360(125.04452-1934.136261*T+.0020708*T*T-ay);out.Ra={lon:node,retro:true};out.Ke={lon:n360(node+180),retro:true};
+  if(withLagna){const lst=n360(Astronomy.SiderealTime(dt)*15+lon)*Math.PI/180,eps=23.4393*Math.PI/180,ph=lat*Math.PI/180;out.As={lon:n360(n360(Math.atan2(Math.cos(lst),-(Math.sin(lst)*Math.cos(eps)+Math.tan(ph)*Math.sin(eps)))*180/Math.PI)-ay)}}
+  return out}
+const DL=['Ke','Ve','Su','Mo','Ma','Ra','Ju','Sa','Me'],DY={Ke:7,Ve:20,Su:6,Mo:10,Ma:7,Ra:18,Ju:16,Sa:19,Me:17},DN={Su:'Sun',Mo:'Moon',Ma:'Mars',Me:'Mercury',Ju:'Jupiter',Ve:'Venus',Sa:'Saturn',Ra:'Rahu',Ke:'Ketu'};
+function dasha(moonLon,born,at){const span=360/27,ni=Math.floor(moonLon/span),f=(moonLon%span)/span,Y=365.2425*864e5;let i=ni%9,start=+born-f*DY[DL[i]]*Y;
+  for(let k=0;k<20;k++){const L=DL[(i+k)%9],len=DY[L]*Y;if(at<start+len){let s2=start;for(let j=0;j<9;j++){const A=DL[(i+k+j)%9],l2=len*DY[A]/120;if(at<s2+l2)return{maha:L,mEnd:new Date(start+len),antar:A,aEnd:new Date(s2+l2)};s2+=l2}}start+=len}return null}
+function northChart(pos,asc,title){const S=300,cx=S/2,H=[[150,78],[78,36],[34,78],[78,150],[34,222],[78,264],[150,222],[222,264],[266,222],[222,150],[266,78],[222,36]],N=[[150,128],[78,62],[60,78],[128,150],[60,222],[78,238],[150,172],[222,238],[240,222],[172,150],[240,78],[222,62]];
+  const by=Array.from({length:12},()=>[]);Object.entries(pos).forEach(([k,v])=>{if(k==='As')return;const h=((Math.floor(v.lon/30)-asc+12)%12);by[h].push(k+(v.retro&&k!=='Ra'&&k!=='Ke'?'℞':''))});
+  let g=`<svg viewBox="0 0 ${S} ${S}" class="kchart" role="img" aria-label="${title}"><rect x="2" y="2" width="${S-4}" height="${S-4}" rx="10" class="kc-box"/><path d="M2 2L${S-2} ${S-2}M${S-2} 2L2 ${S-2}M${cx} 2L${S-2} ${cx}L${cx} ${S-2}L2 ${cx}Z" class="kc-line"/>`;
+  H.forEach(([x,y],h)=>{const sign=(asc+h)%12+1,[nx,ny]=N[h];g+=`<text x="${nx}" y="${ny+4}" class="kc-sign">${sign}</text>`;const L=by[h],n=L.length;L.forEach((p,i)=>{const cols=n>3?2:1,r=Math.floor(i/cols),c=i%cols,rows=Math.ceil(n/cols);g+=`<text x="${x+(cols>1?(c?14:-14):0)}" y="${y-(rows-1)*7+r*14+4}" class="kc-pl${p.startsWith('As')?' as':''}">${p}</text>`})});
+  g+=`<text x="${H[0][0]}" y="${H[0][1]-24}" class="kc-asc">Asc</text></svg>`;return g}
+function kundliHTML(b,who){if(!b||!b.dob)return'';const dt=birthDate(b),P=grahas(dt,b.lat,b.lon,!!b.time),asc=P.As?Math.floor(P.As.lon/30):Math.floor(P.Mo.lon/30);
+  const nine={};Object.entries(P).forEach(([k,v])=>nine[k]={lon:n360(Math.floor(v.lon*9/30)%12*30+15),retro:v.retro});const ascD9=P.As?Math.floor(P.As.lon*9/30)%12:Math.floor(P.Mo.lon*9/30)%12;
+  const now=new Date(),T=grahas(now,b.lat,b.lon,false);
+  const da=dasha(P.Mo.lon,dt,+now),fd=d=>d.toLocaleDateString('en-IN',{month:'short',year:'numeric'});
+  const rows=['As',...GR.map(g=>g[0])].filter(k=>P[k]).map(k=>{const v=P[k],sg=Math.floor(v.lon/30),dg=v.lon%30,nk=Math.floor(v.lon/(360/27)),pd=Math.floor((v.lon%(360/27))/(360/108))+1,hs=(sg-asc+12)%12+1;
+    return`<tr><td><b>${k==='As'?'Ascendant':DN[k]}</b>${v.retro&&k!=='Ra'&&k!=='Ke'?' <span class="kc-r">℞</span>':''}</td><td>${RS[sg]} ${Math.floor(dg)}°${String(Math.round((dg%1)*60)).padStart(2,'0')}′</td><td>${NAKN[nk]} ${pd}</td><td>${k==='As'?'1':hs}</td></tr>`}).join('');
+  const id='k'+Math.random().toString(36).slice(2,7);
+  return`<div class="kund" id="${id}"><div class="seg ktabs"><button type="button" data-k="d1" aria-pressed="true">Birth chart</button><button type="button" data-k="d9" aria-pressed="false">Navamsa</button><button type="button" data-k="tr" aria-pressed="false">Today’s sky</button></div>
+   <div class="kpanes"><div data-p="d1">${northChart(P,asc,'Birth chart')}</div><div data-p="d9" hidden>${northChart(nine,ascD9,'Navamsa chart')}</div><div data-p="tr" hidden>${northChart(T,asc,'Transits over the birth chart')}<p class="knote">Today’s planets placed in ${who||'your'} birth houses (gochar).</p></div></div>
+   <p class="knote">North Indian style. Numbers are signs (1 = Aries). ℞ = retrograde.${b.time?'':' No birth time, so houses are counted from the Moon sign.'}</p>
+   ${da?`<div class="kdasha"><div><span>Mahadasha</span><b>${DN[da.maha]}</b><small>until ${fd(da.mEnd)}</small></div><div><span>Antardasha</span><b>${DN[da.antar]}</b><small>until ${fd(da.aEnd)}</small></div></div>`:''}
+   <div class="ktable"><table><thead><tr><th>Planet</th><th>Sign</th><th>Nakshatra</th><th title="House">H</th></tr></thead><tbody>${rows}</tbody></table></div></div>`}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.ktabs button');if(!b)return;const k=b.closest('.kund');k.querySelectorAll('.ktabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));k.querySelectorAll('.kpanes > div').forEach(p=>p.hidden=p.dataset.p!==b.dataset.k)});
+function chartPanel(){const box=document.querySelector('.d-chart');if(!box)return;let k=box.querySelector('.kwrap');if(!ADV()||!ME.birth){if(k)k.remove();return}
+  if(k&&k.dataset.v===JSON.stringify(ME.birth))return;if(k)k.remove();box.insertAdjacentHTML('beforeend',`<div class="kwrap" data-v='${JSON.stringify(ME.birth).replace(/'/g,'')}'>${kundliHTML(ME.birth,ME.self?'your':ME.name+'’s')}</div>`)}
 
 /* ---------- Today: at a glance ---------- */
 function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=SEL(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
