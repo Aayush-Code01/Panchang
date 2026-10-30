@@ -1,11 +1,11 @@
 /* Shubhly scene: a glowing sun rising behind a frosted-glass horizon, a smile of light, and a dial of rays where one long
    cream ray marks "the right moment". One source for the icon, launch screen, sign-up animation and social image.
-   ShubhlyScene(svg,{W,H,cx,hz,R,bg,mode}) -> {frame(t),play(),still(),stop()}. mode 'full' (sign-up) or 'quick' (launch). */
+   ShubhlyScene(svg,{W,H,cx,hz,R,bg,mode,palette:'dawn'|'night'}) -> {frame(t),play(),still(),stop()}. mode 'full' (sign-up) or 'quick' (launch). */
 (function(){
 let N=0;
 window.ShubhlyScene=function(svg,o){
- o=Object.assign({W:1024,H:1024,cx:512,hz:640,R:186,bg:true,mode:'full'},o);
- const {W,H,cx,hz,R}=o, id='s'+(++N), CY=hz-R*.4, quick=o.mode==='quick';
+ o=Object.assign({W:1024,H:1024,cx:512,hz:640,R:186,bg:true,mode:'full',palette:'dawn'},o);
+ const {W,H,cx,hz,R}=o, night=o.palette==='night', f=hz/H, id='s'+(++N), CY=hz-R*.4, quick=o.mode==='quick';
  const ang=i=>Math.PI+(i+1)*Math.PI/6, r1=R*1.27, rS=R*1.56, rH=R*2.08, ws=R*.15, wl=R*.17;
  const cl=x=>x<0?0:x>1?1:x, seg=(t,a,b)=>cl((t-a)/(b-a)), lerp=(a,b,p)=>a+(b-a)*p, bump=p=>Math.sin(Math.PI*p);
  const eio=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2, eos=p=>1-Math.pow(1-p,4), eis=p=>p*p*(3-2*p);
@@ -13,10 +13,14 @@ window.ShubhlyScene=function(svg,o){
  const FX=[-.3,-.1,.1,.3], FL=[.12,.155,.165,.135], FXc=R*1.62;
  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
  svg.innerHTML=`<defs>
- <linearGradient id="${id}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F3373"/><stop offset=".55" stop-color="#1E2048"/><stop offset="1" stop-color="#13142B"/></linearGradient>
+ <linearGradient id="${id}bg" x1="0" y1="0" x2="0" y2="${H}" gradientUnits="userSpaceOnUse">${night
+   ?'<stop offset="0" stop-color="#2F3373"/><stop offset=".55" stop-color="#1E2048"/><stop offset="1" stop-color="#13142B"/>'
+   :`<stop offset="0" stop-color="#2B2E6E"/><stop offset="${(f*.66).toFixed(3)}" stop-color="#4A3C7E"/><stop offset="${(f-.04).toFixed(3)}" stop-color="#B4637A"/><stop offset="${f.toFixed(3)}" stop-color="#E79A7C"/><stop offset="${Math.min(f+.13,.97).toFixed(3)}" stop-color="#55406F"/><stop offset="1" stop-color="#2E2650"/>`}</linearGradient>
  <radialGradient id="${id}gl" class="glg" cx="${cx}" cy="${CY}" r="${R*2.6}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9E4A" stop-opacity=".55"/><stop offset=".45" stop-color="#E9734A" stop-opacity=".15"/><stop offset="1" stop-color="#E9734A" stop-opacity="0"/></radialGradient>
  <radialGradient id="${id}sn" class="sng" cx="${cx-R*.3}" cy="${CY-R*.4}" r="${R*1.25}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFF1CF"/><stop offset=".32" stop-color="#FFC56A"/><stop offset=".72" stop-color="#F5953A"/><stop offset="1" stop-color="#DB6A2A"/></radialGradient>
- <linearGradient id="${id}gs" x1="0" y1="${hz}" x2="0" y2="${H}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#A8B0F5" stop-opacity=".2"/><stop offset=".35" stop-color="#6C74C8" stop-opacity=".12"/><stop offset="1" stop-color="#1A1C46" stop-opacity=".35"/></linearGradient>
+ <linearGradient id="${id}gs" x1="0" y1="${hz}" x2="0" y2="${H}" gradientUnits="userSpaceOnUse">${night
+   ?'<stop offset="0" stop-color="#A8B0F5" stop-opacity=".2"/><stop offset=".35" stop-color="#6C74C8" stop-opacity=".12"/><stop offset="1" stop-color="#1A1C46" stop-opacity=".35"/>'
+   :'<stop offset="0" stop-color="#F3B9A0" stop-opacity=".22"/><stop offset=".4" stop-color="#8A6FB0" stop-opacity=".14"/><stop offset="1" stop-color="#2A2250" stop-opacity=".4"/>'}</linearGradient>
  <radialGradient id="${id}df"><stop offset="0" stop-color="#FFA552" stop-opacity=".85"/><stop offset=".6" stop-color="#F07F48" stop-opacity=".25"/><stop offset="1" stop-color="#F07F48" stop-opacity="0"/></radialGradient>
  <filter id="${id}bl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="${R*.2}"/></filter>
  <filter id="${id}sf" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="${R*.07}"/></filter>
