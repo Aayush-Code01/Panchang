@@ -175,7 +175,7 @@ function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,
   if(td)top=`<span class="kpill k-good">${VI.good.replace(/width="\d+" height="\d+"/,'width="16" height="16"')}Today works</span><div class="ans">Yes, go ahead today.</div><div class="when">Best window: <b>${hm(td.w[0].a)} – ${fmt(td.w[0].b)}</b></div>`;
   else if(L.length)top=`<span class="kpill k-mixed">${VI.mixed.replace(/width="\d+" height="\d+"/,'width="16" height="16"')}A better day is coming</span><div class="ans">${dayLabel(L[0].ds)} looks better.</div><div class="when"><b>${hm(L[0].w[0].a)} – ${fmt(L[0].w[0].b)}</b> · ${L[0].why[0]||'a supportive day'}</div>`;
   else top=`<span class="kpill k-slow">${VI.slow.replace(/width="\d+" height="\d+"/,'width="16" height="16"')}Quiet month</span><div class="ans">No standout days in the next 30.</div><div class="when">Choose any calm, good window from the Today tab.</div>`;
-  const slots=L.slice(0,8).map(x=>{const d=dObj(x.ds);return`<div class="slot"><div class="d"><small>${WDS[x.r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div><div class="t">${hm(x.w[0].a)} – ${fmt(x.w[0].b)}${x===best?'<span class="tagb">Best pick</span>':''}</div><div class="w">${x.why.slice(0,3).join(' · ')||'A supportive day'}${x.w[1]?` · also ${hm(x.w[1].a)} – ${fmt(x.w[1].b)}`:''}</div></div></div>`}).join('');
+  const slots=L.slice(0,8).map(x=>{const d=dObj(x.ds);return`<div class="slot"><div class="d"><small>${WDS[x.r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div><div class="t">${hm(x.w[0].a)} – ${fmt(x.w[0].b)}${x===best?'<span class="tagb">Best pick</span>':''}</div><div class="w">${x.why.slice(0,3).join(' · ')||'A supportive day'}${ADV()?` · <span class="advt">${x.r.nak.name}, ${x.r.tithi.paksha} ${x.r.tithi.name}, ${personDay(x.r,BIRTH).tara.name} tara, ${x.w[0].tag}</span>`:''}${x.w[1]?` · also ${hm(x.w[1].a)} – ${fmt(x.w[1].b)}`:''}</div></div></div>`}).join('');
   CAL.k=k;CAL.id=id;CAL.m=0;CAL.sel=null;
   return paneHead(tab,ACT[k].t,a.t,true,k)+`<div class="card res-top">${top}</div><h2 class="sec-t">Calendar</h2><div class="card calc" id="calBox"></div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
 
@@ -395,6 +395,34 @@ function drawCmp(){if(!CMPS||CMPS.h==null)return;const h=CMPS.h,dial=$('cmpDial'
   if((ok||okN)&&!CMPS.ok){CMPS.ok=true;if(navigator.vibrate)navigator.vibrate([20,60,20])}else if(!ok&&!okN)CMPS.ok=false}
 function closeCompass(){if(CMPS&&CMPS.fn){window.removeEventListener('deviceorientationabsolute',CMPS.fn);window.removeEventListener('deviceorientation',CMPS.fn)}CMPS=null;const o=$('cmpOv');o.classList.remove('on');setTimeout(()=>{o.hidden=true},280)}
 
+/* ---------- Depth: Simple vs Advanced ---------- */
+const ADV=()=>ls.get('depth','simple')==='advanced';
+const HORA_ORD=['Sun','Venus','Mercury','Moon','Saturn','Jupiter','Mars'],DAYLORD=['Sun','Moon','Mars','Mercury','Jupiter','Venus','Saturn'];
+const HORA_Q={Sun:'authority, government work',Moon:'travel, public dealings',Mars:'courage, property, sport',Mercury:'writing, trade, study',Jupiter:'learning, finance, rituals',Venus:'love, arts, purchases',Saturn:'labour, discipline, old matters'};
+function horaAt(r,t){const rise=+r.rise,set=+r.set,next=+r.chog[15].b;let i,a,b;if(t>=rise&&t<set){const L=(set-rise)/12;i=Math.floor((t-rise)/L);a=rise+i*L;b=a+L}else if(t>=set&&t<next){const L=(next-set)/12;i=12+Math.floor((t-set)/L);a=set+(i-12)*L;b=a+L}else return null;
+  const start=HORA_ORD.indexOf(DAYLORD[r.wd]);return{lord:HORA_ORD[(start+i)%7],a:new Date(a),b:new Date(b)}}
+const ORD=n=>n+(['th','st','nd','rd'][(n%100-20)%10]||['th','st','nd','rd'][n%100]||'th');
+function applyDepth(){document.documentElement.dataset.depth=ADV()?'advanced':'simple';
+  const [lat,lon]=loc(),ds=SEL(),r=calc(ds,lat,lon),p=personDay(r,BIRTH),why=$('why');
+  document.querySelectorAll('.advx').forEach(x=>x.remove());
+  if(!ADV())return;
+  const ti=TARAN.indexOf(p.tara.name)+1;
+  if(why)why.insertAdjacentHTML('afterend',`<p class="advx advline">Tara bala: ${p.tara.name} (${ORD(ti)}) · Chandra bala: Moon in ${ORD(p.chandra.house)} from natal Moon · ${r.nak.name} nakshatra · ${r.tithi.paksha} ${r.tithi.name}</p>`);
+  const det=$('details');if(det){const h=ds===todayIST()?horaAt(r,Date.now()):null,ay=(23.853+((+r.rise-Date.UTC(2000,0,1,12))/31557600000)*.013969);
+    const rows=[['Tara bala','Star strength',`${p.tara.name} (${ORD(ti)})`,TARA[p.tara.name][0]==='good'?'favourable':TARA[p.tara.name][0]==='bad'?'unfavourable':'neutral'],
+      ['Chandra bala','Moon strength',`${ORD(p.chandra.house)} house`,p.chandra.q==='good'?'favourable':p.chandra.q==='bad'?'unfavourable':'neutral'],
+      h?['Hora now','Planetary hour',h.lord,`until ${fmt(h.b)} · ${HORA_Q[h.lord]}`]:null,
+      ['Abhijit muhurat','Midday window',r.abhijitValid?hm(r.abhijit[0])+' – '+fmt(r.abhijit[1]):'Not used on Wednesdays',''],
+      ['Sun sign','Sidereal',r.sunRashi,''],
+      ['Ayanamsa','Lahiri',ay.toFixed(2)+'°',''],
+      ['Choghadiya','Day periods',r.chog.slice(0,8).map(c=>c.name).join(', '),'sunrise to sunset']].filter(Boolean);
+    det.insertAdjacentHTML('beforeend',rows.map(([k,ks,v,vs])=>`<div class="kv advx"><div class="k">${k}<small>${ks}</small></div><div class="v num">${v}${vs?`<small>${vs}</small>`:''}</div></div>`).join(''))}
+  document.querySelectorAll('.d-det,.d-chart').forEach(d=>{if(!d.dataset.auto){d.open=true;d.dataset.auto=1}})}
+function depthSetting(){const g=[...document.querySelectorAll('.grp-t')].find(x=>x.textContent.trim()==='Appearance');if(!g||$('segDepth'))return;
+  g.nextElementSibling.insertAdjacentHTML('beforeend',`<div class="row"><span>Detail level<small>Advanced adds tara and chandra bala, hora and more</small></span><div class="seg" id="segDepth"><button type="button" data-v="simple">Simple</button><button type="button" data-v="advanced">Advanced</button></div></div>`);
+  const sync=()=>$('segDepth').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===ls.get('depth','simple')));sync();
+  $('segDepth').onclick=e=>{const b=e.target.closest('button');if(!b)return;ls.set('depth',b.dataset.v);sync();document.querySelectorAll('.d-det,.d-chart').forEach(d=>{delete d.dataset.auto;if(b.dataset.v==='simple')d.open=false});applyDepth();if(cur!=='today')draw(cur)}}
+
 /* ---------- Today: at a glance ---------- */
 function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc(),t=SEL(),r=calc(t,lat,lon),[wc,wt]=workScore(r),p=partner()||people()[0];
   const ds=$('date').value||t,done=ls.get('ritual:'+ds,[]).length,tot=document.querySelectorAll('#prac .pi').length||4,kd=ls.get('habit:'+ds,[]).length;
@@ -468,8 +496,8 @@ function init(){const app=document.querySelector('.app');
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();document.querySelectorAll('.pane .pdate').forEach(x=>{x.outerHTML=dateLine()});renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
-  try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();applyDepth();document.querySelectorAll('.pane .pdate').forEach(x=>{x.outerHTML=dateLine()});renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
+  try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}depthSetting();applyDepth();nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
