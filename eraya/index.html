@@ -23,6 +23,7 @@
 <meta name="twitter:image" content="https://aayush-code01.github.io/Panchang/og.jpg">
 <link rel="apple-touch-icon" href="../icon-180.png">
 <link rel="icon" type="image/png" href="../icon-192.png">
+<script src="../scene.js"></script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&family=Tiro+Devanagari+Hindi&display=swap">
@@ -38,8 +39,8 @@
 </head>
 <body>
 <script>window.ME={birth:{dob:"2026-09-15",time:"08:09",lat:28.4595,lon:77.0266,tz:"Asia/Kolkata"},first:"Eraya",name:"Eraya",self:false,noWork:true}</script>
-<div class="splash anim" id="splash" aria-hidden="true"><svg class="sp-mark" viewBox="230 225 564 455" aria-hidden="true"><defs><clipPath id="spc"><rect x="0" y="0" width="1024" height="632"/></clipPath></defs><g clip-path="url(#spc)"><g class="sp-sun"><circle cx="512" cy="545" r="168" fill="#F09A3E"/><g class="sp-s"><g><ellipse cx="452" cy="499" rx="19" ry="31" fill="#1E2140"/><ellipse cx="572" cy="499" rx="19" ry="31" fill="#1E2140"/></g><path d="M440,557 Q512,637 584,557" fill="none" stroke="#1E2140" stroke-width="32" stroke-linecap="round"/></g></g></g><line class="sp-r" style="--i:0" x1="324.9" y1="437.0" x2="264.3" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:1" x1="404.0" y1="357.9" x2="369.0" y2="297.3" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:2" x1="512.0" y1="329.0" x2="512.0" y2="259.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r hi" style="--i:3" x1="620.0" y1="357.9" x2="682.0" y2="250.6" stroke="#F6EAD6" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:4" x1="699.1" y1="437.0" x2="759.7" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-h" x1="250" y1="660" x2="774" y2="660" stroke="#F6EAD6" stroke-width="32" stroke-linecap="round"/></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
-<script>(function(){try{var h=(new Date(Date.now()+19800e3)).getUTCHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script>
+<div class="splash" id="splash" aria-hidden="true"><svg class="sp-scene"></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
+<script>(function(){try{var h=(new Date(Date.now()+19800e3)).getUTCHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script><script>(function(){try{var s=document.querySelector('#splash .sp-scene'),w=innerWidth,h=innerHeight,r=Math.min(w*.2,92),sc=ShubhlyScene(s,{W:w,H:h,cx:w/2,hz:Math.round(h*.5),R:r,mode:'quick'});matchMedia('(prefers-reduced-motion: reduce)').matches?sc.frame(9):sc.play(false)}catch(e){}})()</script>
 <meta name="color-scheme" content="light">
 <style>
 /* Panchang — visual system v5
@@ -94,28 +95,15 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 html[data-size="large"] .app > :not(.sheet):not(.sheet-bg):not(.daynav):not(.focus):not(.totop):not(.col),html[data-size="large"] .col > :not(.daynav),html[data-size="large"] .focus-pad,html[data-size="large"] .daynav .dn{zoom:1.12}
 
 /* ---------- splash ---------- */
-.splash{position:fixed;inset:0;z-index:100;overflow:hidden;background:#1E2140;transition:opacity .45s ease,visibility .45s}
+.splash{position:fixed;inset:0;z-index:100;overflow:hidden;background:#1E2048;transition:opacity .45s ease,visibility .45s}
 .splash.gone{opacity:0;visibility:hidden}
-.sp-mark{position:absolute;left:50%;top:calc(50% - 118px);width:150px;transform:translateX(-50%);overflow:visible}
-.sp-word{position:absolute;left:0;right:0;top:calc(50% + 24px);text-align:center;color:#F6EAD6}
+.sp-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sp-word{position:absolute;left:0;right:0;top:calc(50% + 34px);text-align:center;color:#F6EAD6}
 .sp-word b{display:block;font-family:"Fraunces",var(--serif),Georgia,serif;font-size:44px;line-height:1.1;font-weight:500;letter-spacing:-.01em;font-variation-settings:"opsz" 96,"SOFT" 30}
 .sp-word i{display:block;margin-top:10px;font-family:"Fraunces",var(--serif),Georgia,serif;font-size:16px;color:rgba(246,234,214,.62);font-variation-settings:"opsz" 14,"SOFT" 80}
-.sp-hi{position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));text-align:center;font-size:15px;font-weight:600;color:rgba(246,234,214,.7);letter-spacing:.01em;opacity:0}
-.sp-h,.sp-r{transform-box:view-box;transform-origin:512px 545px}.sp-h{transform-origin:512px 660px}
-.splash.anim .sp-sun{animation:spsun .75s cubic-bezier(.2,.8,.2,1) both}
-.splash.anim .sp-h{animation:sph .55s cubic-bezier(.3,0,.2,1) both}
-.splash.anim .sp-r{animation:spray .4s calc(.32s + var(--i)*.045s) cubic-bezier(.2,.8,.2,1) both}
-.splash.anim .sp-s{animation:spsm .45s .62s ease-out both}
-.splash.anim .sp-r.hi{animation:spray .45s .78s cubic-bezier(.3,1.5,.5,1) both}
-.splash.anim .sp-word b{animation:spfade .6s .2s ease-out both}
-.splash.anim .sp-word i{animation:spfade .6s .4s ease-out both}
-.splash.anim .sp-hi{animation:spfade .6s .6s ease-out both}
-@keyframes spsun{from{transform:translateY(290px)}to{transform:none}}
-@keyframes spsm{from{opacity:0}to{opacity:1}}
-@keyframes sph{from{opacity:0;transform:scaleX(.15)}to{opacity:1;transform:none}}
-@keyframes spray{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
+.sp-hi{position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));text-align:center;font-size:15px;font-weight:600;color:rgba(246,234,214,.7);letter-spacing:.01em;animation:spfade .6s .6s ease-out both}
 @keyframes spfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.splash *{animation:none!important}.sp-hi{opacity:1}}
+@media (prefers-reduced-motion:reduce){.splash *{animation:none!important}}
 
 /* ---------- header ---------- */
 .head{padding-block:26px 6px}

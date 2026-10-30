@@ -23,6 +23,7 @@
 <meta name="twitter:image" content="https://aayush-code01.github.io/Panchang/og.jpg">
 <link rel="apple-touch-icon" href="../icon-180.png">
 <link rel="icon" type="image/png" href="../icon-192.png">
+<script src="../scene.js"></script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..600,0..100,0..1;1,9..144,400..600,0..100,0..1&family=Tiro+Devanagari+Hindi&display=swap">
@@ -38,8 +39,8 @@
 </head>
 <body>
 <script>(function(){var p=null;try{p=JSON.parse(localStorage.getItem("a:profile")||"null")}catch(e){}window.ME={first:p&&p.name?p.name.split(" ")[0]:"",name:"You",self:true,birth:p&&p.dob?{dob:p.dob,time:p.time,lat:p.place[0],lon:p.place[1],tz:p.tz||"Asia/Kolkata"}:null}})()</script>
-<div class="splash anim" id="splash" aria-hidden="true"><svg class="sp-mark" viewBox="230 225 564 455" aria-hidden="true"><defs><clipPath id="spc"><rect x="0" y="0" width="1024" height="632"/></clipPath></defs><g clip-path="url(#spc)"><g class="sp-sun"><circle cx="512" cy="545" r="168" fill="#F09A3E"/><g class="sp-s"><g><ellipse cx="452" cy="499" rx="19" ry="31" fill="#1E2140"/><ellipse cx="572" cy="499" rx="19" ry="31" fill="#1E2140"/></g><path d="M440,557 Q512,637 584,557" fill="none" stroke="#1E2140" stroke-width="32" stroke-linecap="round"/></g></g></g><line class="sp-r" style="--i:0" x1="324.9" y1="437.0" x2="264.3" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:1" x1="404.0" y1="357.9" x2="369.0" y2="297.3" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:2" x1="512.0" y1="329.0" x2="512.0" y2="259.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r hi" style="--i:3" x1="620.0" y1="357.9" x2="682.0" y2="250.6" stroke="#F6EAD6" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:4" x1="699.1" y1="437.0" x2="759.7" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-h" x1="250" y1="660" x2="774" y2="660" stroke="#F6EAD6" stroke-width="32" stroke-linecap="round"/></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
-<script>(function(){try{var h=(new Date(Date.now()+19800e3)).getUTCHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script>
+<div class="splash" id="splash" aria-hidden="true"><svg class="sp-scene"></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
+<script>(function(){try{var h=(new Date(Date.now()+19800e3)).getUTCHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script><script>(function(){try{var s=document.querySelector('#splash .sp-scene'),w=innerWidth,h=innerHeight,r=Math.min(w*.2,92),sc=ShubhlyScene(s,{W:w,H:h,cx:w/2,hz:Math.round(h*.5),R:r,mode:'quick'});matchMedia('(prefers-reduced-motion: reduce)').matches?sc.frame(9):sc.play(false)}catch(e){}})()</script>
 <meta name="color-scheme" content="light">
 <style>
 /* Panchang — visual system v5
@@ -94,28 +95,15 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 html[data-size="large"] .app > :not(.sheet):not(.sheet-bg):not(.daynav):not(.focus):not(.totop):not(.col),html[data-size="large"] .col > :not(.daynav),html[data-size="large"] .focus-pad,html[data-size="large"] .daynav .dn{zoom:1.12}
 
 /* ---------- splash ---------- */
-.splash{position:fixed;inset:0;z-index:100;overflow:hidden;background:#1E2140;transition:opacity .45s ease,visibility .45s}
+.splash{position:fixed;inset:0;z-index:100;overflow:hidden;background:#1E2048;transition:opacity .45s ease,visibility .45s}
 .splash.gone{opacity:0;visibility:hidden}
-.sp-mark{position:absolute;left:50%;top:calc(50% - 118px);width:150px;transform:translateX(-50%);overflow:visible}
-.sp-word{position:absolute;left:0;right:0;top:calc(50% + 24px);text-align:center;color:#F6EAD6}
+.sp-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sp-word{position:absolute;left:0;right:0;top:calc(50% + 34px);text-align:center;color:#F6EAD6}
 .sp-word b{display:block;font-family:"Fraunces",var(--serif),Georgia,serif;font-size:44px;line-height:1.1;font-weight:500;letter-spacing:-.01em;font-variation-settings:"opsz" 96,"SOFT" 30}
 .sp-word i{display:block;margin-top:10px;font-family:"Fraunces",var(--serif),Georgia,serif;font-size:16px;color:rgba(246,234,214,.62);font-variation-settings:"opsz" 14,"SOFT" 80}
-.sp-hi{position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));text-align:center;font-size:15px;font-weight:600;color:rgba(246,234,214,.7);letter-spacing:.01em;opacity:0}
-.sp-h,.sp-r{transform-box:view-box;transform-origin:512px 545px}.sp-h{transform-origin:512px 660px}
-.splash.anim .sp-sun{animation:spsun .75s cubic-bezier(.2,.8,.2,1) both}
-.splash.anim .sp-h{animation:sph .55s cubic-bezier(.3,0,.2,1) both}
-.splash.anim .sp-r{animation:spray .4s calc(.32s + var(--i)*.045s) cubic-bezier(.2,.8,.2,1) both}
-.splash.anim .sp-s{animation:spsm .45s .62s ease-out both}
-.splash.anim .sp-r.hi{animation:spray .45s .78s cubic-bezier(.3,1.5,.5,1) both}
-.splash.anim .sp-word b{animation:spfade .6s .2s ease-out both}
-.splash.anim .sp-word i{animation:spfade .6s .4s ease-out both}
-.splash.anim .sp-hi{animation:spfade .6s .6s ease-out both}
-@keyframes spsun{from{transform:translateY(290px)}to{transform:none}}
-@keyframes spsm{from{opacity:0}to{opacity:1}}
-@keyframes sph{from{opacity:0;transform:scaleX(.15)}to{opacity:1;transform:none}}
-@keyframes spray{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:none}}
+.sp-hi{position:absolute;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));text-align:center;font-size:15px;font-weight:600;color:rgba(246,234,214,.7);letter-spacing:.01em;animation:spfade .6s .6s ease-out both}
 @keyframes spfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.splash *{animation:none!important}.sp-hi{opacity:1}}
+@media (prefers-reduced-motion:reduce){.splash *{animation:none!important}}
 
 /* ---------- header ---------- */
 .head{padding-block:26px 6px}
@@ -1479,7 +1467,6 @@ if(window.Astronomy)go();else window.addEventListener('load',go);
 navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()});
 window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{}))}</script>
-<script src="../wake.js"></script>
 <script>
 (function(){const P=PROFILE;
  function fillChart(){if(!P)return;const lg=P.lagna!=null?RS_EN[P.lagna]:'Unknown';$('chartRow').innerHTML=`<div><b>${lg}</b><span>Rising sign</span></div><div><b>${RS_EN[P.rashi]}</b><span>Moon sign</span></div><div><b>${NAK_EN[P.nak]}</b><span>Birth star</span></div>`;
@@ -1488,13 +1475,13 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{upd
  fillChart();
  const eb=$('editBirth');if(eb)eb.onclick=()=>show(true);
  function show(edit){const o=document.createElement('div');o.className='onb'+(edit?'':' wake');const p=P||{};
-  o.innerHTML=`<div class="onb-in"><svg class="wk" aria-hidden="true"></svg><h1>${edit?'Your birth details':'Welcome to Shubhly'}</h1><p class="onb-lead">${edit?'Change any detail and save. Your readings update straight away.':'Your day, well timed. Tell us when and where you were born, and every reading becomes yours.'}</p>
+  o.innerHTML=`<div class="onb-in"><div class="wk-card"><svg class="wk" aria-hidden="true"></svg></div><h1>${edit?'Your birth details':'Welcome to Shubhly'}</h1><p class="onb-lead">${edit?'Change any detail and save. Your readings update straight away.':'Your day, well timed. Tell us when and where you were born, and every reading becomes yours.'}</p>
    <label>Your name<input id="oName" type="text" autocomplete="given-name" value="${(p.name||'').replace(/"/g,'&quot;')}" placeholder="First name"></label>
    <label>Date of birth<input id="oDob" type="date" value="${p.dob||''}"></label>
    <label>Time of birth<input id="oTime" type="time" value="${p.time||''}"></label><label class="chk2"><input type="checkbox" id="oNoT" ${p.dob&&!p.time?'checked':''}> I don’t know my birth time</label>
    <label>Place of birth<input id="oPlace" type="text" autocomplete="off" placeholder="Start typing a city" value="${(p.placeName||'').replace(/"/g,'&quot;')}"></label><div class="onb-res" id="oRes"></div>
    <button type="button" class="btnp" id="oGo">${edit?'Save':'Continue'}</button>${edit?'<button type="button" class="onb-x" id="oX">Cancel</button>':''}<p class="onb-note">Your details stay on this phone. Used only to work out your chart.</p></div>`;
-  document.body.appendChild(o);try{const w=ShubhlyWake(o.querySelector('.wk'));(!edit&&!matchMedia('(prefers-reduced-motion: reduce)').matches)?w.play():w.still()}catch(e){}let pl=p.place?{lat:p.place[0],lon:p.place[1],tz:p.tz||'Asia/Kolkata',name:p.placeName}:null,tm;
+  document.body.appendChild(o);try{const w=ShubhlyScene(o.querySelector('.wk'),{W:1024,H:600,hz:410,R:128});(!edit&&!matchMedia('(prefers-reduced-motion: reduce)').matches)?w.play():w.still()}catch(e){}let pl=p.place?{lat:p.place[0],lon:p.place[1],tz:p.tz||'Asia/Kolkata',name:p.placeName}:null,tm;
   const q=$('oPlace'),res=$('oRes');
   q.oninput=()=>{pl=null;clearTimeout(tm);const v=q.value.trim();if(v.length<2){res.innerHTML='';return}tm=setTimeout(()=>{fetch('https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&name='+encodeURIComponent(v)).then(r=>r.json()).then(j=>{const L=j.results||[];
     res.innerHTML=L.map((c,i)=>`<button type="button" data-i="${i}">${c.name}<small>${[c.admin1,c.country].filter(Boolean).join(', ')}</small></button>`).join('')||'<p>No match. Try a nearby bigger city.</p>';
@@ -1534,9 +1521,9 @@ html[data-theme="dark"] .onb{background:linear-gradient(180deg,#1B1D33 0%,#2C233
 .onb-x{align-self:center;font-size:15px;font-weight:600;color:var(--muted);padding:8px}
 .onb-note{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}
 .onb-sun{display:none}
-.wk{display:block;width:216px;max-width:62%;margin:4px auto 6px;overflow:visible;--wk-line:#1E2140}
-html[data-theme="dark"] .wk{--wk-line:#F6EAD6}
-.onb.wake .onb-in>*:not(.wk){animation:wkup .6s .35s cubic-bezier(.2,.8,.2,1) both}
+.wk-card{position:relative;border-radius:28px;overflow:hidden;aspect-ratio:1024/600;margin:2px 0 8px;box-shadow:0 18px 40px -18px rgba(30,32,72,.55),inset 0 0 0 1px rgba(255,255,255,.06)}
+.wk{position:absolute;inset:0;width:100%;height:100%;display:block}
+.onb.wake .onb-in>*:not(.wk-card){animation:wkup .6s .35s cubic-bezier(.2,.8,.2,1) both}
 .onb.wake .onb-in>h1{animation-delay:.2s}.onb.wake .onb-in>.onb-lead{animation-delay:.28s}
 @keyframes wkup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .onb h1,.onb-lead{text-align:center}
