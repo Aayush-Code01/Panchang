@@ -1,0 +1,11 @@
+{
+  "appId": "in.panchang.app",
+  "appName": "Panchang",
+  "webDir": "www",
+  "backgroundColor": "#F3EEE5",
+  "ios": { "contentInset": "never" },
+  "android": { "backgroundColor": "#F3EEE5" },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 600, "backgroundColor": "#F4EFE6", "showSpinner": false }
+  }
+}
