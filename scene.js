@@ -10,7 +10,7 @@ window.ShubhlyScene=function(svg,o){
  const cl=x=>x<0?0:x>1?1:x, seg=(t,a,b)=>cl((t-a)/(b-a)), lerp=(a,b,p)=>a+(b-a)*p, bump=p=>Math.sin(Math.PI*p);
  const eio=p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2, eos=p=>1-Math.pow(1-p,4), eis=p=>p*p*(3-2*p);
  const eob=(p,c=1.1)=>p<=0?0:p>=1?1:1+(c+1)*Math.pow(p-1,3)+c*Math.pow(p-1,2);
- const FX=[-.21,-.07,.07,.21], FL=[.15,.2,.21,.17], FXc=R*1.5;
+ const FX=[-.3,-.1,.1,.3], FL=[.12,.155,.165,.135], FXc=R*1.62;
  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
  svg.innerHTML=`<defs>
  <linearGradient id="${id}bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F3373"/><stop offset=".55" stop-color="#1E2048"/><stop offset="1" stop-color="#13142B"/></linearGradient>
@@ -20,6 +20,7 @@ window.ShubhlyScene=function(svg,o){
  <radialGradient id="${id}df"><stop offset="0" stop-color="#FFA552" stop-opacity=".85"/><stop offset=".6" stop-color="#F07F48" stop-opacity=".25"/><stop offset="1" stop-color="#F07F48" stop-opacity="0"/></radialGradient>
  <filter id="${id}bl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="${R*.2}"/></filter>
  <filter id="${id}sf" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="${R*.07}"/></filter>
+ <filter id="${id}fg" x="-100%" y="-100%" width="300%" height="300%"><feDropShadow dx="0" dy="0" stdDeviation="${R*.05}" flood-color="#FF9E4A" flood-opacity=".7"/></filter>
  <clipPath id="${id}up"><rect x="0" y="0" width="${W}" height="${hz}"/></clipPath>
  <clipPath id="${id}dn"><rect x="0" y="${hz}" width="${W}" height="${H-hz}"/></clipPath></defs>
  ${o.bg?`<rect width="${W}" height="${H}" fill="url(#${id}bg)"/>`:''}
@@ -33,7 +34,7 @@ window.ShubhlyScene=function(svg,o){
   <rect x="0" y="${hz}" width="${W}" height="${H-hz}" fill="url(#${id}gs)"/></g>
  <line class="edge" x1="0" x2="${W}" y1="${hz+1}" y2="${hz+1}" stroke="#FFFFFF" stroke-width="${Math.max(1.5,R*.016)}"/>
  <line class="edge2" x1="0" x2="${W}" y1="${hz+R*.06}" y2="${hz+R*.06}" stroke="#FFFFFF" stroke-opacity=".07" stroke-width="${Math.max(1,R*.012)}"/>
- ${quick?'':FX.map((x,i)=>`<line class="fg fgL" stroke="#FFB861" stroke-width="${R*.1}" stroke-linecap="round" opacity="0"/><line class="fg fgR" stroke="#FFB861" stroke-width="${R*.1}" stroke-linecap="round" opacity="0"/>`).join('')}`;
+ ${quick?'':`<g filter="url(#${id}fg)">`+FX.map((x,i)=>`<line class="fg fgL" stroke="#FFBE6A" stroke-width="${R*.17}" stroke-linecap="round" opacity="0"/><line class="fg fgR" stroke="#FFBE6A" stroke-width="${R*.17}" stroke-linecap="round" opacity="0"/>`).join('')+'</g>'}`;
  const q=c=>svg.querySelector('.'+c), A=(el,a)=>{for(const k in a)el.setAttribute(k,typeof a[k]==='number'?+a[k].toFixed(3):a[k])};
  const E={glow:q('glow'),bloom:q('bloom'),sun:q('sun'),smile:q('smile'),rh:q('rh'),refg:q('refg'),edge:q('edge'),edge2:q('edge2'),
   gl:svg.querySelector('.glg'),sn:svg.querySelector('.sng'),ry:{0:q('ry0'),1:q('ry1'),2:q('ry2'),4:q('ry4')},
