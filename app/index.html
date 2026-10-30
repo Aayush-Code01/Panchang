@@ -38,7 +38,7 @@
 </head>
 <body>
 <script>(function(){var p=null;try{p=JSON.parse(localStorage.getItem("a:profile")||"null")}catch(e){}window.ME={first:p&&p.name?p.name.split(" ")[0]:"",name:"You",self:true,birth:p&&p.dob?{dob:p.dob,time:p.time,lat:p.place[0],lon:p.place[1],tz:p.tz||"Asia/Kolkata"}:null}})()</script>
-<div class="splash anim" id="splash" aria-hidden="true"><svg class="sp-mark" viewBox="230 225 564 455" aria-hidden="true"><defs><clipPath id="spc"><rect x="0" y="0" width="1024" height="632"/></clipPath></defs><g clip-path="url(#spc)"><g class="sp-sun"><circle cx="512" cy="545" r="168" fill="#F09A3E"/><g class="sp-s"><g><circle cx="452" cy="499" r="23" fill="#1E2140"/><circle cx="572" cy="499" r="23" fill="#1E2140"/></g><path d="M440,557 Q512,637 584,557" fill="none" stroke="#1E2140" stroke-width="32" stroke-linecap="round"/></g></g></g><line class="sp-r" style="--i:0" x1="324.9" y1="437.0" x2="264.3" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:1" x1="404.0" y1="357.9" x2="369.0" y2="297.3" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:2" x1="512.0" y1="329.0" x2="512.0" y2="259.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r hi" style="--i:3" x1="620.0" y1="357.9" x2="682.0" y2="250.6" stroke="#F6EAD6" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:4" x1="699.1" y1="437.0" x2="759.7" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-h" x1="250" y1="660" x2="774" y2="660" stroke="#F6EAD6" stroke-width="32" stroke-linecap="round"/></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
+<div class="splash anim" id="splash" aria-hidden="true"><svg class="sp-mark" viewBox="230 225 564 455" aria-hidden="true"><defs><clipPath id="spc"><rect x="0" y="0" width="1024" height="632"/></clipPath></defs><g clip-path="url(#spc)"><g class="sp-sun"><circle cx="512" cy="545" r="168" fill="#F09A3E"/><g class="sp-s"><g><ellipse cx="452" cy="499" rx="19" ry="31" fill="#1E2140"/><ellipse cx="572" cy="499" rx="19" ry="31" fill="#1E2140"/></g><path d="M440,557 Q512,637 584,557" fill="none" stroke="#1E2140" stroke-width="32" stroke-linecap="round"/></g></g></g><line class="sp-r" style="--i:0" x1="324.9" y1="437.0" x2="264.3" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:1" x1="404.0" y1="357.9" x2="369.0" y2="297.3" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:2" x1="512.0" y1="329.0" x2="512.0" y2="259.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-r hi" style="--i:3" x1="620.0" y1="357.9" x2="682.0" y2="250.6" stroke="#F6EAD6" stroke-width="44" stroke-linecap="round"/><line class="sp-r" style="--i:4" x1="699.1" y1="437.0" x2="759.7" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="sp-h" x1="250" y1="660" x2="774" y2="660" stroke="#F6EAD6" stroke-width="32" stroke-linecap="round"/></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
 <script>(function(){try{var h=(new Date(Date.now()+19800e3)).getUTCHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script>
 <meta name="color-scheme" content="light">
 <style>
@@ -1479,6 +1479,7 @@ if(window.Astronomy)go();else window.addEventListener('load',go);
 navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()});
 window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{}))}</script>
+<script src="../wake.js"></script>
 <script>
 (function(){const P=PROFILE;
  function fillChart(){if(!P)return;const lg=P.lagna!=null?RS_EN[P.lagna]:'Unknown';$('chartRow').innerHTML=`<div><b>${lg}</b><span>Rising sign</span></div><div><b>${RS_EN[P.rashi]}</b><span>Moon sign</span></div><div><b>${NAK_EN[P.nak]}</b><span>Birth star</span></div>`;
@@ -1487,19 +1488,13 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{upd
  fillChart();
  const eb=$('editBirth');if(eb)eb.onclick=()=>show(true);
  function show(edit){const o=document.createElement('div');o.className='onb'+(edit?'':' wake');const p=P||{};
-  o.innerHTML=`<div class="onb-in"><svg class="wk" viewBox="230 225 564 455" aria-hidden="true" style="overflow:visible"><defs><clipPath id="wkc"><rect x="0" y="0" width="1024" height="632"/></clipPath></defs>
-<g clip-path="url(#wkc)"><g class="wk-hand wk-hand-l"><ellipse cx="278" cy="592" rx="34" ry="40" fill="#F09A3E"/><ellipse cx="312" cy="586" rx="14" ry="20" transform="rotate(-28 312 586)" fill="#F09A3E"/><path d="M264,566 v-10 M278,562 v-12 M292,566 v-10" stroke="#1E2140" stroke-opacity=".0" stroke-width="0"/></g><g class="wk-hand wk-hand-r"><ellipse cx="746" cy="592" rx="34" ry="40" fill="#F09A3E"/><ellipse cx="712" cy="586" rx="14" ry="20" transform="rotate(28 712 586)" fill="#F09A3E"/><path d="M732,566 v-10 M746,562 v-12 M760,566 v-10" stroke="#1E2140" stroke-opacity=".0" stroke-width="0"/></g><g class="wk-sun"><g class="wk-body"><circle cx="512" cy="545" r="168" fill="#F09A3E"/>
-<g class="wk-shut"><path d="M428,503 Q452,523 476,503" fill="none" stroke="#1E2140" stroke-width="16" stroke-linecap="round"/><path d="M548,503 Q572,523 596,503" fill="none" stroke="#1E2140" stroke-width="16" stroke-linecap="round"/></g>
-<g class="wk-open"><circle cx="452" cy="499" r="23" fill="#1E2140"/><circle cx="572" cy="499" r="23" fill="#1E2140"/></g>
-<path class="wk-m1" d="M476,587 Q512,605 548,587" fill="none" stroke="#1E2140" stroke-width="22" stroke-linecap="round"/>
-<path class="wk-m2" d="M440,557 Q512,637 584,557" fill="none" stroke="#1E2140" stroke-width="32" stroke-linecap="round"/>
-</g></g></g><text class="wk-z wk-z1" x="662" y="495" font-size="92" font-family="Georgia,serif" font-style="italic" font-weight="700" fill="currentColor">z</text><text class="wk-z wk-z2" x="712" y="420" font-size="124" font-family="Georgia,serif" font-style="italic" font-weight="700" fill="currentColor">z</text><g class="wk-rays"><line class="wk-r" style="--i:0" x1="324.9" y1="437.0" x2="264.3" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="wk-r" style="--i:1" x1="404.0" y1="357.9" x2="369.0" y2="297.3" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="wk-r" style="--i:2" x1="512.0" y1="329.0" x2="512.0" y2="259.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/><line class="wk-r hi" style="--i:3" x1="620.0" y1="357.9" x2="682.0" y2="250.6" stroke="#F6EAD6" stroke-width="44" stroke-linecap="round"/><line class="wk-r" style="--i:4" x1="699.1" y1="437.0" x2="759.7" y2="402.0" stroke="#F09A3E" stroke-width="44" stroke-linecap="round"/></g><line class="wk-h" x1="250" y1="660" x2="774" y2="660" stroke="#F6EAD6" stroke-width="32" stroke-linecap="round"/></svg><h1>${edit?'Your birth details':'Welcome to Shubhly'}</h1><p class="onb-lead">${edit?'Change any detail and save. Your readings update straight away.':'Your day, well timed. Tell us when and where you were born, and every reading becomes yours.'}</p>
+  o.innerHTML=`<div class="onb-in"><svg class="wk" aria-hidden="true"></svg><h1>${edit?'Your birth details':'Welcome to Shubhly'}</h1><p class="onb-lead">${edit?'Change any detail and save. Your readings update straight away.':'Your day, well timed. Tell us when and where you were born, and every reading becomes yours.'}</p>
    <label>Your name<input id="oName" type="text" autocomplete="given-name" value="${(p.name||'').replace(/"/g,'&quot;')}" placeholder="First name"></label>
    <label>Date of birth<input id="oDob" type="date" value="${p.dob||''}"></label>
    <label>Time of birth<input id="oTime" type="time" value="${p.time||''}"></label><label class="chk2"><input type="checkbox" id="oNoT" ${p.dob&&!p.time?'checked':''}> I don’t know my birth time</label>
    <label>Place of birth<input id="oPlace" type="text" autocomplete="off" placeholder="Start typing a city" value="${(p.placeName||'').replace(/"/g,'&quot;')}"></label><div class="onb-res" id="oRes"></div>
    <button type="button" class="btnp" id="oGo">${edit?'Save':'Continue'}</button>${edit?'<button type="button" class="onb-x" id="oX">Cancel</button>':''}<p class="onb-note">Your details stay on this phone. Used only to work out your chart.</p></div>`;
-  document.body.appendChild(o);let pl=p.place?{lat:p.place[0],lon:p.place[1],tz:p.tz||'Asia/Kolkata',name:p.placeName}:null,tm;
+  document.body.appendChild(o);try{const w=ShubhlyWake(o.querySelector('.wk'));(!edit&&!matchMedia('(prefers-reduced-motion: reduce)').matches)?w.play():w.still()}catch(e){}let pl=p.place?{lat:p.place[0],lon:p.place[1],tz:p.tz||'Asia/Kolkata',name:p.placeName}:null,tm;
   const q=$('oPlace'),res=$('oRes');
   q.oninput=()=>{pl=null;clearTimeout(tm);const v=q.value.trim();if(v.length<2){res.innerHTML='';return}tm=setTimeout(()=>{fetch('https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&name='+encodeURIComponent(v)).then(r=>r.json()).then(j=>{const L=j.results||[];
     res.innerHTML=L.map((c,i)=>`<button type="button" data-i="${i}">${c.name}<small>${[c.admin1,c.country].filter(Boolean).join(', ')}</small></button>`).join('')||'<p>No match. Try a nearby bigger city.</p>';
@@ -1539,44 +1534,10 @@ html[data-theme="dark"] .onb{background:linear-gradient(180deg,#1B1D33 0%,#2C233
 .onb-x{align-self:center;font-size:15px;font-weight:600;color:var(--muted);padding:8px}
 .onb-note{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}
 .onb-sun{display:none}
-.wk{display:block;width:216px;max-width:62%;margin:4px auto 6px;color:var(--text);--wk-line:#1E2140}
+.wk{display:block;width:216px;max-width:62%;margin:4px auto 6px;overflow:visible;--wk-line:#1E2140}
 html[data-theme="dark"] .wk{--wk-line:#F6EAD6}
-.wk .wk-h,.wk .wk-r.hi{stroke:var(--wk-line)}
-.wk-z,.wk-shut,.wk-m1,.wk-hand{opacity:0}
-.wk-body,.wk-h{transform-box:view-box;transform-origin:512px 660px}
-.wk-r,.wk-rays{transform-box:view-box;transform-origin:512px 545px}
-.wk-open circle,.wk-m2,.wk-z,.wk-hand{transform-box:fill-box;transform-origin:center}
-.wk-m2{transform-origin:center top}
-.onb.wake .wk-h{animation:wkline .5s cubic-bezier(.3,0,.2,1) both}
-.onb.wake .wk-hand-l{animation:wkhandl 2s .3s cubic-bezier(.4,0,.3,1) both}
-.onb.wake .wk-hand-r{animation:wkhandr 2s .3s cubic-bezier(.4,0,.3,1) both}
-.onb.wake .wk-sun{animation:wkrise .85s .45s cubic-bezier(.4,0,.25,1) both}
-.onb.wake .wk-z1{animation:wkz 1.1s .7s ease-out both}
-.onb.wake .wk-z2{animation:wkz 1.1s .95s ease-out both}
-.onb.wake .wk-body{animation:wkstretch .65s 1.3s ease-in-out both}
-.onb.wake .wk-shut{animation:wkout .1s 1.65s linear both}
-.onb.wake .wk-open circle{animation:wkopen .3s 1.65s cubic-bezier(.3,1.6,.5,1) both,wkblink 4.2s 2.15s infinite}
-.onb.wake .wk-m1{animation:wkout .12s 1.75s linear both}
-.onb.wake .wk-m2{animation:wksmile .5s 1.75s cubic-bezier(.3,1.6,.5,1) both}
-.onb.wake .wk-r{animation:wkray .5s calc(2.25s + var(--i)*.06s) cubic-bezier(.3,1.7,.5,1) both}
-.onb.wake .wk-r.hi{animation:wksweep 1.1s 2.55s cubic-bezier(.45,0,.3,1) both}
-.onb.wake .wk-rays{animation:wkpulse 3.4s 3.8s ease-in-out infinite}
-.onb:not(.wake) .wk-open circle{animation:wkblink 4.2s 1s infinite}
-.onb.wake .onb-in>*:not(.wk){animation:wkup .55s .35s cubic-bezier(.2,.8,.2,1) both}
+.onb.wake .onb-in>*:not(.wk){animation:wkup .6s .35s cubic-bezier(.2,.8,.2,1) both}
 .onb.wake .onb-in>h1{animation-delay:.2s}.onb.wake .onb-in>.onb-lead{animation-delay:.28s}
-@keyframes wkline{from{opacity:0;transform:scaleX(.2)}to{opacity:1;transform:none}}
-@keyframes wkhandl{0%{opacity:1;transform:translateY(70px)}12%{transform:none}35%{transform:translateY(5px) scale(1.08,.9)}45%{transform:none}60%{transform:translate(-30px,-200px) rotate(0)}68%{transform:translate(-30px,-206px) rotate(-22deg)}76%{transform:translate(-30px,-202px) rotate(16deg)}84%{opacity:1;transform:translate(-30px,-204px) rotate(-10deg)}100%{opacity:0;transform:translate(-30px,-204px) scale(.2)}}
-@keyframes wkhandr{0%{opacity:1;transform:translateY(70px)}12%{transform:none}35%{transform:translateY(5px) scale(1.08,.9)}45%{transform:none}60%{transform:translate(30px,-200px) rotate(0)}68%{transform:translate(30px,-206px) rotate(22deg)}76%{transform:translate(30px,-202px) rotate(-16deg)}84%{opacity:1;transform:translate(30px,-204px) rotate(10deg)}100%{opacity:0;transform:translate(30px,-204px) scale(.2)}}
-@keyframes wkrise{0%{transform:translateY(300px)}55%{transform:translateY(120px)}70%{transform:translateY(135px)}100%{transform:none}}
-@keyframes wkz{0%{opacity:0;transform:translate(0,24px) scale(.6)}30%{opacity:.7}100%{opacity:0;transform:translate(34px,-70px) scale(1.1)}}
-@keyframes wkstretch{0%{transform:none}35%{transform:scale(.93,1.09)}68%{transform:scale(1.05,.96)}100%{transform:none}}
-@keyframes wkout{from{opacity:1}to{opacity:0}}
-@keyframes wkopen{from{opacity:0;transform:scaleY(.08)}to{opacity:1;transform:none}}
-@keyframes wkblink{0%,100%{transform:none}3%{transform:scaleY(.1)}6%{transform:none}}
-@keyframes wksmile{from{opacity:0;transform:scale(.45,.3)}to{opacity:1;transform:none}}
-@keyframes wkray{from{opacity:0;transform:scale(.55)}to{opacity:1;transform:none}}
-@keyframes wksweep{0%{opacity:0;transform:rotate(-90deg)}12%{opacity:1;transform:rotate(-90deg)}68%{transform:rotate(34deg)}84%{transform:rotate(-7deg)}100%{opacity:1;transform:none}}
-@keyframes wkpulse{0%,100%{transform:none}50%{transform:scale(1.045)}}
 @keyframes wkup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .onb h1,.onb-lead{text-align:center}
 @media (prefers-reduced-motion:reduce){.onb *{animation:none!important}}
