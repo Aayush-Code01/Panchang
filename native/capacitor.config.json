@@ -1,11 +1,19 @@
 {
-  "appId": "in.panchang.app",
-  "appName": "Panchang",
+  "appId": "com.healway.shubhly",
+  "appName": "Shubhly",
   "webDir": "www",
-  "backgroundColor": "#F3EEE5",
-  "ios": { "contentInset": "never" },
-  "android": { "backgroundColor": "#F3EEE5" },
+  "backgroundColor": "#1E2140",
+  "ios": {
+    "contentInset": "never"
+  },
+  "android": {
+    "backgroundColor": "#1E2140"
+  },
   "plugins": {
-    "SplashScreen": { "launchShowDuration": 600, "backgroundColor": "#F4EFE6", "showSpinner": false }
+    "SplashScreen": {
+      "launchShowDuration": 600,
+      "backgroundColor": "#1E2140",
+      "showSpinner": false
+    }
   }
 }

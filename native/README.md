@@ -1,4 +1,4 @@
-# Panchang native apps (iOS + Android)
+# Shubhly native apps (iOS + Android)
 
 The store apps wrap the web app in `../app` with [Capacitor](https://capacitorjs.com).
 

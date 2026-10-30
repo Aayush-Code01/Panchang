@@ -1,8 +1,8 @@
 {
-  "name": "panchang-native",
+  "name": "shubhly-native",
   "private": true,
   "version": "0.1.0",
-  "description": "Panchang for iOS and Android (Capacitor wrapper around the web app in ../app)",
+  "description": "Shubhly for iOS and Android (Capacitor wrapper around the web app in ../app)",
   "scripts": {
     "build:web": "node scripts/build-web.mjs",
     "sync": "npm run build:web && npx cap sync",
