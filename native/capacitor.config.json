@@ -2,18 +2,21 @@
   "appId": "com.healway.shubhly",
   "appName": "Shubhly",
   "webDir": "www",
-  "backgroundColor": "#1E2140",
+  "backgroundColor": "#3A2F5C",
   "ios": {
     "contentInset": "never"
   },
   "android": {
-    "backgroundColor": "#1E2140"
+    "backgroundColor": "#3A2F5C"
   },
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 600,
-      "backgroundColor": "#1E2140",
+      "backgroundColor": "#3A2F5C",
       "showSpinner": false
+    },
+    "LocalNotifications": {
+      "iconColor": "#E79A7C"
     }
   }
 }
