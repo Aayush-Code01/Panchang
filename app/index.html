@@ -38,7 +38,7 @@
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
-<script>(function(){var p=null;try{p=JSON.parse(localStorage.getItem("a:profile")||"null")}catch(e){}window.ME={first:p&&p.name?p.name.split(" ")[0]:"",name:"You",self:true,birth:p&&p.dob?{dob:p.dob,time:p.time,lat:p.place[0],lon:p.place[1],tz:p.tz||"Asia/Kolkata"}:null}})()</script>
+<script>(function(){var p=null;try{p=JSON.parse(localStorage.getItem("a:profile")||"null")}catch(e){}window.ME={first:p&&p.name?p.name.split(" ")[0]:"",name:"You",self:true,gender:p&&p.gender||"",birth:p&&p.dob?{dob:p.dob,time:p.time,lat:p.place[0],lon:p.place[1],tz:p.tz||"Asia/Kolkata"}:null}})()</script>
 <div class="splash" id="splash" aria-hidden="true"><svg class="sp-scene"></svg><div class="sp-word"><b>Shubhly</b><i>Your day, well timed</i></div><div class="sp-hi" id="spHi"></div></div>
 <script>(function(){try{var h=(new Date()).getHours(),g=h<5?'Good night':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Good night',M=window.ME||{},n=M.first||'';document.getElementById('spHi').textContent=M.self===false?(n?n+'\u2019s day':''):(g+(n?', '+n:''))}catch(e){}window._spT=Date.now()})()</script><script>(function(){try{var s=document.querySelector('#splash .sp-scene'),w=innerWidth,h=innerHeight,r=Math.min(w*.2,92),sc=ShubhlyScene(s,{W:w,H:h,cx:w/2,hz:Math.round(h*.5),R:r,mode:'quick'});matchMedia('(prefers-reduced-motion: reduce)').matches?sc.frame(9):sc.play(false)}catch(e){}})()</script>
 <meta name="color-scheme" content="light">
@@ -1487,6 +1487,7 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{upd
  const eb=$('editBirth');if(eb)eb.onclick=()=>show(true);
  function show(edit){const o=document.createElement('div');o.className='onb'+(edit?'':' wake');const p=P||{};
   o.innerHTML=`<div class="onb-in"><div class="wk-card"><svg class="wk" aria-hidden="true"></svg></div><h1>${edit?'Your birth details':'Welcome to Shubhly'}</h1><p class="onb-lead">${edit?'Change any detail and save. Your readings update straight away.':'Your day, well timed. Tell us when and where you were born, and every reading becomes yours.'}</p>
+   <div class="onb-q"><span>You are</span><div class="seg onb-g" id="oG" role="radiogroup" aria-label="You are">${[['f','Female'],['m','Male'],['o','Other']].map(([v,t])=>`<button type="button" role="radio" data-v="${v}" aria-pressed="${p.gender===v}">${t}</button>`).join('')}</div></div>
    <label>Your name<input id="oName" type="text" autocomplete="given-name" value="${(p.name||'').replace(/"/g,'&quot;')}" placeholder="First name"></label>
    <label>Date of birth<input id="oDob" type="date" value="${p.dob||''}"></label>
    <label>Time of birth<input id="oTime" type="time" value="${p.time||''}"></label><label class="chk2"><input type="checkbox" id="oNoT" ${p.dob&&!p.time?'checked':''}> I don’t know my birth time</label>
@@ -1497,11 +1498,12 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{upd
   q.oninput=()=>{pl=null;clearTimeout(tm);const v=q.value.trim();if(v.length<2){res.innerHTML='';return}tm=setTimeout(()=>{fetch('https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&name='+encodeURIComponent(v)).then(r=>r.json()).then(j=>{const L=j.results||[];
     res.innerHTML=L.map((c,i)=>`<button type="button" data-i="${i}">${c.name}<small>${[c.admin1,c.country].filter(Boolean).join(', ')}</small></button>`).join('')||'<p>No match. Try a nearby bigger city.</p>';
     res.querySelectorAll('button').forEach(b=>b.onclick=()=>{const c=L[+b.dataset.i];pl={lat:c.latitude,lon:c.longitude,tz:c.timezone||'Asia/Kolkata',name:`${c.name}${c.admin1?', '+c.admin1:''}`};q.value=pl.name;res.innerHTML=''})}).catch(()=>{res.innerHTML='<p>Couldn’t search right now. Check your internet.</p>'})},250)};
+  let gen=p.gender||'';$('oG').onclick=e=>{const x=e.target.closest('button');if(!x)return;gen=x.dataset.v;$('oG').classList.remove('need');$('oG').querySelectorAll('button').forEach(y=>y.setAttribute('aria-pressed',String(y===x)))};
   $('oNoT').onchange=()=>{if($('oNoT').checked)$('oTime').value=''};
   if(edit)$('oX').onclick=()=>o.remove();
   $('oGo').onclick=()=>{const name=$('oName').value.trim(),dob=$('oDob').value,time=$('oNoT').checked?'':$('oTime').value;
-   if(!name){$('oName').focus();return}if(!dob){$('oDob').focus();return}if(!time&&!$('oNoT').checked){$('oTime').focus();return}if(!pl){q.focus();res.innerHTML='<p>Pick your city from the list.</p>';return}
-   const ch=chartFor(dob,time,pl);localStorage.setItem('a:profile',JSON.stringify(Object.assign({name,dob,time,place:[pl.lat,pl.lon],tz:pl.tz,placeName:pl.name},ch)));location.reload()}}
+   if(!gen){$('oG').classList.add('need');$('oG').scrollIntoView({block:'center',behavior:'smooth'});return}if(!name){$('oName').focus();return}if(!dob){$('oDob').focus();return}if(!time&&!$('oNoT').checked){$('oTime').focus();return}if(!pl){q.focus();res.innerHTML='<p>Pick your city from the list.</p>';return}
+   const ch=chartFor(dob,time,pl);localStorage.setItem('a:profile',JSON.stringify(Object.assign({name,gender:gen,dob,time,place:[pl.lat,pl.lon],tz:pl.tz,placeName:pl.name},ch)));location.reload()}}
  function tzOffsetMin(tz,y,m,d,hh,mm){try{const dt=new Date(Date.UTC(y,m-1,d,hh,mm));const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(dt).reduce((a,p)=>(a[p.type]=p.value,a),{});
    return (Date.UTC(+f.year,+f.month-1,+f.day,+f.hour,+f.minute)-dt)/60000}catch(e){return 330}}
  function chartFor(dob,time,pl){const A=Astronomy,ay=d=>{const y=2000+(d-Date.UTC(2000,0,1,12))/31557600000;return 23.853+(y-2000)*.013969},n=x=>((x%360)+360)%360;
@@ -1523,6 +1525,10 @@ html[data-theme="dark"] .onb{background:linear-gradient(180deg,#1B1D33 0%,#2C233
 .onb-lead{margin:0 0 6px;font-size:16px;line-height:1.45;color:var(--text)}
 .onb label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
 .onb input[type=text],.onb input[type=date],.onb input[type=time]{font:inherit;font-size:17px;font-weight:400;color:var(--ink);padding:12px 14px;border-radius:14px;border:1px solid var(--g-edge);background:var(--g-row);-webkit-appearance:none;appearance:none;min-height:48px;box-sizing:border-box;width:100%}
+.onb-q{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600;color:var(--muted)}
+.onb-g{display:flex;width:100%}.onb-g button{flex:1;min-height:46px;font-size:16px}
+.onb-g.need{box-shadow:0 0 0 2px var(--avoid);border-radius:14px;animation:onbshake .35s}
+@keyframes onbshake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .onb .chk2{flex-direction:row;align-items:center;font-weight:500;color:var(--text);font-size:14.5px}
 .onb-res{display:flex;flex-direction:column;gap:4px;margin-top:-4px}
 .onb-res button{text-align:left;padding:10px 14px;border-radius:12px;background:var(--card-solid);border:1px solid var(--line);font-size:15.5px;color:var(--ink)}
