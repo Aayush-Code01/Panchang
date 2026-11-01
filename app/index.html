@@ -1485,6 +1485,19 @@ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{upd
   $('chartNote').textContent=(P.lagna!=null?`Your ${RS_EN[P.lagna]} rising sign is ruled by ${PL_EN[sl]}, so ${days[STRONG]} is your strongest day. `:`Without a birth time we use your Moon sign: ${days[STRONG]} is your strongest day. `)+`${NAK_EN[P.nak]} (${['1st','2nd','3rd','4th'][P.pada-1]||''} quarter) is ruled by ${PL_EN[NAK_LORD[P.nak]]}.`+(P.unsure?' The Moon changed stars on your birth date; adding a birth time makes this exact.':'')}
  fillChart();
  const eb=$('editBirth');if(eb)eb.onclick=()=>show(true);
+ // Settings: your details (edit) and delete everything, at the top and bottom of the sheet
+ (function(){const sh=document.getElementById('sheet');if(!sh||document.getElementById('meRow'))return;const first=sh.querySelector('.grp-t');if(!first)return;
+  const esc=x=>String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const d=P&&P.dob?new Date(P.dob+'T00:00:00Z').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}):'';
+  first.insertAdjacentHTML('beforebegin',`<div class="grp-t">Your details</div><div class="grp-b"><div class="row" id="meRow"><span>${esc(P&&P.name||'You')}<small>${[{f:'Female',m:'Male',o:'Other'}[P&&P.gender]||'',d,P&&P.time?P.time:'',esc(P&&P.placeName||'')].filter(Boolean).join(' · ')}</small></span><button type="button" class="act" id="meEdit">Edit</button></div></div>`);
+  document.getElementById('meEdit').onclick=()=>{try{if(typeof closeSheet==='function')closeSheet()}catch(e){}show(true)};
+  const data=[...sh.querySelectorAll('.grp-t')].find(g=>/Data/.test(g.textContent));const db=data&&data.nextElementSibling;
+  if(db){db.insertAdjacentHTML('beforeend','<div class="row"><span>Log out<small>Removes your details, notes and practice from this phone</small></span><button type="button" class="act danger" id="wipeAll">Log out</button></div>');
+   const w=document.getElementById('wipeAll');w.onclick=async()=>{if(!w.dataset.arm){w.dataset.arm='1';w.textContent='Tap again to log out';setTimeout(()=>{w.dataset.arm='';w.textContent='Log out'},4000);return}
+    Object.keys(localStorage).filter(k=>k.startsWith('a:')).forEach(k=>localStorage.removeItem(k));
+    try{if(window.ShubhlyRemind)await window.ShubhlyRemind.refresh()}catch(e){}
+    location.reload()}}})();
+
  function show(edit){const o=document.createElement('div');o.className='onb'+(edit?'':' wake');const p=P||{};
   o.innerHTML=`<div class="onb-in"><div class="wk-card"><svg class="wk" aria-hidden="true"></svg></div><h1>${edit?'Your birth details':'Welcome to Shubhly'}</h1><p class="onb-lead">${edit?'Change any detail and save. Your readings update straight away.':'Your day, well timed. Tell us when and where you were born, and every reading becomes yours.'}</p>
    <div class="onb-q"><span>You are</span><div class="seg onb-g" id="oG" role="radiogroup" aria-label="You are">${[['f','Female'],['m','Male'],['o','Other']].map(([v,t])=>`<button type="button" role="radio" data-v="${v}" aria-pressed="${p.gender===v}">${t}</button>`).join('')}</div></div>
