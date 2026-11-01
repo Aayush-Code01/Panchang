@@ -180,7 +180,7 @@ function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,
   return paneHead(tab,ACT[k].t,a.t,true,k)+`<div class="card res-top">${top}</div><h2 class="sec-t">Calendar</h2><div class="card calc" id="calBox"></div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}${td?'':shubhCTA('Can’t move the date?')}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
 
 function drawPlan(){const el=$('pane-plan'),v=view.plan[view.plan.length-1];let h;
-  if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">The kindest times in the next 30 days${ME.self?'':' for '+ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+`<p class="note2">Work and money decisions are also in Professional.</p>`;
+  if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">The kindest times in the next 30 days${ME.self?'':' for '+ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+festList()+`<p class="note2">Work and money decisions are also in Professional.</p>`;
   else if(v.startsWith('cat:')){const k=v.slice(4);h=paneHead('plan','Plan',ACT[k].t,true,k)+actList(k)}
   else{const [k,id]=v.slice(4).split(':');if(id==='compat')return drawCompat();h=resultView('plan',k,id)}
   el.innerHTML=h;wire(el,'plan');wireCats(el,'plan');if($('calBox'))drawCal()}
@@ -530,9 +530,104 @@ function init(){const app=document.querySelector('.app');
   // sankalp chip opens Practice
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.daynav .dsk')){setTab('practice')}},true);
   // re-render hooks
-  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();applyDepth();document.querySelectorAll('.pane .pdate').forEach(x=>{x.outerHTML=dateLine()});renderGlance();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
+  const R=window.render;window.render=function(){const x=R.apply(this,arguments);try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}introBar();nameEyebrow();applyDepth();document.querySelectorAll('.pane .pdate').forEach(x=>{x.outerHTML=dateLine()});renderGlance();festCard();if(cur!=='today'&&(!view[cur]||view[cur].length===1))draw(cur)}catch(e){console.error(e)}return x};
   try{{const L=[...document.querySelectorAll('#tl .tl-seg')].pop();if(L)L.style.borderRight='0'}depthSetting();applyDepth();nameEyebrow();renderGlance();drawKind();introBar()}catch(e){console.error(e)}
+  try{window.render($('date').value)}catch(e){console.error(e)}
   let t0=null;try{t0=sessionStorage.getItem('tab')}catch(e){}if(t0&&t0!=='today')setTab(t0)}
+/* ---------- Festivals and vrats ----------
+   Each festival is fixed by its lunar month (amanta, as the app computes it) and tithi (0 = Shukla Pratipada … 14 = Purnima,
+   15 = Krishna Pratipada … 29 = Amavasya). North-Indian (purnimanta) names are shown, so a Krishna-paksha festival's amanta
+   month is one before its usual name (Ahoi Ashtami, "Kartik Krishna Ashtami", is amanta Ashwin K8).
+   at: 'rise' = the tithi at sunrise (or skipped between two sunrises), 'eve' = the tithi at sunset (pradosh / moonrise /
+   stars), 'mid' = the tithi at midnight (nishita). A tithi that covers two sunrises/sunsets is kept on the first day. */
+const FEST=[
+ {n:'Hindu New Year',sn:'New Year',m:'Chaitra',t:0,at:'rise',d:'The first day of Chaitra: Ugadi, Gudi Padwa and the start of Chaitra Navratri.',how:'Begin the year with a clean home, a small puja and something sweet. Navratri runs for nine days.'},
+ {n:'Ram Navami',sn:'Ram Navami',m:'Chaitra',t:8,at:'noon',d:'Lord Rama’s birthday, the last day of Chaitra Navratri.',how:'Midday prayer to Rama; read or listen to a few verses of the Ramayana.',tm:'noon'},
+ {n:'Hanuman Jayanti',sn:'Hanuman',m:'Chaitra',t:14,at:'rise',d:'Hanuman’s birthday, celebrated on the full moon of Chaitra.',how:'Recite the Hanuman Chalisa and offer something sweet.'},
+ {n:'Akshaya Tritiya',sn:'Akshaya',m:'Vaishakha',t:2,at:'noon',d:'One of the most auspicious days of the year: what you begin today is said to grow and never fade.',how:'A great day to start something new, buy gold or give in charity, no muhurat needed.'},
+ {n:'Buddha Purnima',sn:'Buddha',m:'Vaishakha',t:14,at:'rise',d:'The full moon of Vaishakha, honouring the Buddha’s birth and enlightenment.',how:'A quiet day for kindness, giving and a few minutes of stillness.'},
+ {n:'Vat Savitri Vrat',sn:'Vat Savitri',m:'Vaishakha',t:29,at:'rise',d:'Married women fast and pray at a banyan tree for their husband’s long life, remembering Savitri.',how:'Tie a thread around a banyan tree and walk around it; break the fast after the puja.'},
+ {n:'Ganga Dussehra',sn:'Ganga',m:'Jyeshtha',t:9,at:'rise',d:'The day the Ganga is said to have descended to earth.',how:'A dip in a river, or a little Ganga jal in your bath water, and a prayer for cleansing.'},
+ {n:'Nirjala Ekadashi',sn:'Nirjala',m:'Jyeshtha',t:10,at:'rise',d:'The strictest Ekadashi: devotees fast without water. Said to equal all the year’s Ekadashis.',how:'Fast as much as your health allows; giving water or a pot to someone in need is part of the day.'},
+ {n:'Jagannath Rath Yatra',sn:'Rath Yatra',m:'Ashadha',t:1,at:'rise',d:'Lord Jagannath’s chariot festival, famous in Puri.',how:'Watch the yatra or offer a simple prayer to Jagannath.'},
+ {n:'Devshayani Ekadashi',sn:'Devshayani',m:'Ashadha',t:10,at:'rise',d:'Vishnu begins his four-month rest (Chaturmas). Weddings pause until Dev Uthani Ekadashi.',how:'Fast or eat light and chant a Vishnu mantra. Plan weddings and housewarmings for after Chaturmas.'},
+ {n:'Guru Purnima',sn:'Guru',m:'Ashadha',t:14,at:'rise',d:'A day to honour your teachers and guides.',how:'Thank a teacher, mentor or parent; touch their feet or send them a message.'},
+ {n:'Hariyali Teej',sn:'Teej',m:'Shravana',t:2,at:'rise',d:'A monsoon festival of Shiva and Parvati, loved by married women.',how:'Green clothes, mehendi, swings and a prayer to Parvati.'},
+ {n:'Nag Panchami',sn:'Nag Panchami',m:'Shravana',t:4,at:'rise',d:'A day to honour serpents and the protection they symbolise.',how:'Offer milk at a Shiva temple and pray for your family’s safety.'},
+ {n:'Raksha Bandhan',sn:'Rakhi',m:'Shravana',t:14,at:'rise',d:'Sisters tie a rakhi on their brothers’ wrists for protection and love.',how:'Tie the rakhi after Bhadra ends; exchange sweets and gifts.',bhadra:true},
+ {n:'Kajari Teej',sn:'Kajari Teej',m:'Shravana',t:17,at:'rise',d:'A monsoon Teej of fasting and folk songs, especially in UP and Bihar.',how:'Married women fast and pray to the neem tree and Parvati.'},
+ {n:'Janmashtami',sn:'Janmashtami',m:'Shravana',t:22,at:'mid',d:'Lord Krishna’s birthday, born at midnight.',how:'Fast through the day and break it after the midnight puja, with makhan-mishri.',tm:'mid'},
+ {n:'Hartalika Teej',sn:'Hartalika',m:'Bhadrapada',t:2,at:'rise',d:'Women fast for a happy marriage, remembering Parvati’s devotion to Shiva.',how:'A waterless fast for many; evening puja to Shiva and Parvati.'},
+ {n:'Ganesh Chaturthi',sn:'Ganesh',m:'Bhadrapada',t:3,at:'noon',w:2,d:'Ganesha’s birthday and the start of the ten-day Ganeshotsav.',how:'Welcome Ganesha home or visit a pandal; offer modak. Tradition says don’t look at the Moon tonight.',tm:'noon'},
+ {n:'Anant Chaturdashi',sn:'Anant',m:'Bhadrapada',t:13,at:'rise',d:'The last day of Ganeshotsav, when Ganesha idols are immersed, and a day for Vishnu.',how:'Tie an anant thread (14 knots) on your arm and pray to Vishnu.'},
+ {n:'Pitru Paksha begins',sn:'Pitru Paksha',m:'Bhadrapada',t:15,at:'rise',d:'Fifteen days to remember and thank your ancestors.',how:'Offer water and food in their memory; many avoid big new starts and purchases in these days.'},
+ {n:'Sarva Pitru Amavasya',sn:'Mahalaya',m:'Bhadrapada',t:29,at:'rise',d:'The last day of Pitru Paksha, for all ancestors whose date you don’t know.',how:'Offer food to a cow, crows or someone in need in your ancestors’ name.'},
+ {n:'Sharad Navratri begins',sn:'Navratri',m:'Ashwin',t:0,at:'rise',d:'Nine nights of the Goddess. Ghatasthapana is done this morning.',how:'Light a lamp for the nine days; many fast or eat satvik food.'},
+ {n:'Durga Ashtami',sn:'Ashtami',m:'Ashwin',t:7,at:'rise',d:'The eighth day of Navratri, for Maha Gauri. Kanya puja is done today or tomorrow.',how:'Invite young girls home, wash their feet and offer them a meal and a gift.'},
+ {n:'Maha Navami',sn:'Navami',m:'Ashwin',t:8,at:'aft',d:'The ninth day of Navratri, for Siddhidatri.',how:'Kanya puja and havan to close Navratri.'},
+ {n:'Dussehra',sn:'Dussehra',m:'Ashwin',t:9,at:'aft',w:2,d:'Vijayadashami: the victory of good over evil. One of the year’s most auspicious days.',how:'A good day to start something new or buy vehicles and tools; watch Ravan Dahan in the evening.'},
+ {n:'Sharad Purnima',sn:'Sharad Purnima',m:'Ashwin',t:14,at:'eve',d:'The brightest full moon of the year, said to shower nectar.',how:'Leave kheer in the moonlight overnight and eat it in the morning.',tm:'moon'},
+ {n:'Karva Chauth',sn:'Karva Chauth',m:'Ashwin',t:18,at:'eve',d:'Married women fast from sunrise to moonrise for their husband’s long life.',how:'Sargi before dawn, evening puja, and break the fast after seeing the moon.',tm:'moon'},
+ {n:'Ahoi Ashtami',sn:'Ahoi Ashtami',m:'Ashwin',t:22,at:'eve',d:'Mothers fast for the long life and wellbeing of their children, praying to Ahoi Mata.',how:'Draw or place the Ahoi Mata picture, do the evening puja, and break the fast after seeing the stars.',tm:'stars'},
+ {n:'Dhanteras',sn:'Dhanteras',m:'Ashwin',t:27,at:'eve',d:'The first day of Diwali, for Dhanvantari and Lakshmi.',how:'Buy something in metal, gold or a new utensil; light a lamp for Yama at the door in the evening.',tm:'pradosh'},
+ {n:'Choti Diwali',sn:'Choti Diwali',m:'Ashwin',t:28,at:'rise',w:0,d:'Narak Chaturdashi, the day before Diwali.',how:'An early oil bath before sunrise and a few lamps in the evening.'},
+ {n:'Diwali',sn:'Diwali',m:'Ashwin',t:29,at:'eve',w:3,d:'The festival of lights. Lakshmi and Ganesha are worshipped in the evening.',how:'Clean and light up the home; do Lakshmi puja after sunset, in pradosh kaal.',tm:'pradosh'},
+ {n:'Govardhan Puja',sn:'Govardhan',m:'Kartik',t:0,at:'rise',d:'Krishna lifting Govardhan hill; Annakut, a mountain of food, is offered.',how:'Offer a variety of dishes to Krishna and share them.'},
+ {n:'Bhai Dooj',sn:'Bhai Dooj',m:'Kartik',t:1,at:'rise',d:'Sisters pray for their brothers; brothers visit and bring gifts.',how:'Tilak on the brother’s forehead, a meal together and blessings.'},
+ {n:'Chhath Puja',sn:'Chhath',m:'Kartik',t:5,at:'rise',d:'Worship of the Sun and Chhathi Maiya, with offerings at sunset today and sunrise tomorrow.',how:'Arghya to the setting sun from a river or pond; many keep a strict fast.',tm:'sunset'},
+ {n:'Dev Uthani Ekadashi',sn:'Dev Uthani',m:'Kartik',t:10,at:'rise',d:'Vishnu wakes from his four-month rest; Tulsi Vivah is celebrated and the wedding season opens.',how:'Fast or eat light, decorate the tulsi plant and light lamps.'},
+ {n:'Kartik Purnima',sn:'Kartik Purnima',m:'Kartik',t:14,at:'rise',d:'Dev Deepawali, when the gods are said to celebrate Diwali; also Guru Nanak Jayanti.',how:'A holy dip or a bath at sunrise, and lamps in the evening.'},
+ {n:'Vivah Panchami',sn:'Vivah',m:'Margashirsha',t:4,at:'rise',d:'The wedding day of Rama and Sita.',how:'Read the Ram–Sita wedding from the Ramayana; a lovely day for couples to pray together.'},
+ {n:'Gita Jayanti',sn:'Gita Jayanti',m:'Margashirsha',t:10,at:'rise',d:'The day Krishna spoke the Bhagavad Gita; also Mokshada Ekadashi.',how:'Read one chapter, or even one verse, of the Gita.'},
+ {n:'Mauni Amavasya',sn:'Mauni',m:'Pausha',t:29,at:'rise',d:'A day of silence and holy dips, especially at the Sangam.',how:'Keep a little silence today and give warm clothes or food.'},
+ {n:'Vasant Panchami',sn:'Vasant',m:'Magha',t:4,at:'rise',d:'Saraswati puja and the arrival of spring.',how:'Wear yellow, pray to Saraswati and begin a new study or skill.'},
+ {n:'Maha Shivratri',sn:'Shivratri',m:'Magha',t:28,at:'mid',d:'The great night of Shiva.',how:'Fast, offer water and bel leaves to Shiva and chant Om Namah Shivaya, especially at night.',tm:'mid'},
+ {n:'Holika Dahan',sn:'Holika',m:'Phalguna',t:14,at:'rise',d:'The bonfire on the eve of Holi, for the victory of devotion over ego.',how:'Walk around the bonfire after Bhadra ends and offer grains and coconut.',tm:'sunset'},
+ {n:'Holi',sn:'Holi',m:'Phalguna',t:15,at:'rise',w:2,d:'The festival of colours.',how:'Play with colours, forgive and forget, and share gujiya.'}
+];
+const SANK=[{n:'Makar Sankranti',sn:'Sankranti',s:9,d:'The Sun enters Capricorn: Makar Sankranti, Pongal and Uttarayan.',how:'A bath, sesame and jaggery sweets, and giving in charity. Fly a kite.'},
+ {n:'Baisakhi',sn:'Baisakhi',s:0,d:'The Sun enters Aries: the solar new year, Baisakhi and Vishu.',how:'Visit a gurdwara or temple and celebrate the harvest.'}];
+const fTithi=t=>Math.floor(Astronomy.MoonPhase(t)/12)%30;
+const fSunSign=t=>{const y=t.getUTCFullYear()+t.getUTCMonth()/12;return Math.floor((((Astronomy.SunPosition(t).elon-(23.853+(y-2000)*.013969))%360)+360)%360/30)};
+const fCache={};
+function festAll(r){if(!r||!r.rise)return [];const key=+r.rise;if(key in fCache)return fCache[key];const out=[];
+ try{const rise=r.rise,set=r.set,next=r.chog&&r.chog[15]?r.chog[15].b:new Date(+rise+864e5),day=864e5,dl=set-rise;
+  const at={noon:new Date(+rise+dl*.5),aft:new Date(+rise+dl*.6),eve:set,mid:new Date((+set+ +next)/2)};
+  const a=r.tithi.idx,b=fTithi(next),present=[a];if((b-a+30)%30===2)present.push((a+1)%30);
+  const ord=MASA_N.indexOf(r.masa.amanta),mon=t=>(t<a&&a>=24&&t<=5)?MASA_N[(ord+1)%12]:r.masa.amanta;
+  for(const F of FEST){let ok=false;
+   if(F.at==='rise')ok=present.includes(F.t)&&fTithi(new Date(+rise-day))!==F.t;
+   else{const T=at[F.at],c=fTithi(T),p=fTithi(new Date(+T-day));
+    // the tithi at the festival's hour today; if the tithi slipped between two such hours, the day it rose on
+    ok=(c===F.t&&p!==F.t)||(p===(F.t+29)%30&&c===(F.t+1)%30&&present.includes(F.t))}
+   if(ok&&mon(F.t)===F.m&&!(r.masa.adhik&&mon(F.t)===r.masa.amanta))out.push(F)}
+  {const s1=fSunSign(set),s0=fSunSign(new Date(+set-day));if(s1!==s0){const S=SANK.find(x=>x.s===s1);if(S)out.push(S)}}
+  out.sort((x,y)=>(y.w??1)-(x.w??1));
+ }catch(e){console.warn('fest',e)}
+ return fCache[key]=out}
+function festOf(r){return festAll(r)[0]||null}
+const MASA_N=['Chaitra','Vaishakha','Jyeshtha','Ashadha','Shravana','Bhadrapada','Ashwin','Kartik','Margashirsha','Pausha','Magha','Phalguna'];
+function festTime(F,r){const [lat,lon]=loc();try{
+  if(F.tm==='moon'){const m=Astronomy.SearchRiseSet('Moon',new Astronomy.Observer(lat,lon,0),+1,new Date(+r.set-2*3600e3),1);return m?'Moonrise around '+fmt(m.date):''}
+  if(F.tm==='stars')return 'Stars are out from about '+fmt(new Date(+r.set+40*60e3));
+  if(F.tm==='pradosh')return 'Pradosh kaal '+fmt(r.set)+' – '+fmt(new Date(+r.set+144*60e3));
+  if(F.tm==='sunset')return 'Sunset at '+fmt(r.set);
+  if(F.tm==='mid'){const next=r.chog[15].b,m=(+r.set+ +next)/2;return 'Midnight puja around '+fmt(new Date(m-24*60e3))+' – '+fmt(new Date(m+24*60e3))}
+  if(F.tm==='noon'){const d=(r.set-r.rise)/5;return 'Midday puja '+fmt(new Date(+r.rise+2*d))+' – '+fmt(new Date(+r.rise+3*d))}
+ }catch(e){}return ''}
+window.festOf=festOf;
+const TN=['Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi'];
+function festTithi(F){if(F.t==null)return '';const k=F.t>=15,m=k?MASA_N[(MASA_N.indexOf(F.m)+1)%12]:F.m;return m+' '+(k?'Krishna':'Shukla')+' '+(F.t===14?'Purnima':F.t===29?'Amavasya':TN[F.t%15])}
+// observance() (Ekadashi, Pradosh…) is defined by the page; a festival takes its place on the day it falls
+if(typeof window.observance==='function'){const O=window.observance;window.observance=function(r){const F=ls.get('special',true)?festOf(r):null;if(!F)return O(r);
+  const tm=festTime(F,r);return{n:F.sn||F.n,full:F.n,fest:true,d:F.d+' '+F.how+(tm?' '+tm+'.':''),F,tm}}}
+function festCard(){let el=$('festBox');if(!el){const al=$('alerts');if(!al)return;el=document.createElement('div');el.id='festBox';al.parentNode.insertBefore(el,al)}el.innerHTML='';const ds=$('date').value,[lat,lon]=loc(),r=calc(ds,lat,lon),ob=observance(r);if(!ob||!ob.fest)return;
+ const isT=ds===todayIST();
+ el.innerHTML=`<div class="fest-card"><div class="fc-k">${isT?'Today':'This day'} · ${festTithi(ob.F)||(r.masa.purnimanta+' '+r.tithi.paksha+' '+r.tithi.name)}</div><h3>${ob.full}</h3><p>${ob.F.d}</p><p class="fc-how"><b>How to observe.</b> ${ob.F.how}</p>${ob.tm?`<div class="fc-tm">${ob.tm}</div>`:''}${festAll(r).length>1?`<p class="fc-also">Also ${isT?'today':'this day'}: ${festAll(r).slice(1).map(x=>x.n).join(', ')}</p>`:''}</div>`}
+function festAhead(days){const [lat,lon]=loc(),t=todayIST(),L=[];for(let i=0;i<days;i++){const ds=addDays(t,i),r=calc(ds,lat,lon);festAll(r).forEach(F=>{if(!L.some(x=>x.F.n===F.n))L.push({ds,r,F})})}return L}
+function festList(){const L=festAhead(60);if(!L.length)return'';
+ return `<h2 class="sec-t">Festivals ahead</h2><div class="card fest-list">${L.slice(0,6).map(({ds,r,F})=>{const d=dObj(ds),n=Math.round((d-dObj(todayIST()))/864e5),tm=festTime(F,r);
+  return `<details class="fl-row"><summary><div class="d"><small>${WDS[r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div class="fl-t"><b>${F.n}</b><small>${n===0?'Today':n===1?'Tomorrow':'In '+n+' days'}</small></div><span class="fl-c" aria-hidden="true">›</span></summary><div class="fl-b"><p>${F.d}</p><p><b>How to observe.</b> ${F.how}</p>${tm?`<p class="fl-tm">${tm}</p>`:''}</div></details>`}).join('')}</div>`}
 /* ---------- Make it shubh: when the time isn't right but the work can't wait ----------
    Tradition: remember Ganesha before any beginning, recite "Tadeva lagnam" (said before ceremonies so that whatever the hour,
    it becomes auspicious), begin with something sweet and step out right foot first. A calm 2-minute guided flow. */

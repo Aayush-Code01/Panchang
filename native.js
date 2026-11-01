@@ -29,7 +29,7 @@
   const runs=[];S.forEach(s=>{const ok=s.cls==='best'||s.cls==='good',L=runs[runs.length-1];
    if(ok&&L&&L.b===s.a)L.b=s.b,L.best=L.best||s.cls==='best';else if(ok)runs.push({a:s.a,b:s.b,best:s.cls==='best'})});
   const best=runs.sort((x,y)=>(y.b-y.a)+(y.best?20*60e3:0)-((x.b-x.a)+(x.best?20*60e3:0)))[0];
-  const title=v[1]+(ob?' · '+ob.n:'');
+  const title=v[1]+(ob?' · '+(ob.full||ob.n):'');
   const parts=[];
   if(best)parts.push('Best time '+span(best.a,best.b));
   parts.push('Avoid '+span(r.rahu[0],r.rahu[1]));

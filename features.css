@@ -502,3 +502,29 @@ html[data-theme="dark"] .shov{background:linear-gradient(180deg,#2B2E6E 0%,#3A2F
 .sh-foot .btnp{width:auto;min-width:150px;padding:0 26px}
 .sh-back{font-size:16px;font-weight:600;color:var(--muted);padding:12px 6px;background:none;border:0}
 @media (prefers-reduced-motion:reduce){.sh-body,.sh-breath i{animation:none}}
+/* festivals */
+.fest-card{position:relative;overflow:hidden;border-radius:22px;padding:16px 18px 16px;margin:2px 0;color:#F6EAD6;
+ background:linear-gradient(150deg,#2B2E6E 0%,#4A3C7E 52%,#B4637A 100%);box-shadow:var(--shadow)}
+.fest-card::after{content:"";position:absolute;right:-40px;top:-50px;width:170px;height:170px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,180,100,.55),rgba(255,160,90,0));pointer-events:none}
+.fest-card .fc-k{font-size:12.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgba(246,234,214,.72)}
+.fest-card h3{font-family:var(--serif);font-weight:500;font-size:30px;line-height:1.08;letter-spacing:-.02em;margin:4px 0 8px;color:#FFF4E2;font-variation-settings:"opsz" 96,"SOFT" 30}
+.fest-card p{margin:0 0 8px;font-size:15.5px;line-height:1.45;color:rgba(246,234,214,.88);position:relative;z-index:1}
+.fest-card .fc-how b{color:#FFF4E2}
+.fest-card .fc-tm{display:inline-flex;margin-top:4px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);font-size:14px;font-weight:600;color:#FFF4E2}
+.fest-list{padding:4px 0}
+.fl-row{border-top:1px solid var(--line)}.fl-row:first-child{border-top:0}
+.fl-row summary{list-style:none;display:flex;align-items:center;gap:14px;padding:12px 16px;cursor:pointer}
+.fl-row summary::-webkit-details-marker{display:none}
+.fl-row .d{flex:none;width:46px;text-align:center;display:flex;flex-direction:column;line-height:1.1}
+.fl-row .d small{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.fl-row .d b{font-family:var(--serif);font-weight:500;font-size:22px;color:var(--ink)}
+.fl-t{flex:1;min-width:0;display:flex;flex-direction:column}
+.fl-t b{font-size:16.5px;font-weight:600;color:var(--ink)}.fl-t small{font-size:13.5px;color:var(--muted)}
+.fl-c{color:var(--muted);font-size:22px;transition:transform .2s}
+.fl-row[open] .fl-c{transform:rotate(90deg)}
+.fl-b{padding:0 16px 14px 76px}
+.fl-b p{margin:0 0 8px;font-size:15px;line-height:1.45;color:var(--text)}
+.fl-b .fl-tm{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--brass-soft);color:var(--ink);font-size:13.5px;font-weight:600}
+.fest-card .fc-also{margin:10px 0 0;font-size:13.5px;color:rgba(246,234,214,.75)}
+#festBox{order:3}#festBox:empty{display:none}
+#festBox .fest-card{margin:0}
