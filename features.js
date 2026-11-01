@@ -42,6 +42,9 @@ const vPill=(vc,vt)=>`<span class="kpill ${VK[vc]}">${VI[vc].replace(/width="\d+
 const people=()=>ls.get('people',[]);
 const savePeople=a=>ls.set('people',a);
 const partner=()=>people().find(p=>p.rel==='Partner');
+/* who is using the app: age bands and gender shape what we suggest */
+const AGE=(()=>{const b=ME.birth;if(!b||!b.dob)return null;const [y,m,d]=b.dob.split('-').map(Number),t=new Date();let n=t.getFullYear()-y;if(t.getMonth()+1<m||(t.getMonth()+1===m&&t.getDate()<d))n--;return n})();
+const MINOR=AGE!=null&&AGE<18,CHILD=AGE!=null&&AGE<13,SENIOR=AGE!=null&&AGE>=65,GEN=ME.gender||'';
 const REL={Partner:'#C77A6E',Child:'#D6A64E',Parent:'#7F9C77',Sibling:'#6E8FB8',Friend:'#9A86B8'};
 
 /* ---------- birth chart for a person ---------- */
@@ -180,7 +183,7 @@ function resultView(tab,k,id){const a=ACT[k].a.find(x=>x.id===id),L=findTimes(a,
   return paneHead(tab,ACT[k].t,a.t,true,k)+`<div class="card res-top">${top}</div><h2 class="sec-t">Calendar</h2><div class="card calc" id="calBox"></div>${slots?`<h2 class="sec-t">Good times, next 30 days</h2><div class="card slots">${slots}</div>`:''}${td?'':shubhCTA('Can’t move the date?')}<p class="note2">${a.note?a.note+' ':''}Worked out from ${ME.self?'your':ME.name+'’s'} birth star and Moon sign, the day's star, weekday and tithi, and the good choghadiya windows. Traditional guidance to help you plan, not a guarantee.</p>`}
 
 function drawPlan(){const el=$('pane-plan'),v=view.plan[view.plan.length-1];let h;
-  if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">The kindest times in the next 30 days${ME.self?'':' for '+ME.name}.</p>`+catTiles(['love','home','travel','health','learn','spirit','family','money'],'plan')+festList()+`<p class="note2">Work and money decisions are also in Professional.</p>`;
+  if(v==='home')h=paneHead('plan','Find a good time','Plan')+`<p class="pane-lead">${MINOR?'Good times for studies, travel and health':'The kindest times'} in the next 30 days${ME.self?'':' for '+ME.name}.</p>`+catTiles(MINOR?['learn','travel','health','spirit']:['love','home','travel','health','learn','spirit','family','money'],'plan')+festList()+(MINOR?'':`<p class="note2">Work and money decisions are also in Professional.</p>`);
   else if(v.startsWith('cat:')){const k=v.slice(4);h=paneHead('plan','Plan',ACT[k].t,true,k)+actList(k)}
   else{const [k,id]=v.slice(4).split(':');if(id==='compat')return drawCompat();h=resultView('plan',k,id)}
   el.innerHTML=h;wire(el,'plan');wireCats(el,'plan');if($('calBox'))drawCal()}
@@ -242,23 +245,23 @@ function showCompat(){const {A,B}=CMP.res,m=match(A,B),us=A.me||B.me,other=A.me?
 function workScore(r){const p=personDay(r,BIRTH),tq=TARA[p.tara.name][0];let s=(tq==='good'?2:tq==='bad'?-2:0)+(p.chandra.q==='good'?1:p.chandra.q==='bad'?-1:0)+([3,4].includes(r.wd)?1:0)-(r.yoga.bad?1:0);if(p.chandra.ashtama)s=-3;
   return s>=2?['good','Strong day for work']:s>=0?['mixed','Steady day for work']:['slow','Keep work routine']}
 function drawWork(){const el=$('pane-work'),v=view.work[view.work.length-1];
-  if(v!=='home'){if(v.startsWith('act:')){const [k,id]=v.slice(4).split(':');el.innerHTML=resultView('work',k,id);setTimeout(drawCal)}else{const k=v.slice(4);el.innerHTML=paneHead('work','Professional',ACT[k].t,true,k)+actList(k)}wire(el,'work');wireCats(el,'work');return}
+  if(v!=='home'){if(v.startsWith('act:')){const [k,id]=v.slice(4).split(':');el.innerHTML=resultView('work',k,id);setTimeout(drawCal)}else{const k=v.slice(4);el.innerHTML=paneHead('work',MINOR?'Studies':'Professional',ACT[k].t,true,k)+actList(k)}wire(el,'work');wireCats(el,'work');return}
   const [lat,lon]=loc(),t=SEL(),r=calc(t,lat,lon),[vc,vt]=workScore(r),now=Date.now();
   const W=windows(r,{},now).filter(g=>g.cls!=='ok');const focus=W.slice().sort((a,b)=>a.a-b.a)[0];
   const rahuLeft=+r.rahu[1]>now;
-  const line=vc==='good'?'Good energy for bold moves: pitch, negotiate, decide.':vc==='mixed'?'A steady day. Good for progress on what\'s already moving.':'A day for routine work and preparation. Save big moves for a stronger day.';
+  const line=MINOR?(vc==='good'?'Good energy for tests, presentations and starting something new.':vc==='mixed'?'A steady day for regular study and revision.':'A day for revision and practice. Save big tests for a stronger day if you can.'):vc==='good'?'Good energy for bold moves: pitch, negotiate, decide.':vc==='mixed'?'A steady day. Good for progress on what\'s already moving.':'A day for routine work and preparation. Save big moves for a stronger day.';
   let wk='';for(let i=0;i<7;i++){const ds=addDays(t,i),rr=calc(ds,lat,lon),[c]=workScore(rr),d=dObj(ds);wk+=`<div class="${i===0?'tdy':''}"><small>${WDS[rr.wd]}</small><b>${d.getUTCDate()}</b><i style="background:${c==='good'?'var(--good)':c==='mixed'?'var(--best)':'var(--avoid)'}"></i></div>`}
-  el.innerHTML=paneHead('work','Work & money','Professional')+`<div class="two"><div><div class="card gcard"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>${vt}</h3>${vPill(vc,{good:'Strong',mixed:'Steady',slow:'Routine'}[vc]+' day')}</div><p>${line}</p>
-    <div class="chips3"><div><span>Best for focus</span><b>${focus?hm(focus.a)+' – '+fmt(focus.b):'Tomorrow morning'}</b></div><div><span>${rahuLeft?'Avoid signing':'Rahu Kaal'}</span><b>${hm(r.rahu[0])} – ${fmt(r.rahu[1])}</b></div></div></div>
-    <div class="card gcard"><h3>This week at work</h3><div class="week">${wk}</div><div class="wkey"><span><i style="background:var(--good)"></i>Strong</span><span><i style="background:var(--best)"></i>Steady</span><span><i style="background:var(--avoid)"></i>Routine</span></div></div></div>
-    <div><h2 class="sec-t">${badge('career',30)}Career</h2>${actList('career')}<h2 class="sec-t">${badge('money',30)}Money</h2>${actList('money')}<p class="note2">Traditional timing to help you choose a good moment. It isn't financial advice: check the numbers, and talk to an advisor for big decisions.</p></div></div>`;
+  el.innerHTML=paneHead('work',MINOR?'School & exams':'Work & money',MINOR?'Studies':'Professional')+`<div class="two"><div><div class="card gcard"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>${vt}</h3>${vPill(vc,{good:'Strong',mixed:'Steady',slow:'Routine'}[vc]+' day')}</div><p>${line}</p>
+    <div class="chips3"><div><span>Best for focus</span><b>${focus?hm(focus.a)+' – '+fmt(focus.b):'Tomorrow morning'}</b></div><div><span>${rahuLeft?(MINOR?'Avoid starting':'Avoid signing'):'Rahu Kaal'}</span><b>${hm(r.rahu[0])} – ${fmt(r.rahu[1])}</b></div></div></div>
+    <div class="card gcard"><h3>This week ${MINOR?'for studies':'at work'}</h3><div class="week">${wk}</div><div class="wkey"><span><i style="background:var(--good)"></i>Strong</span><span><i style="background:var(--best)"></i>Steady</span><span><i style="background:var(--avoid)"></i>Routine</span></div></div></div>
+    <div>${MINOR?`<h2 class="sec-t">${badge('learn',30)}Learning</h2>${actList('learn')}`:`<h2 class="sec-t">${badge('career',30)}Career</h2>${actList('career')}<h2 class="sec-t">${badge('money',30)}Money</h2>${actList('money')}<p class="note2">Traditional timing to help you choose a good moment. It isn't financial advice: check the numbers, and talk to an advisor for big decisions.</p>`}</div></div>`;
   wire(el,'work');wireCats(el,'work')}
 
 /* ---------- Personal ---------- */
 function personSummary(p){const [lat,lon]=loc(),r=calc(SEL(),lat,lon),[vc,vt]=vFor(r,p);return{vc,vt,line:TARA[personDay(r,p).tara.name][1].replace(/for you/,'for '+p.name).replace(/your/g,'their')}}
 function drawPersonal(){const el=$('pane-personal'),v=view.personal[view.personal.length-1];let h='';
   if(v==='home'){const P=people();h=paneHead('personal','Love & family','Personal');
-    h+=`<p class="pane-lead">${P.length?'How today looks for the people you love.':'Add your partner, children or family to see how each day looks for them, and the best days for you together.'}</p>`;
+    h+=`<p class="pane-lead">${P.length?'How today looks for the people you love.':(MINOR?'Add your parents, brothers and sisters or friends to see how each day looks for them.':'Add your partner, children or family to see how each day looks for them, and the best days for you together.')}</p>`;
     h+=`<div class="plist">${P.map(p=>{const s=personSummary(p);return`<button type="button" class="person card" data-p="${p.id}"><span class="av" style="background:${REL[p.rel]||'#B9A27C'}">${esc(p.name[0]||'?')}</span><span><b>${esc(p.name)}</b><small>${p.rel} · ${NAKN[p.nak]}, ${RS[p.rashi]} Moon</small></span>${vPill(s.vc,s.vt)}</button>`}).join('')}<button type="button" class="addp" data-add>${IC.plus}Add ${P.length?'someone':'your partner or family'}</button></div>`;
     el.innerHTML=h;wire(el,'personal');el.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>go2('personal','p:'+b.dataset.p));el.querySelector('[data-add]').onclick=()=>go2('personal','edit:new');return}
   if(v.startsWith('edit:'))return drawForm(v.slice(5));
@@ -283,7 +286,7 @@ function drawForm(id){const el=$('pane-personal'),P=people(),p=P.find(x=>x.id===
   const opts=$('loc').innerHTML.replace(/ selected(="")?/g,'').replace(/<option[^>]*id="nearOpt"[^>]*>.*?<\/option>/,'');
   el.innerHTML=paneHead('personal',id==='new'?'Add someone':'Edit',id==='new'?'New person':esc(p.name),true)+`<div class="card form">
    <div class="frow"><label class="l">Name</label><input type="text" id="fName" value="${esc(p.name||'')}" placeholder="Their name" autocomplete="off"></div>
-   <div class="frow"><label class="l">Relationship</label><div class="seg" id="fRel">${['Partner','Child','Parent','Sibling','Friend'].map(x=>`<button type="button" data-v="${x}" aria-pressed="${x===p.rel}">${x}</button>`).join('')}</div></div>
+   <div class="frow"><label class="l">Relationship</label><div class="seg" id="fRel">${['Partner','Child','Parent','Sibling','Friend'].filter(x=>!(MINOR&&(x==='Partner'||x==='Child'))).map(x=>`<button type="button" data-v="${x}" aria-pressed="${x===p.rel}">${x}</button>`).join('')}</div></div>
    <div class="frow"><label class="l">Date of birth</label><input type="date" id="fDob" value="${p.dob||''}"></div>
    <div class="frow"><label class="l">Time of birth</label><input type="time" id="fTime" value="${p.time||''}"><label class="chk2"><input type="checkbox" id="fNoT" ${p.dob&&!p.time?'checked':''}> I don't know the time</label></div>
    <div class="frow"><label class="l">Place of birth</label><select id="fPlace">${opts}</select></div></div>
@@ -463,13 +466,13 @@ function renderGlance(){const box=$('glance');if(!box)return;const [lat,lon]=loc
   const dot=c=>`<i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${c==='good'?'var(--good)':c==='mixed'?'var(--best)':'var(--avoid)'}"></i>`;
   let ph;if(p){const [vc,vt]=vFor(r,p);ph=`<button type="button" class="gl card" data-go="personal"><span class="k">${IC.heart}${esc(p.name)}</span><b>${dot(vc)} ${vt}</b><small>${personSummary(p).line}</small></button>`}
   else ph=`<button type="button" class="gl card" data-go="personal"><span class="k">${IC.heart}Personal</span><b>Add your partner</b><small>See how each day looks for them</small></button>`;
-  box.innerHTML=(ME.noWork?'':`<button type="button" class="gl card" data-go="work"><span class="k">${IC.work}Work</span><b>${dot(wc)} ${wt}</b><small>Career and money timing</small></button>`)+`${ph}
+  box.innerHTML=(ME.noWork?'':`<button type="button" class="gl card" data-go="work"><span class="k">${IC.work}Work</span><b>${dot(wc)} ${wt}</b><small>${MINOR?'Study timing':'Career and money timing'}</small></button>`)+`${ph}
    <button type="button" class="gl card" data-go="practice"><span class="k">${IC.lotus}Practice</span><b>${done} of ${tot} done</b><small>${kd?kd+' kind act'+(kd>1?'s':'')+' today':'Mantras, kind acts, intention'}</small></button>
    <button type="button" class="gl card" data-go="plan"><span class="k">${IC.plan}Plan</span><b>Planning something?</b><small>Find a good time</small></button>`;
   box.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>setTab(b.dataset.go))}
 
 /* ---------- tabs ---------- */
-const TABS=[['today','Today',IC.today],['plan','Plan',IC.plan],['personal','Personal',IC.heart],['work','Professional',IC.work],['practice','Practice',IC.lotus]].filter(t=>!(ME.noWork&&t[0]==='work'));
+const TABS=[['today','Today',IC.today],['plan','Plan',IC.plan],['personal','Personal',IC.heart],['work',MINOR?'Studies':'Professional',IC.work],['practice','Practice',IC.lotus]].filter(t=>!(ME.noWork&&t[0]==='work'));
 function draw(tab){if(tab==='plan')drawPlan();else if(tab==='work')drawWork();else if(tab==='personal')drawPersonal();else if(tab==='practice'){drawKind()}}
 let cur='today';
 function setTab(t){if(t===cur){if(t!=='today'&&view[t]&&view[t].length>1){view[t]=['home'];draw(t)}scrollTo({top:0,behavior:'smooth'});return}
@@ -514,7 +517,7 @@ function init(){const app=document.querySelector('.app');
   const c3=document.querySelector('.c3');if(c3){c3.prepend(gl);const dd=document.querySelector('.d-det'),dc=document.querySelector('.d-chart');if(dd)c3.appendChild(dd);if(dc)c3.appendChild(dc)}else app.appendChild(gl);gl.style.order=5;
   const nav=document.createElement('nav');nav.className='tabbar';nav.setAttribute('role','tablist');
   nav.innerHTML='<span class="tind"></span>'+TABS.map(([k,l,i])=>`<button type="button" role="tab" data-t="${k}" aria-selected="${k==='today'}">${i}<span>${l}</span></button>`).join('');
-  document.body.appendChild(nav);const fitL=()=>nav.querySelectorAll('span').forEach(sp=>{const b=sp.parentElement;if(b.dataset.t==='work'){sp.textContent='Professional';if(sp.scrollWidth>sp.clientWidth+1)sp.textContent='Work'}});requestAnimationFrame(fitL);addEventListener('resize',fitL);if(document.fonts)document.fonts.ready.then(fitL);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));dragTabs(nav);requestAnimationFrame(placeInd);if(document.fonts)document.fonts.ready.then(placeInd);
+  document.body.appendChild(nav);const fitL=()=>nav.querySelectorAll('span').forEach(sp=>{const b=sp.parentElement;if(b.dataset.t==='work'){sp.textContent=MINOR?'Studies':'Professional';if(sp.scrollWidth>sp.clientWidth+1)sp.textContent=MINOR?'Studies':'Work'}});requestAnimationFrame(fitL);addEventListener('resize',fitL);if(document.fonts)document.fonts.ready.then(fitL);nav.querySelectorAll('button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));dragTabs(nav);requestAnimationFrame(placeInd);if(document.fonts)document.fonts.ready.then(placeInd);
   document.body.dataset.tab='today';
   // best practices sheet for mantras
   document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.bpbtn'))openBP()});
@@ -546,42 +549,42 @@ const FEST=[
  {n:'Hanuman Jayanti',sn:'Hanuman',m:'Chaitra',t:14,at:'rise',d:'Hanuman’s birthday, celebrated on the full moon of Chaitra.',how:'Recite the Hanuman Chalisa and offer something sweet.'},
  {n:'Akshaya Tritiya',sn:'Akshaya',m:'Vaishakha',t:2,at:'noon',d:'One of the most auspicious days of the year: what you begin today is said to grow and never fade.',how:'A great day to start something new, buy gold or give in charity, no muhurat needed.'},
  {n:'Buddha Purnima',sn:'Buddha',m:'Vaishakha',t:14,at:'rise',d:'The full moon of Vaishakha, honouring the Buddha’s birth and enlightenment.',how:'A quiet day for kindness, giving and a few minutes of stillness.'},
- {n:'Vat Savitri Vrat',sn:'Vat Savitri',m:'Vaishakha',t:29,at:'rise',d:'Married women fast and pray at a banyan tree for their husband’s long life, remembering Savitri.',how:'Tie a thread around a banyan tree and walk around it; break the fast after the puja.'},
+ {n:'Vat Savitri Vrat',fast:1,who:'married women',sn:'Vat Savitri',m:'Vaishakha',t:29,at:'rise',d:'Married women fast and pray at a banyan tree for their husband’s long life, remembering Savitri.',how:'Tie a thread around a banyan tree and walk around it; break the fast after the puja.'},
  {n:'Ganga Dussehra',sn:'Ganga',m:'Jyeshtha',t:9,at:'rise',d:'The day the Ganga is said to have descended to earth.',how:'A dip in a river, or a little Ganga jal in your bath water, and a prayer for cleansing.'},
- {n:'Nirjala Ekadashi',sn:'Nirjala',m:'Jyeshtha',t:10,at:'rise',d:'The strictest Ekadashi: devotees fast without water. Said to equal all the year’s Ekadashis.',how:'Fast as much as your health allows; giving water or a pot to someone in need is part of the day.'},
+ {n:'Nirjala Ekadashi',fast:1,sn:'Nirjala',m:'Jyeshtha',t:10,at:'rise',d:'The strictest Ekadashi: devotees fast without water. Said to equal all the year’s Ekadashis.',how:'Fast as much as your health allows; giving water or a pot to someone in need is part of the day.'},
  {n:'Jagannath Rath Yatra',sn:'Rath Yatra',m:'Ashadha',t:1,at:'rise',d:'Lord Jagannath’s chariot festival, famous in Puri.',how:'Watch the yatra or offer a simple prayer to Jagannath.'},
- {n:'Devshayani Ekadashi',sn:'Devshayani',m:'Ashadha',t:10,at:'rise',d:'Vishnu begins his four-month rest (Chaturmas). Weddings pause until Dev Uthani Ekadashi.',how:'Fast or eat light and chant a Vishnu mantra. Plan weddings and housewarmings for after Chaturmas.'},
+ {n:'Devshayani Ekadashi',fast:1,sn:'Devshayani',m:'Ashadha',t:10,at:'rise',d:'Vishnu begins his four-month rest (Chaturmas). Weddings pause until Dev Uthani Ekadashi.',how:'Fast or eat light and chant a Vishnu mantra. Plan weddings and housewarmings for after Chaturmas.'},
  {n:'Guru Purnima',sn:'Guru',m:'Ashadha',t:14,at:'rise',d:'A day to honour your teachers and guides.',how:'Thank a teacher, mentor or parent; touch their feet or send them a message.'},
- {n:'Hariyali Teej',sn:'Teej',m:'Shravana',t:2,at:'rise',d:'A monsoon festival of Shiva and Parvati, loved by married women.',how:'Green clothes, mehendi, swings and a prayer to Parvati.'},
+ {n:'Hariyali Teej',fast:1,who:'married women',sn:'Teej',m:'Shravana',t:2,at:'rise',d:'A monsoon festival of Shiva and Parvati, loved by married women.',how:'Green clothes, mehendi, swings and a prayer to Parvati.'},
  {n:'Nag Panchami',sn:'Nag Panchami',m:'Shravana',t:4,at:'rise',d:'A day to honour serpents and the protection they symbolise.',how:'Offer milk at a Shiva temple and pray for your family’s safety.'},
  {n:'Raksha Bandhan',sn:'Rakhi',m:'Shravana',t:14,at:'rise',d:'Sisters tie a rakhi on their brothers’ wrists for protection and love.',how:'Tie the rakhi after Bhadra ends; exchange sweets and gifts.',bhadra:true},
- {n:'Kajari Teej',sn:'Kajari Teej',m:'Shravana',t:17,at:'rise',d:'A monsoon Teej of fasting and folk songs, especially in UP and Bihar.',how:'Married women fast and pray to the neem tree and Parvati.'},
- {n:'Janmashtami',sn:'Janmashtami',m:'Shravana',t:22,at:'mid',d:'Lord Krishna’s birthday, born at midnight.',how:'Fast through the day and break it after the midnight puja, with makhan-mishri.',tm:'mid'},
- {n:'Hartalika Teej',sn:'Hartalika',m:'Bhadrapada',t:2,at:'rise',d:'Women fast for a happy marriage, remembering Parvati’s devotion to Shiva.',how:'A waterless fast for many; evening puja to Shiva and Parvati.'},
+ {n:'Kajari Teej',fast:1,who:'married women',sn:'Kajari Teej',m:'Shravana',t:17,at:'rise',d:'A monsoon Teej of fasting and folk songs, especially in UP and Bihar.',how:'Married women fast and pray to the neem tree and Parvati.'},
+ {n:'Janmashtami',fast:1,sn:'Janmashtami',m:'Shravana',t:22,at:'mid',d:'Lord Krishna’s birthday, born at midnight.',how:'Fast through the day and break it after the midnight puja, with makhan-mishri.',tm:'mid'},
+ {n:'Hartalika Teej',fast:1,who:'women',sn:'Hartalika',m:'Bhadrapada',t:2,at:'rise',d:'Women fast for a happy marriage, remembering Parvati’s devotion to Shiva.',how:'A waterless fast for many; evening puja to Shiva and Parvati.'},
  {n:'Ganesh Chaturthi',sn:'Ganesh',m:'Bhadrapada',t:3,at:'noon',w:2,d:'Ganesha’s birthday and the start of the ten-day Ganeshotsav.',how:'Welcome Ganesha home or visit a pandal; offer modak. Tradition says don’t look at the Moon tonight.',tm:'noon'},
  {n:'Anant Chaturdashi',sn:'Anant',m:'Bhadrapada',t:13,at:'rise',d:'The last day of Ganeshotsav, when Ganesha idols are immersed, and a day for Vishnu.',how:'Tie an anant thread (14 knots) on your arm and pray to Vishnu.'},
  {n:'Pitru Paksha begins',sn:'Pitru Paksha',m:'Bhadrapada',t:15,at:'rise',d:'Fifteen days to remember and thank your ancestors.',how:'Offer water and food in their memory; many avoid big new starts and purchases in these days.'},
  {n:'Sarva Pitru Amavasya',sn:'Mahalaya',m:'Bhadrapada',t:29,at:'rise',d:'The last day of Pitru Paksha, for all ancestors whose date you don’t know.',how:'Offer food to a cow, crows or someone in need in your ancestors’ name.'},
- {n:'Sharad Navratri begins',sn:'Navratri',m:'Ashwin',t:0,at:'rise',d:'Nine nights of the Goddess. Ghatasthapana is done this morning.',how:'Light a lamp for the nine days; many fast or eat satvik food.'},
+ {n:'Sharad Navratri begins',fast:1,sn:'Navratri',m:'Ashwin',t:0,at:'rise',d:'Nine nights of the Goddess. Ghatasthapana is done this morning.',how:'Light a lamp for the nine days; many fast or eat satvik food.'},
  {n:'Durga Ashtami',sn:'Ashtami',m:'Ashwin',t:7,at:'rise',d:'The eighth day of Navratri, for Maha Gauri. Kanya puja is done today or tomorrow.',how:'Invite young girls home, wash their feet and offer them a meal and a gift.'},
  {n:'Maha Navami',sn:'Navami',m:'Ashwin',t:8,at:'aft',d:'The ninth day of Navratri, for Siddhidatri.',how:'Kanya puja and havan to close Navratri.'},
  {n:'Dussehra',sn:'Dussehra',m:'Ashwin',t:9,at:'aft',w:2,d:'Vijayadashami: the victory of good over evil. One of the year’s most auspicious days.',how:'A good day to start something new or buy vehicles and tools; watch Ravan Dahan in the evening.'},
  {n:'Sharad Purnima',sn:'Sharad Purnima',m:'Ashwin',t:14,at:'eve',d:'The brightest full moon of the year, said to shower nectar.',how:'Leave kheer in the moonlight overnight and eat it in the morning.',tm:'moon'},
- {n:'Karva Chauth',sn:'Karva Chauth',m:'Ashwin',t:18,at:'eve',d:'Married women fast from sunrise to moonrise for their husband’s long life.',how:'Sargi before dawn, evening puja, and break the fast after seeing the moon.',tm:'moon'},
- {n:'Ahoi Ashtami',sn:'Ahoi Ashtami',m:'Ashwin',t:22,at:'eve',d:'Mothers fast for the long life and wellbeing of their children, praying to Ahoi Mata.',how:'Draw or place the Ahoi Mata picture, do the evening puja, and break the fast after seeing the stars.',tm:'stars'},
+ {n:'Karva Chauth',fast:1,who:'married women',sn:'Karva Chauth',m:'Ashwin',t:18,at:'eve',d:'Married women fast from sunrise to moonrise for their husband’s long life.',how:'Sargi before dawn, evening puja, and break the fast after seeing the moon.',tm:'moon'},
+ {n:'Ahoi Ashtami',fast:1,who:'mothers',sn:'Ahoi Ashtami',m:'Ashwin',t:22,at:'eve',d:'Mothers fast for the long life and wellbeing of their children, praying to Ahoi Mata.',how:'Draw or place the Ahoi Mata picture, do the evening puja, and break the fast after seeing the stars.',tm:'stars'},
  {n:'Dhanteras',sn:'Dhanteras',m:'Ashwin',t:27,at:'eve',d:'The first day of Diwali, for Dhanvantari and Lakshmi.',how:'Buy something in metal, gold or a new utensil; light a lamp for Yama at the door in the evening.',tm:'pradosh'},
  {n:'Choti Diwali',sn:'Choti Diwali',m:'Ashwin',t:28,at:'rise',w:0,d:'Narak Chaturdashi, the day before Diwali.',how:'An early oil bath before sunrise and a few lamps in the evening.'},
  {n:'Diwali',sn:'Diwali',m:'Ashwin',t:29,at:'eve',w:3,d:'The festival of lights. Lakshmi and Ganesha are worshipped in the evening.',how:'Clean and light up the home; do Lakshmi puja after sunset, in pradosh kaal.',tm:'pradosh'},
  {n:'Govardhan Puja',sn:'Govardhan',m:'Kartik',t:0,at:'rise',d:'Krishna lifting Govardhan hill; Annakut, a mountain of food, is offered.',how:'Offer a variety of dishes to Krishna and share them.'},
  {n:'Bhai Dooj',sn:'Bhai Dooj',m:'Kartik',t:1,at:'rise',d:'Sisters pray for their brothers; brothers visit and bring gifts.',how:'Tilak on the brother’s forehead, a meal together and blessings.'},
  {n:'Chhath Puja',sn:'Chhath',m:'Kartik',t:5,at:'rise',d:'Worship of the Sun and Chhathi Maiya, with offerings at sunset today and sunrise tomorrow.',how:'Arghya to the setting sun from a river or pond; many keep a strict fast.',tm:'sunset'},
- {n:'Dev Uthani Ekadashi',sn:'Dev Uthani',m:'Kartik',t:10,at:'rise',d:'Vishnu wakes from his four-month rest; Tulsi Vivah is celebrated and the wedding season opens.',how:'Fast or eat light, decorate the tulsi plant and light lamps.'},
+ {n:'Dev Uthani Ekadashi',fast:1,sn:'Dev Uthani',m:'Kartik',t:10,at:'rise',d:'Vishnu wakes from his four-month rest; Tulsi Vivah is celebrated and the wedding season opens.',how:'Fast or eat light, decorate the tulsi plant and light lamps.'},
  {n:'Kartik Purnima',sn:'Kartik Purnima',m:'Kartik',t:14,at:'rise',d:'Dev Deepawali, when the gods are said to celebrate Diwali; also Guru Nanak Jayanti.',how:'A holy dip or a bath at sunrise, and lamps in the evening.'},
  {n:'Vivah Panchami',sn:'Vivah',m:'Margashirsha',t:4,at:'rise',d:'The wedding day of Rama and Sita.',how:'Read the Ram–Sita wedding from the Ramayana; a lovely day for couples to pray together.'},
  {n:'Gita Jayanti',sn:'Gita Jayanti',m:'Margashirsha',t:10,at:'rise',d:'The day Krishna spoke the Bhagavad Gita; also Mokshada Ekadashi.',how:'Read one chapter, or even one verse, of the Gita.'},
  {n:'Mauni Amavasya',sn:'Mauni',m:'Pausha',t:29,at:'rise',d:'A day of silence and holy dips, especially at the Sangam.',how:'Keep a little silence today and give warm clothes or food.'},
  {n:'Vasant Panchami',sn:'Vasant',m:'Magha',t:4,at:'rise',d:'Saraswati puja and the arrival of spring.',how:'Wear yellow, pray to Saraswati and begin a new study or skill.'},
- {n:'Maha Shivratri',sn:'Shivratri',m:'Magha',t:28,at:'mid',d:'The great night of Shiva.',how:'Fast, offer water and bel leaves to Shiva and chant Om Namah Shivaya, especially at night.',tm:'mid'},
+ {n:'Maha Shivratri',fast:1,sn:'Shivratri',m:'Magha',t:28,at:'mid',d:'The great night of Shiva.',how:'Fast, offer water and bel leaves to Shiva and chant Om Namah Shivaya, especially at night.',tm:'mid'},
  {n:'Holika Dahan',sn:'Holika',m:'Phalguna',t:14,at:'rise',d:'The bonfire on the eve of Holi, for the victory of devotion over ego.',how:'Walk around the bonfire after Bhadra ends and offer grains and coconut.',tm:'sunset'},
  {n:'Holi',sn:'Holi',m:'Phalguna',t:15,at:'rise',w:2,d:'The festival of colours.',how:'Play with colours, forgive and forget, and share gujiya.'}
 ];
@@ -616,18 +619,25 @@ function festTime(F,r){const [lat,lon]=loc();try{
   if(F.tm==='noon'){const d=(r.set-r.rise)/5;return 'Midday puja '+fmt(new Date(+r.rise+2*d))+' – '+fmt(new Date(+r.rise+3*d))}
  }catch(e){}return ''}
 window.festOf=festOf;
+function festNote(F){const o=[];
+ if(F.who&&GEN==='m')o.push(`Traditionally kept by ${F.who}. You can join the puja, help with the preparations and share the meal after.`);
+ else if(F.who&&GEN==='f'&&MINOR)o.push(`Traditionally kept by ${F.who}. You can join the puja with your family.`);
+ if(F.fast){if(CHILD)o.push('Children don’t need to fast. Join the puja and enjoy the prasad.');else if(MINOR)o.push('At your age a light version is enough: fruit and milk rather than a full fast.');
+  else if(SENIOR)o.push('Keep it light rather than a strict fast, and check with your doctor if you have a health condition.');
+  else if(F.n==='Nirjala Ekadashi')o.push('Skip the waterless fast if you’re pregnant, unwell or on medication; fruit and water are fine.')}
+ return o.join(' ')}
 const TN=['Pratipada','Dwitiya','Tritiya','Chaturthi','Panchami','Shashthi','Saptami','Ashtami','Navami','Dashami','Ekadashi','Dwadashi','Trayodashi','Chaturdashi'];
 function festTithi(F){if(F.t==null)return '';const k=F.t>=15,m=k?MASA_N[(MASA_N.indexOf(F.m)+1)%12]:F.m;return m+' '+(k?'Krishna':'Shukla')+' '+(F.t===14?'Purnima':F.t===29?'Amavasya':TN[F.t%15])}
 // observance() (Ekadashi, Pradosh…) is defined by the page; a festival takes its place on the day it falls
-if(typeof window.observance==='function'){const O=window.observance;window.observance=function(r){const F=ls.get('special',true)?festOf(r):null;if(!F)return O(r);
+if(typeof window.observance==='function'){const O=window.observance;window.observance=function(r){const F=ls.get('special',true)?festOf(r):null;if(!F){const o=O(r);if(o&&o.n==='Ekadashi'&&(MINOR||SENIOR))return Object.assign({},o,{d:CHILD?'A Vishnu day. Children don’t need to fast; a short prayer is enough.':MINOR?'A Vishnu day. A light day of fruit and milk is plenty at your age, or simply skip rice.':'A Vishnu day. Eat light rather than fasting fully: skipping rice and wheat is enough.'});return o}
   const tm=festTime(F,r);return{n:F.sn||F.n,full:F.n,fest:true,d:F.d+' '+F.how+(tm?' '+tm+'.':''),F,tm}}}
 function festCard(){let el=$('festBox');if(!el){const al=$('alerts');if(!al)return;el=document.createElement('div');el.id='festBox';al.parentNode.insertBefore(el,al)}el.innerHTML='';const ds=$('date').value,[lat,lon]=loc(),r=calc(ds,lat,lon),ob=observance(r);if(!ob||!ob.fest)return;
  const isT=ds===todayIST();
- el.innerHTML=`<div class="fest-card"><div class="fc-k">${isT?'Today':'This day'} · ${festTithi(ob.F)||(r.masa.purnimanta+' '+r.tithi.paksha+' '+r.tithi.name)}</div><h3>${ob.full}</h3><p>${ob.F.d}</p><p class="fc-how"><b>How to observe.</b> ${ob.F.how}</p>${ob.tm?`<div class="fc-tm">${ob.tm}</div>`:''}${festAll(r).length>1?`<p class="fc-also">Also ${isT?'today':'this day'}: ${festAll(r).slice(1).map(x=>x.n).join(', ')}</p>`:''}</div>`}
+ el.innerHTML=`<div class="fest-card"><div class="fc-k">${isT?'Today':'This day'} · ${festTithi(ob.F)||(r.masa.purnimanta+' '+r.tithi.paksha+' '+r.tithi.name)}</div><h3>${ob.full}</h3><p>${ob.F.d}</p><p class="fc-how"><b>How to observe.</b> ${ob.F.how}</p>${festNote(ob.F)?`<p class="fc-note">${festNote(ob.F)}</p>`:''}${ob.tm?`<div class="fc-tm">${ob.tm}</div>`:''}${festAll(r).length>1?`<p class="fc-also">Also ${isT?'today':'this day'}: ${festAll(r).slice(1).map(x=>x.n).join(', ')}</p>`:''}</div>`}
 function festAhead(days){const [lat,lon]=loc(),t=todayIST(),L=[];for(let i=0;i<days;i++){const ds=addDays(t,i),r=calc(ds,lat,lon);festAll(r).forEach(F=>{if(!L.some(x=>x.F.n===F.n))L.push({ds,r,F})})}return L}
 function festList(){const L=festAhead(60);if(!L.length)return'';
  return `<h2 class="sec-t">Festivals ahead</h2><div class="card fest-list">${L.slice(0,6).map(({ds,r,F})=>{const d=dObj(ds),n=Math.round((d-dObj(todayIST()))/864e5),tm=festTime(F,r);
-  return `<details class="fl-row"><summary><div class="d"><small>${WDS[r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div class="fl-t"><b>${F.n}</b><small>${n===0?'Today':n===1?'Tomorrow':'In '+n+' days'}</small></div><span class="fl-c" aria-hidden="true">›</span></summary><div class="fl-b"><p>${F.d}</p><p><b>How to observe.</b> ${F.how}</p>${tm?`<p class="fl-tm">${tm}</p>`:''}</div></details>`}).join('')}</div>`}
+  return `<details class="fl-row"><summary><div class="d"><small>${WDS[r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div class="fl-t"><b>${F.n}</b><small>${n===0?'Today':n===1?'Tomorrow':'In '+n+' days'}</small></div><span class="fl-c" aria-hidden="true">›</span></summary><div class="fl-b"><p>${F.d}</p><p><b>How to observe.</b> ${F.how}</p>${festNote(F)?`<p class="fl-note">${festNote(F)}</p>`:''}${tm?`<p class="fl-tm">${tm}</p>`:''}</div></details>`}).join('')}</div>`}
 /* ---------- Month calendar (the calendar button): each day's tone, festivals and vrats; tap a day to open it ---------- */
 const MC={m:0};
 function mcDay(ds){const [lat,lon]=loc(),r=calc(ds,lat,lon),[vc]=verdict(r),fs=festAll(r),ob=fs.length?null:observance(r);return{ds,r,vc,fs,ob}}
