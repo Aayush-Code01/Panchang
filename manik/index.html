@@ -1459,6 +1459,7 @@ if(window.Astronomy)go();else window.addEventListener('load',go);
 <script>if('serviceWorker' in navigator){
 window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{reg.update();
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{})})}).catch(()=>{}))}</script>
+<script src="../guides.js"></script>
 <script src="../features.js"></script>
 </body>
 </html>

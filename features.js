@@ -618,7 +618,7 @@ function festOf(r){return festAll(r)[0]||null}
 const MASA_N=['Chaitra','Vaishakha','Jyeshtha','Ashadha','Shravana','Bhadrapada','Ashwin','Kartik','Margashirsha','Pausha','Magha','Phalguna'];
 function festTime(F,r){const [lat,lon]=loc();try{
   if(F.tm==='moon'){const m=Astronomy.SearchRiseSet('Moon',new Astronomy.Observer(lat,lon,0),+1,new Date(+r.set-2*3600e3),1);return m?'Moonrise around '+fmt(m.date):''}
-  if(F.tm==='stars')return 'Stars are out from about '+fmt(new Date(+r.set+40*60e3));
+  if(F.tm==='stars')return 'Stars are out from about '+fmt(new Date(+r.set+28*60e3));
   if(F.tm==='pradosh')return 'Pradosh kaal '+fmt(r.set)+' – '+fmt(new Date(+r.set+144*60e3));
   if(F.tm==='sunset')return 'Sunset at '+fmt(r.set);
   if(F.tm==='mid'){const next=r.chog[15].b,m=(+r.set+ +next)/2;return 'Midnight puja around '+fmt(new Date(m-24*60e3))+' – '+fmt(new Date(m+24*60e3))}
@@ -639,11 +639,11 @@ if(typeof window.observance==='function'){const O=window.observance;window.obser
   const tm=festTime(F,r);return{n:F.sn||F.n,full:F.n,fest:true,d:F.d+' '+F.how+(tm?' '+tm+'.':''),F,tm}}}
 function festCard(){let el=$('festBox');if(!el){const al=$('alerts');if(!al)return;el=document.createElement('div');el.id='festBox';al.parentNode.insertBefore(el,al)}el.innerHTML='';const ds=$('date').value,[lat,lon]=loc(),r=calc(ds,lat,lon),ob=observance(r);if(!ob||!ob.fest)return;
  const isT=ds===todayIST();
- el.innerHTML=`<div class="fest-card"><div class="fc-k">${isT?'Today':'This day'} · ${festTithi(ob.F)||(r.masa.purnimanta+' '+r.tithi.paksha+' '+r.tithi.name)}</div><h3>${ob.full}</h3><p>${ob.F.d}</p><p class="fc-how"><b>How to observe.</b> ${ob.F.how}</p>${festNote(ob.F)?`<p class="fc-note">${festNote(ob.F)}</p>`:''}${ob.tm?`<div class="fc-tm">${ob.tm}</div>`:''}${festAll(r).length>1?`<p class="fc-also">Also ${isT?'today':'this day'}: ${festAll(r).slice(1).map(x=>x.n).join(', ')}</p>`:''}</div>`}
+ el.innerHTML=`<div class="fest-card"><div class="fc-k">${isT?'Today':'This day'} · ${festTithi(ob.F)||(r.masa.purnimanta+' '+r.tithi.paksha+' '+r.tithi.name)}</div><h3>${ob.full}</h3><p>${ob.F.d}</p><p class="fc-how"><b>How to observe.</b> ${ob.F.how}</p>${festNote(ob.F)?`<p class="fc-note">${festNote(ob.F)}</p>`:''}${ob.tm?`<div class="fc-tm">${ob.tm}</div>`:''}${guideBtn(ob.F,ds)}${festAll(r).length>1?`<p class="fc-also">Also ${isT?'today':'this day'}: ${festAll(r).slice(1).map(x=>x.n).join(', ')}</p>`:''}</div>`}
 function festAhead(days){const [lat,lon]=loc(),t=todayIST(),L=[];for(let i=0;i<days;i++){const ds=addDays(t,i),r=calc(ds,lat,lon);festAll(r).forEach(F=>{if(!L.some(x=>x.F.n===F.n))L.push({ds,r,F})})}return L}
 function festList(){const L=festAhead(60);if(!L.length)return'';
  return `<h2 class="sec-t">Festivals ahead</h2><div class="card fest-list">${L.slice(0,6).map(({ds,r,F})=>{const d=dObj(ds),n=Math.round((d-dObj(todayIST()))/864e5),tm=festTime(F,r);
-  return `<details class="fl-row"><summary><div class="d"><small>${WDS[r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div class="fl-t"><b>${F.n}</b><small>${n===0?'Today':n===1?'Tomorrow':'In '+n+' days'}</small></div><span class="fl-c" aria-hidden="true">›</span></summary><div class="fl-b"><p>${F.d}</p><p><b>How to observe.</b> ${F.how}</p>${festNote(F)?`<p class="fl-note">${festNote(F)}</p>`:''}${tm?`<p class="fl-tm">${tm}</p>`:''}</div></details>`}).join('')}</div>`}
+  return `<details class="fl-row"><summary><div class="d"><small>${WDS[r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div class="fl-t"><b>${F.n}</b><small>${n===0?'Today':n===1?'Tomorrow':'In '+n+' days'}</small></div><span class="fl-c" aria-hidden="true">›</span></summary><div class="fl-b"><p>${F.d}</p><p><b>How to observe.</b> ${F.how}</p>${festNote(F)?`<p class="fl-note">${festNote(F)}</p>`:''}${tm?`<p class="fl-tm">${tm}</p>`:''}${guideBtn(F,ds,'fl-guide')}</div></details>`}).join('')}</div>`}
 /* ---------- Month calendar (the calendar button): each day's tone, festivals and vrats; tap a day to open it ---------- */
 const MC={m:0};
 function mcDay(ds){const [lat,lon]=loc(),r=calc(ds,lat,lon),[vc]=verdict(r),fs=festAll(r),ob=fs.length?null:observance(r);return{ds,r,vc,fs,ob}}
@@ -657,7 +657,7 @@ function mcDraw(){const o=$('mcOv');if(!o)return;const t=todayIST(),sel=$('date'
  o.querySelector('.mc-body').innerHTML=`<div class="mc-h"><button type="button" class="cnav" data-m="-1" aria-label="Previous month">‹</button><b>${first.toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'UTC'})}</b><button type="button" class="cnav" data-m="1" aria-label="Next month">›</button></div>
   <div class="mc-g mc-wk">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="mc-g">${g}</div>
   <div class="mc-key"><span><i style="background:var(--good)"></i>Good</span><span><i style="background:var(--best)"></i>Balanced</span><span><i style="background:var(--avoid)"></i>Take it easy</span><span><i class="fk"></i>Festival</span></div>
-  ${fl.length?`<h3 class="mc-st">Festivals this month</h3><div class="mc-fl">${fl.map(({x,F})=>{const d=dObj(x.ds);return`<button type="button" class="mc-f" data-d="${x.ds}"><span class="d"><small>${WDS[x.r.wd]}</small><b>${d.getUTCDate()}</b></span><span class="t"><b>${F.n}</b><small>${F.d}</small></span><span class="go" aria-hidden="true">›</span></button>`}).join('')}</div>`:''}`;
+  ${fl.length?`<h3 class="mc-st">Festivals this month</h3><div class="mc-fl">${fl.map(({x,F})=>{const d=dObj(x.ds);return`<button type="button" class="mc-f" data-d="${x.ds}"><span class="d"><small>${WDS[x.r.wd]}</small><b>${d.getUTCDate()}</b></span><span class="t"><b>${F.n}</b><small>${F.d}</small></span><span class="go" aria-hidden="true">›</span></button><button type="button" class="mc-gd" data-guide="${esc(F.n)}" data-gd="${x.ds}" aria-label="${esc(F.n)} puja guide">${GD_IC}</button>`}).join('')}</div>`:''}`;
  o.querySelectorAll('.cnav').forEach(b=>b.onclick=()=>{haptic();MC.m=Math.max(-12,Math.min(12,MC.m+ +b.dataset.m));o.querySelector('.mc-body').classList.add('busy');setTimeout(mcDraw,16)});
  o.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{haptic();$('date').value=b.dataset.d;mcClose();go(false);if(typeof setTab==='function')setTab('today');scrollTo(0,0)});
  o.querySelector('.mc-body').classList.remove('busy')}
@@ -673,6 +673,43 @@ window.mcOpen=mcOpen;
 // the calendar button opens this instead of the phone's plain date picker
 {const pill=document.querySelector('label.pill[aria-label="Pick any date"]');if(pill){const inp=pill.querySelector('input');if(inp){inp.tabIndex=-1;inp.style.pointerEvents='none'}
  pill.setAttribute('role','button');pill.tabIndex=0;pill.addEventListener('click',e=>{e.preventDefault();haptic();mcOpen()});pill.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mcOpen()}})}}
+/* ---------- Puja guide sheet: best times for your place, what you need, vidhi, mantra, fast, story ---------- */
+function guideTimes(keys,r,F){const out=[],rg=(a,b)=>fmt(a)+' – '+fmt(b),day=r.set-r.rise,dmu=day/15,next=r.chog[15].b,mid=(+r.set+ +next)/2,[lat,lon]=loc();
+ const T={evePuja:()=>['Puja time',rg(r.set,new Date(+r.set+78*60e3))],stars:()=>['Stars visible from about',fmt(new Date(+r.set+28*60e3))],
+  moon:()=>{try{const m=Astronomy.SearchRiseSet('Moon',new Astronomy.Observer(lat,lon,0),+1,new Date(+r.set-2*3600e3),1);return m?['Moonrise',fmt(m.date)]:null}catch(e){return null}},
+  sargi:()=>['Sargi, before sunrise',rg(r.brahma[0],r.rise)],pradosh:()=>['Pradosh kaal',rg(r.set,new Date(+r.set+144*60e3))],
+  nishita:()=>['Midnight (Nishita) puja',rg(new Date(mid-24*60e3),new Date(mid+24*60e3))],
+  noon:()=>['Midday (Madhyahna) muhurat',rg(new Date(+r.rise+day*.4),new Date(+r.rise+day*.6))],aft:()=>['Afternoon (Aparahna)',rg(new Date(+r.rise+day*.6),new Date(+r.rise+day*.8))],
+  morning:()=>['Morning muhurat',rg(r.rise,new Date(+r.rise+day*.2))],morningT:()=>['Ghatasthapana muhurat',rg(r.rise,new Date(+r.rise+day/3))],
+  purvahna:()=>['Puja muhurat',rg(r.rise,new Date(+r.rise+day*.5))],abhijit:()=>r.abhijitValid?['Abhijit muhurat',rg(r.abhijit[0],r.abhijit[1])]:null,
+  vijay:()=>['Vijay muhurat',rg(new Date(+r.rise+10*dmu),new Date(+r.rise+11*dmu))],kutup:()=>['Kutup and Rohina muhurat',rg(new Date(+r.rise+7*dmu),new Date(+r.rise+9*dmu))],
+  sunsetW:()=>['Sunset',fmt(r.set)],nextrise:()=>['Sunrise tomorrow',fmt(next)],brahma:()=>['Before sunrise (Brahma muhurat)',rg(r.brahma[0],r.brahma[1])],
+  sandhi:()=>r.tithi.idx===7&&r.tithi.end?['Sandhi puja',rg(new Date(+r.tithi.end-24*60e3),new Date(+r.tithi.end+24*60e3))]:null,
+  prahar:()=>{const q=(next-r.set)/4;return['Four prahars of the night',[0,1,2,3].map(i=>rg(new Date(+r.set+i*q),new Date(+r.set+(i+1)*q))).join(' · ')]}};
+ keys.forEach(k=>{const v=T[k]&&T[k]();if(v)out.push(v)});
+ if(!out.length){const tm=festTime(F,r);if(tm)out.push(['Timing',tm.replace(/^[A-Z][a-z]+ [a-z ]*?(around|at|from about) /,'')])}
+ if(!out.length)out.push(['Sunrise',fmt(r.rise)],['Sunset',fmt(r.set)]);return out}
+function openGuide(name,ds){const F=FEST.concat(SANK).find(x=>x.n===name);if(!F)return;const [lat,lon]=loc(),r=calc(ds,lat,lon),G=(window.GUIDE||{})[name]||{},T=guideTimes(G.times||[],r,F),note=festNote(F);
+ const steps=G.steps||['Bathe and wear clean clothes; light a diya and incense at your puja place.','Offer water, flowers and a little sweet bhog.',F.how,'Do the aarti and share the prasad.'];
+ let o=$('gdOv');if(!o){o=document.createElement('div');o.id='gdOv';o.className='mcov gdov';o.hidden=true;o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');
+  o.innerHTML='<div class="mc-scrim"></div><div class="mc-sheet"><div class="mc-grab"></div><div class="mc-top"><b>Puja guide</b><button type="button" class="mc-x" aria-label="Close">✕</button></div><div class="gd-body"></div></div>';document.body.appendChild(o);
+  const cl=()=>{o.classList.remove('on');document.documentElement.classList.remove('sh-lock');setTimeout(()=>{o.hidden=true},280)};o.querySelector('.mc-scrim').onclick=cl;o.querySelector('.mc-x').onclick=()=>{haptic();cl()}}
+ o.setAttribute('aria-label',name+' puja guide');
+ o.querySelector('.gd-body').innerHTML=`<div class="gd-hero"><div class="fc-k">${dObj(ds).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}${festTithi(F)?' · '+festTithi(F):''}</div><h2>${F.n}</h2><p>${F.d}</p></div>
+  <h3 class="gd-h">Best time <small>for ${esc($('cityName')?$('cityName').textContent.replace(/ · IST$/,''):'your place')}</small></h3><div class="gd-times">${T.map(([k,v])=>`<div><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+  ${G.need?`<h3 class="gd-h">What you need</h3><ul class="gd-need">${G.need.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}
+  <h3 class="gd-h">Puja vidhi</h3><ol class="gd-steps">${steps.map(x=>`<li>${x}</li>`).join('')}</ol>
+  ${G.mantra?`<h3 class="gd-h">Mantra</h3><div class="sh-verse"><div class="dv">${G.mantra.dv}</div><div class="tr">${G.mantra.tr}</div><div class="mn">${G.mantra.mn} Chant 11 or 108 times.</div></div>`:''}
+  ${G.fast||F.fast?`<h3 class="gd-h">The fast</h3><p class="gd-p">${G.fast||'Many keep a fast or eat light today, with fruit and milk.'}</p>`:''}
+  ${note?`<p class="gd-note">${note}</p>`:''}
+  ${G.avoid?`<h3 class="gd-h">Keep in mind</h3><ul class="gd-need">${G.avoid.map(x=>`<li>${x}</li>`).join('')}</ul>`:''}
+  ${G.katha?`<h3 class="gd-h">The story</h3><p class="gd-p">${G.katha}</p>`:''}
+  <p class="gd-foot">Traditions vary by family and region. Where your elders do it differently, follow their way.</p>`;
+ o.hidden=false;document.documentElement.classList.add('sh-lock');o.querySelector('.mc-sheet').scrollTop=0;requestAnimationFrame(()=>o.classList.add('on'))}
+window.openGuide=openGuide;
+const GD_IC='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3c-1.6 2.2-1.6 3.6 0 5 1.6-1.4 1.6-2.8 0-5zM5 12.5c2.3 0 4.6.9 7 2.6 2.4-1.7 4.7-2.6 7-2.6-.4 4-3.3 7-7 7s-6.6-3-7-7z" fill="currentColor"/></svg>';
+function guideBtn(F,ds,cls='fc-guide'){return `<button type="button" class="${cls}" data-guide="${esc(F.n)}" data-gd="${ds}">${GD_IC}<span>Puja guide &amp; best time</span><i aria-hidden="true">›</i></button>`}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-guide]');if(!b)return;e.preventDefault();e.stopPropagation();haptic();openGuide(b.dataset.guide,b.dataset.gd)},true);
 /* ---------- Make it shubh: when the time isn't right but the work can't wait ----------
    Tradition: remember Ganesha before any beginning, recite "Tadeva lagnam" (said before ceremonies so that whatever the hour,
    it becomes auspicious), begin with something sweet and step out right foot first. A calm 2-minute guided flow. */
