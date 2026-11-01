@@ -169,7 +169,7 @@ h1{margin:2px 0 0;font-family:var(--serif);font-size:44px;line-height:1.02;white
 .tl-now{position:absolute;top:-7px;width:2px;height:34px;background:var(--ink);border-radius:1px;transform:translateX(-1px)}
 .tl-now::before{content:"";position:absolute;top:-4px;left:50%;width:10px;height:10px;border-radius:50%;background:var(--ink);transform:translateX(-50%);box-shadow:0 0 0 2.5px var(--card-solid)}
 .tl-lab{position:absolute;left:0;right:0;top:26px;height:16px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-.tl-lab .tl-l0{transform:none;font-weight:700;color:var(--ink)}
+.tl-lab .tl-l0{font-weight:700;color:var(--ink)}
 .tl-lab span{position:absolute;transform:translateX(-50%);white-space:nowrap}
 .tl-sun{position:absolute;top:-3px;width:0;height:26px;border-left:2px dotted var(--best-ink);transform:translateX(-1px)}
 .tl-lift{position:absolute;top:-8px;height:36px;border-radius:10px;box-shadow:0 8px 18px -4px rgba(26,33,38,.3),0 0 0 2.5px var(--card-solid);pointer-events:none;z-index:3;transition:left .12s ease,width .12s ease,background .12s}
@@ -924,15 +924,16 @@ function calc(ds,lat,lon){const k=ds+lat+','+lon+(tzDev()?'d':'i');if(!cache[k])
 function bar(r,S0,isToday){
   // today: the bar starts at the current time and the rest of the day fills it; other days run sunrise to sunrise
   const now=Date.now(),live=isToday&&now>+r.rise&&S0.length&&now<S0[S0.length-1].b-30*60e3;
-  const t0=live?now:+r.rise,S=live?S0.filter(g=>g.b>t0).map(g=>Object.assign({},g,{a:Math.max(g.a,t0)})):S0;
+  // keep a short greyed lead-in so Now sits about 12% in, not on the edge
+  const end0=S0.length?S0[S0.length-1].b:+r.set,t0=live?Math.max(+r.rise,now-(end0-now)*.136):+r.rise,S=live?S0.filter(g=>g.b>t0).map(g=>Object.assign({},g,{a:Math.max(g.a,t0)})):S0;
   const t1=S.length?S[S.length-1].b:+r.set,span=t1-t0,pc=t=>((t-t0)/span*100);
   let h='<div class="tl-track">';
   S.forEach(g=>{h+=`<div class="tl-seg" style="left:${pc(g.a)}%;width:${pc(g.b)-pc(g.a)}%;background:${C[g.cls]}" title="${LBL[g.cls]} ${fmt(g.a)}–${fmt(g.b)}"></div>`});
-  if(isToday&&!live&&now>t0)h+=`<div class="tl-past" style="width:${Math.min(100,pc(now))}%"></div>`;
+  if(isToday&&now>t0)h+=`<div class="tl-past" style="width:${Math.min(100,pc(now))}%"></div>`;
   h+='</div>';
   if(isToday&&now>=t0&&now<t1)h+=`<div class="tl-now" style="left:${pc(now)}%" title="Now"></div>`;
-  const x=ist(r.rise),hs=span/36e5,step=hs>15?4:hs>8?3:hs>4?2:1;let lab=live?'<span class="tl-l0" style="left:0">Now</span>':'';
-  for(let hr=0;hr<=54;hr++){if(hr%step)continue;const t=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate(),hr)-tzDay(x.getUTCFullYear(),x.getUTCMonth()+1,x.getUTCDate())*3600e3;if(t<t0||t>t1||(live&&pc(t)<9)||pc(t)>97)continue;
+  const x=ist(r.rise),hs=span/36e5,step=hs>15?4:hs>8?3:hs>4?2:1;let lab=live?`<span class="tl-l0" style="left:${pc(now)}%">Now</span>`:'';
+  for(let hr=0;hr<=54;hr++){if(hr%step)continue;const t=Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate(),hr)-tzDay(x.getUTCFullYear(),x.getUTCMonth()+1,x.getUTCDate())*3600e3;if(t<t0||t>t1||(live&&Math.abs(pc(t)-pc(now))<10)||pc(t)<3||pc(t)>97)continue;
     lab+=`<span style="left:${pc(t)}%">${hr%12||12}${(hr%24)<12?'am':'pm'}</span>`}
   const sm=+r.set>t0?`<div class="tl-sun" style="left:${pc(+r.set)}%" title="Sunset ${fmt(r.set)}"></div>`:'';
   $('tl').innerHTML=h+sm+`<div class="tl-lab">${lab}</div><div class="tl-lift" id="tlLift" hidden></div><div class="tl-bub" id="tlBub" hidden></div>`;
