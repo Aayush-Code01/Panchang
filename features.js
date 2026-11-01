@@ -193,14 +193,14 @@ function drawCal(){const box=$('calBox');if(!box)return;const a=(ACT[CAL.k]||{a:
   const key=CAL.k+CAL.id+y+'-'+mo+loc().join();let days=CAL.cache[key];
   if(!days){days=[];for(let d=1;d<=nd;d++){const ds=new Date(Date.UTC(y,mo,d)).toISOString().slice(0,10);days.push([ds,dayInfo(ds,a)])}CAL.cache[key]=days}
   let g='';for(let i=0;i<first.getUTCDay();i++)g+='<span></span>';
-  days.forEach(([ds,inf])=>{g+=`<button type="button" class="cd lv-${inf.lv}${ds===t?' tdy':''}${ds===CAL.sel?' sel':''}" data-d="${ds}"${inf.lv==='past'?' disabled':''}>${+ds.slice(8)}</button>`});
+  days.forEach(([ds,inf])=>{const fz=inf.r?festOf(inf.r):null;g+=`<button type="button" class="cd lv-${inf.lv}${ds===t?' tdy':''}${ds===CAL.sel?' sel':''}${fz?' fz':''}" data-d="${ds}"${inf.lv==='past'?' disabled':''}${fz?` title="${fz.n}"`:''}>${+ds.slice(8)}</button>`});
   const nb=days.filter(x=>x[1].lv==='best').length,ng=days.filter(x=>x[1].lv==='good').length;
   let det='';if(CAL.sel){const f=days.find(x=>x[0]===CAL.sel);if(f){const inf=f[1],[l]=LV[inf.lv]||['',''];
-    det=`<div class="cdet"><div class="cdh"><b>${dObj(CAL.sel).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}</b><span class="tq ${inf.lv==='best'||inf.lv==='good'?'k-good':inf.lv==='avoid'?'k-slow':'k-mixed'}">${l}</span></div>
+    const fz=inf.r?festOf(inf.r):null;det=`<div class="cdet">${fz?`<div class="cfz">${fz.n}</div>`:''}<div class="cdh"><b>${dObj(CAL.sel).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}</b><span class="tq ${inf.lv==='best'||inf.lv==='good'?'k-good':inf.lv==='avoid'?'k-slow':'k-mixed'}">${l}</span></div>
      <p>${inf.w&&inf.w.length?`Best window <b>${hm(inf.w[0].a)} – ${fmt(inf.w[0].b)}</b>${inf.w[1]?`, also ${hm(inf.w[1].a)} – ${fmt(inf.w[1].b)}`:''}. ${inf.why.slice(0,3).join(' · ')}`:inf.lv==='avoid'?'Traditionally not a good day for this. Pick a green or gold day instead.':'An ordinary day for this. Fine for small steps, but a green or gold day is better for the big moment.'}</p></div>`}}
   box.innerHTML=`<div class="calh"><button type="button" class="cnav" data-m="-1" ${CAL.m<=0?'disabled':''} aria-label="Previous month">‹</button><div><b>${first.toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'UTC'})}</b><small>${nb} best · ${ng} good day${ng===1?'':'s'}</small></div><button type="button" class="cnav" data-m="1" ${CAL.m>=11?'disabled':''} aria-label="Next month">›</button></div>
    <div class="cgr cwk">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cgr">${g}</div>
-   <div class="wkey" style="justify-content:center"><span><i style="background:var(--best)"></i>Best</span><span><i style="background:var(--good)"></i>Good</span><span><i style="background:var(--line-strong)"></i>Okay</span><span><i style="background:var(--avoid)"></i>Avoid</span></div>${det}`;
+   <div class="wkey" style="justify-content:center"><span><i style="background:var(--best)"></i>Best</span><span><i style="background:var(--good)"></i>Good</span><span><i style="background:var(--line-strong)"></i>Okay</span><span><i style="background:var(--avoid)"></i>Avoid</span><span><i class="fk"></i>Festival</span></div>${det}`;
   box.querySelectorAll('.cnav').forEach(b=>b.onclick=()=>{CAL.m=Math.max(0,Math.min(11,CAL.m+ +b.dataset.m));CAL.sel=null;box.innerHTML='<div class="calload">Working out the month…</div>';setTimeout(drawCal,20)});
   box.querySelectorAll('.cd:not([disabled])').forEach(b=>b.onclick=()=>{CAL.sel=CAL.sel===b.dataset.d?null:b.dataset.d;drawCal();const d=box.querySelector('.cdet');if(d){const r=d.getBoundingClientRect();if(r.bottom>innerHeight-110)scrollBy({top:r.bottom-innerHeight+130,behavior:'smooth'})}})}
 const CMP={a:'me',b:'',nb:{name:'',dob:'',time:'',place:'28.4595,77.0266'},res:null};
@@ -628,6 +628,35 @@ function festAhead(days){const [lat,lon]=loc(),t=todayIST(),L=[];for(let i=0;i<d
 function festList(){const L=festAhead(60);if(!L.length)return'';
  return `<h2 class="sec-t">Festivals ahead</h2><div class="card fest-list">${L.slice(0,6).map(({ds,r,F})=>{const d=dObj(ds),n=Math.round((d-dObj(todayIST()))/864e5),tm=festTime(F,r);
   return `<details class="fl-row"><summary><div class="d"><small>${WDS[r.wd]}</small><b>${d.getUTCDate()}</b><small>${d.toLocaleDateString('en-IN',{month:'short',timeZone:'UTC'})}</small></div><div class="fl-t"><b>${F.n}</b><small>${n===0?'Today':n===1?'Tomorrow':'In '+n+' days'}</small></div><span class="fl-c" aria-hidden="true">›</span></summary><div class="fl-b"><p>${F.d}</p><p><b>How to observe.</b> ${F.how}</p>${tm?`<p class="fl-tm">${tm}</p>`:''}</div></details>`}).join('')}</div>`}
+/* ---------- Month calendar (the calendar button): each day's tone, festivals and vrats; tap a day to open it ---------- */
+const MC={m:0};
+function mcDay(ds){const [lat,lon]=loc(),r=calc(ds,lat,lon),[vc]=verdict(r),fs=festAll(r),ob=fs.length?null:observance(r);return{ds,r,vc,fs,ob}}
+function mcDraw(){const o=$('mcOv');if(!o)return;const t=todayIST(),sel=$('date').value,t0=dObj(t),first=new Date(Date.UTC(t0.getUTCFullYear(),t0.getUTCMonth()+MC.m,1)),
+  y=first.getUTCFullYear(),mo=first.getUTCMonth(),nd=new Date(Date.UTC(y,mo+1,0)).getUTCDate(),days=[];
+ for(let d=1;d<=nd;d++)days.push(mcDay(new Date(Date.UTC(y,mo,d)).toISOString().slice(0,10)));
+ let g='';for(let i=0;i<first.getUTCDay();i++)g+='<span></span>';
+ days.forEach(x=>{const lab=x.fs.length?(x.fs[0].sn||x.fs[0].n):x.ob?x.ob.n:'';
+  g+=`<button type="button" class="mc-d v-${x.vc}${x.ds===t?' tdy':''}${x.ds===sel?' sel':''}${x.fs.length?' has-f':''}" data-d="${x.ds}" aria-label="${dObj(x.ds).toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'})}${lab?', '+lab:''}"><b>${+x.ds.slice(8)}</b><i class="dot"></i>${lab?`<small>${lab}</small>`:''}</button>`});
+ const fl=days.flatMap(x=>x.fs.map(F=>({x,F})));
+ o.querySelector('.mc-body').innerHTML=`<div class="mc-h"><button type="button" class="cnav" data-m="-1" aria-label="Previous month">‹</button><b>${first.toLocaleDateString('en-IN',{month:'long',year:'numeric',timeZone:'UTC'})}</b><button type="button" class="cnav" data-m="1" aria-label="Next month">›</button></div>
+  <div class="mc-g mc-wk">${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="mc-g">${g}</div>
+  <div class="mc-key"><span><i style="background:var(--good)"></i>Good</span><span><i style="background:var(--best)"></i>Balanced</span><span><i style="background:var(--avoid)"></i>Take it easy</span><span><i class="fk"></i>Festival</span></div>
+  ${fl.length?`<h3 class="mc-st">Festivals this month</h3><div class="mc-fl">${fl.map(({x,F})=>{const d=dObj(x.ds);return`<button type="button" class="mc-f" data-d="${x.ds}"><span class="d"><small>${WDS[x.r.wd]}</small><b>${d.getUTCDate()}</b></span><span class="t"><b>${F.n}</b><small>${F.d}</small></span><span class="go" aria-hidden="true">›</span></button>`}).join('')}</div>`:''}`;
+ o.querySelectorAll('.cnav').forEach(b=>b.onclick=()=>{haptic();MC.m=Math.max(-12,Math.min(12,MC.m+ +b.dataset.m));o.querySelector('.mc-body').classList.add('busy');setTimeout(mcDraw,16)});
+ o.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{haptic();$('date').value=b.dataset.d;mcClose();go(false);if(typeof setTab==='function')setTab('today');scrollTo(0,0)});
+ o.querySelector('.mc-body').classList.remove('busy')}
+function mcClose(){const o=$('mcOv');if(!o)return;o.classList.remove('on');document.documentElement.classList.remove('sh-lock');setTimeout(()=>{o.hidden=true},280)}
+function mcOpen(){let o=$('mcOv');if(!o){o=document.createElement('div');o.id='mcOv';o.className='mcov';o.hidden=true;o.setAttribute('role','dialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Calendar');
+  o.innerHTML='<div class="mc-scrim"></div><div class="mc-sheet"><div class="mc-grab"></div><div class="mc-top"><b>Calendar</b><button type="button" class="mc-today">Today</button><button type="button" class="mc-x" aria-label="Close">✕</button></div><div class="mc-body"></div></div>';
+  document.body.appendChild(o);o.querySelector('.mc-scrim').onclick=mcClose;o.querySelector('.mc-x').onclick=()=>{haptic();mcClose()};
+  o.querySelector('.mc-today').onclick=()=>{haptic();MC.m=0;$('date').value=todayIST();mcClose();go(false);scrollTo(0,0)}}
+ const sel=$('date').value||todayIST(),t0=dObj(todayIST()),s0=dObj(sel);MC.m=(s0.getUTCFullYear()-t0.getUTCFullYear())*12+s0.getUTCMonth()-t0.getUTCMonth();
+ o.hidden=false;document.documentElement.classList.add('sh-lock');o.querySelector('.mc-body').innerHTML='<div class="calload">Working out the month…</div>';
+ requestAnimationFrame(()=>{o.classList.add('on');setTimeout(mcDraw,30)})}
+window.mcOpen=mcOpen;
+// the calendar button opens this instead of the phone's plain date picker
+{const pill=document.querySelector('label.pill[aria-label="Pick any date"]');if(pill){const inp=pill.querySelector('input');if(inp){inp.tabIndex=-1;inp.style.pointerEvents='none'}
+ pill.setAttribute('role','button');pill.tabIndex=0;pill.addEventListener('click',e=>{e.preventDefault();haptic();mcOpen()});pill.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mcOpen()}})}}
 /* ---------- Make it shubh: when the time isn't right but the work can't wait ----------
    Tradition: remember Ganesha before any beginning, recite "Tadeva lagnam" (said before ceremonies so that whatever the hour,
    it becomes auspicious), begin with something sweet and step out right foot first. A calm 2-minute guided flow. */
