@@ -325,8 +325,14 @@ function drawBreath(){const box=$('breathBox');if(!box)return;const ds=todayIST(
   box.querySelectorAll('[data-b]').forEach(x=>x.onclick=()=>openBreath(BR.find(b=>b.id===x.dataset.b)))}
 let BS=null,BWL=null;
 function brOverlay(){let o=$('brOv');if(o)return o;o=document.createElement('div');o.id='brOv';o.className='brov';o.hidden=true;document.body.appendChild(o);return o}
-function tone(f){try{audioInit();if(!AC||!ls.get('brSound',true))return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.05);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+1.7)}catch(e){}}
-function endChime(){try{audioInit();if(!AC)return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(_){}const out=AC.createGain();out.gain.value=.6;out.connect(AC.destination);const t0=AC.currentTime+.05;
+// a soft bell with a few partials, through a limiter, so it carries on phone speakers; plays even on silent like the chanting bell
+let BUS=null;function bus(){if(BUS&&BUS.context===AC)return BUS;const c=AC.createDynamicsCompressor();c.threshold.value=-10;c.knee.value=6;c.ratio.value=8;c.attack.value=.003;c.release.value=.25;
+ const g=AC.createGain();g.gain.value=1.6;c.connect(g);g.connect(AC.destination);BUS=c;return c}
+function tone(f){try{audioInit();if(!AC||!ls.get('brSound',true))return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(_){}if(AC.state==='suspended')AC.resume();
+ const t=AC.currentTime+.02,f2=f*1.5,out=bus();
+ [[1,.55,2.2],[2,.18,1.4],[3.01,.08,.9],[5.4,.03,.5]].forEach(([m,g,d])=>{const o=AC.createOscillator(),v=AC.createGain();o.type='sine';o.frequency.value=f2*m;
+  v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(g,t+.012);v.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(v);v.connect(out);o.start(t);o.stop(t+d+.05)})}catch(e){}}
+function endChime(){try{audioInit();if(!AC)return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(_){}const out=AC.createGain();out.gain.value=1.1;out.connect(bus());const t0=AC.currentTime+.05;
   [[523.25,0],[659.25,.22],[783.99,.44],[1046.5,.7]].forEach(([f,dt])=>{[[1,.22,2.6],[2.76,.05,1.2]].forEach(([m,g,d])=>{const o=AC.createOscillator(),v=AC.createGain();o.type='sine';o.frequency.value=f*m;v.gain.setValueAtTime(0,t0+dt);v.gain.linearRampToValueAtTime(g,t0+dt+.01);v.gain.exponentialRampToValueAtTime(.0001,t0+dt+d);o.connect(v);v.connect(out);o.start(t0+dt);o.stop(t0+dt+d+.05)})});
   if(navigator.vibrate)navigator.vibrate([30,80,30,80,60]);setTimeout(()=>{try{if(navigator.audioSession)navigator.audioSession.type='auto'}catch(_){}},5000)}catch(e){}}
 function openBreath(b){const o=brOverlay();const mins=ls.get('brMins',3);o.style.setProperty('--c1',b.c[0]);o.style.setProperty('--c2',b.c[1]);o.classList.toggle('shunya',!!ls.get('shunya',false));
